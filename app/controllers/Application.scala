@@ -56,8 +56,8 @@ class Application @Inject() (userDAO: UserDAO)(implicit executionContext: Execut
     result.fold(
       errors => BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors))),
       user => {
-        // probleme avec doublon et autre
-        userDAO.insert(user).map(_ => ())
+        // TODO : probleme avec doublon et autre (aucun erreur levee)
+        userDAO.insert(user)
 
         Ok(Json.obj("status" -> "OK", "message" -> (user.email + ":" + user.password + " created")))
       }
