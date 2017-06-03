@@ -1,6 +1,5 @@
 package controllers
 
-import java.sql.SQLIntegrityConstraintViolationException
 import javax.inject.Inject
 
 import dao.UserDAO
@@ -20,7 +19,7 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
       (JsPath \ "email").read[String] and
       (JsPath \ "password").read[String] and
       (JsPath \ "currency").read[String]
-    )(User.apply _)
+    ) (User.apply _)
 
   implicit val userWrites: Writes[User] = (
     (JsPath \ "lastName").write[String] and
@@ -28,15 +27,7 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
       (JsPath \ "email").write[String] and
       (JsPath \ "password").write[String] and
       (JsPath \ "currency").write[String]
-    )(unlift(User.unapply))
-
-  def index = Action {
-    Ok(views.html.index("Hello World !"))
-  }
-
-  def admin = Action {
-    Ok(views.html.index("Test Admin !"))
-  }
+    ) (unlift(User.unapply))
 
   /*def login: Action[JsValue] = Action(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[LoginForm]
@@ -62,11 +53,11 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
       },
       user => {
         userDAO.insert(user).map { _ =>
-          Ok(Json.obj("status" -> "OK", "message" -> (user.email + ":" + user.password + " created")))
+          Ok(Json.obj("status" -> "OK", "message" -> "user '%s' created".format(user.email)))
         }.recover {
           // case in an error of conflict with the user email
           case e: SQLiteException if e.getResultCode.code == Const.SQLiteUniqueConstraintErrorCode =>
-            Conflict(Json.obj("status" -> "ERROR", "message" -> "'%s' email already exists".format(user.email)))
+            Conflict(Json.obj("status" -> "ERROR", "message" -> "user '%s' already exists".format(user.email)))
         }
       }
     )
