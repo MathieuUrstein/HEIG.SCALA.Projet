@@ -1,5 +1,7 @@
 package utils
 
 object Const {
-  val SQLiteUniqueConstraintErrorCode = 2067
+  final val DbName = "piggybank"
+
+  final val SQLiteUniqueConstraintErrorCode = 2067
 }
