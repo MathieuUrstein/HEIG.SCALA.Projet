@@ -1,0 +1,518 @@
+swagger: "2.0"
+
+info:
+  version: "0.1"
+  title: PiggyBank API
+
+basePath: /api
+schemes: [http]
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /register:
+    post:
+      summary: Register a new PiggyBank user
+      parameters:
+        - name: User
+          in: body
+          description: The piggybank user to be created
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        201:
+          description: Successful
+          headers:
+            Authorization:
+              description: The api_key token
+              type: string
+        400:
+          description: Field missing
+        409:
+          description: Error email already exist
+  /auth:
+    post:
+      summary: Logs an user in
+      parameters:
+        - name: Credentials
+          in: body
+          description: The credentials of the user
+          required: true
+          schema:
+            $ref: "#/definitions/Credentials"
+      responses:
+        201:
+          description: Successful
+          headers:
+            Authorization:
+              description: The api_key token
+              type: string
+        400:
+          description: User already authenticated
+        401:
+          description: Authentication failed
+  /user:
+    get:
+      summary: Get authenticated user details
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/UserPublic"
+      security:
+        - api_key: []
+    patch:
+      summary: Update authenticated user details
+      parameters:
+        - name: UserPatch
+          in: body
+          description: The user edited values
+          required: true
+          schema:
+            $ref: "#/definitions/UserPatch"
+      responses:
+        200:
+          description: OK
+      security:
+        - api_key: []
+    delete:
+      summary: Remove authenticated user
+      responses:
+        200:
+          description: OK
+      security:
+        - api_key: []
+  /transactions:
+    get:
+      summary: Get all transactions of the authenticated user
+      parameters:
+        - name: Date
+          in: body
+          required: true
+          schema:
+            properties:
+              from:
+                $ref: "#/definitions/Date"
+              to:
+                $ref: "#/definitions/Date"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Transaction"
+      security:
+        - api_key: []
+    post:
+      summary: Create a new transaction
+      parameters:
+        - name: Transaction
+          in: body
+          description: The info of the transaction
+          required: true
+          schema:
+            $ref: "#/definitions/TransactionPost"
+      responses:
+        201:
+          description: Successful
+        400:
+          description: Field missing
+  /transactions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: number
+    get:
+      summary: Retrieve the transaction from the ID
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Transaction"
+        404:
+          description: Error transaction not found
+      security:
+        - api_key: []
+    patch:
+      summary: Update transaction details
+      parameters:
+        - name: TransactionPatch
+          in: body
+          description: The transaction edited values with the ID
+          required: true
+          schema:
+            $ref: "#/definitions/TransactionPatch"
+      responses:
+        200:
+          description: OK
+        404:
+          description: Error transaction not found
+      security:
+        - api_key: []
+    delete:
+      summary: Remove the transaction with the ID
+      responses:
+        200:
+          description: OK
+        404:
+          description: Error transaction not found
+      security:
+        - api_key: []
+  /exchanges:
+    get:
+      summary: Get all exchanges of the authenticated user
+      parameters:
+        - name: Date
+          in: body
+          required: true
+          schema:
+            properties:
+              from:
+                $ref: "#/definitions/Date"
+              to:
+                $ref: "#/definitions/Date"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Exchange"
+      security:
+        - api_key: []
+    post:
+      summary: Create a new exchange
+      parameters:
+        - name: Exchange
+          in: body
+          description: The info of the exchange
+          required: true
+          schema:
+            $ref: "#/definitions/Exchange"
+      responses:
+        201:
+          description: Successful
+        400:
+          description: Field missing
+  /exchanges/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: number
+    get:
+      summary: Retrieve the exchange from the ID
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Exchange"
+        404:
+          description: Error exchange not found
+      security:
+        - api_key: []
+    patch:
+      summary: Update exchange details
+      parameters:
+        - name: ExchangePatch
+          in: body
+          description: The exchange edited values with the ID
+          required: true
+          schema:
+            $ref: "#/definitions/ExchangePatch"
+      responses:
+        200:
+          description: OK
+        404:
+          description: Error exchange not found
+      security:
+        - api_key: []
+    delete:
+      summary: Remove the exchange with the ID
+      responses:
+        200:
+          description: OK
+        404:
+          description: Error exchange not found
+      security:
+        - api_key: []
+  /budgets:
+    get:
+      summary: Get all authenticated user budgets preview
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Budget"
+        404:
+          description: Error budget not found
+      security:
+        - api_key: []
+    post:
+      summary: Create a new budget
+      parameters:
+        - name: Budget
+          in: body
+          description: The user edited values
+          required: true
+          schema:
+            $ref: "#/definitions/Budget"
+      responses:
+        201:
+          description: Successful
+        400:
+          description: Field missing
+      security:
+        - api_key: []
+  /budgets/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: number
+    patch:
+      summary: patch the specified budget
+      parameters:
+        - name: Budget
+          in: body
+          description: The user edited values
+          required: true
+          schema:
+            $ref: "#/definitions/BudgetPatch"
+      responses:
+        200:
+          description: OK
+        404:
+          description: Error budget not found
+      security:
+        - api_key: []
+    delete:
+      summary: delete the specified budget
+      responses:
+        200:
+          description: OK
+        404:
+          description: Error budget not found
+      security:
+        - api_key: []
+
+definitions:
+  User:
+    description: A PiggyBank user
+    properties:
+      email:
+        type: string
+      fullname:
+        type: string
+      password:
+        type: string
+      currency:
+        type: string
+    required:
+      - email
+      - fullname
+      - password
+      - currency
+  UserPublic:
+    description: Public info of a PyggyBank user
+    properties:
+      email:
+        type: string
+      fullname:
+        type: string
+      currency:
+        type: string
+    required:
+      - email
+      - fullname
+      - currency
+  UserPatch:
+    description: The user edited values
+    properties:
+      email:
+        type: string
+      fullname:
+        type: string
+      password:
+        type: string
+      currency:
+        type: string
+  Credentials:
+    description: A PiggyBank user credentials
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+      - email
+      - password
+  Transaction:
+    description: Transaction of a PiggyBank user
+    properties:
+      name:
+        type: string
+      date:
+        $ref: "#/definitions/Date"
+      budget:
+        $ref: "#/definitions/TransactionBudget"
+      amount:
+        type: number
+    required:
+      - name
+      - amount
+  TransactionPost:
+    description: The new transaction values
+    properties:
+      name:
+        type: string
+      date:
+        $ref: "#/definitions/Date"
+      budgetId:
+        type: number
+      amount:
+        type: number
+    required:
+      - name
+      - budgetId
+      - amount
+  Date:
+    description: Date of a edited transaction values
+    properties:
+      day:
+        type: number
+      month:
+        type: number
+      year:
+        type: number
+    required:
+      - day
+      - month
+      - year
+  TransactionBudget:
+    description: Budget of a transaction
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+    required:
+      - id
+      - name
+  TransactionPatch:
+    description: The transaction edited values
+    properties:
+      name:
+        type: string
+      date:
+        $ref: "#/definitions/Date"
+      budgetId:
+        type: number
+      amount:
+        type: number
+  Exchange:
+    description: The exchange of a PiggyBank user
+    properties:
+      name:
+        type: string
+      date:
+        $ref: "#/definitions/Date"
+      type:
+        type: string
+      amount:
+        type: number
+    required:
+      - name
+      - type
+      - amount
+  ExchangePatch:
+    description: The exchange edited values
+    properties:
+      name:
+        type: string
+      date:
+        $ref: "#/definitions/Date"
+      type:
+        type: string
+      amount:
+        type: number
+  Budget:
+    description: A budget
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+      used:
+        type: number
+      left:
+        type: number
+      exceeding:
+        type: number
+      persistant:
+        type: number
+      reported:
+        type: boolean
+      color:
+        type: string
+      takesFrom:
+        type: array
+        items:
+          type: object
+          properties:
+            order:
+              type: number
+            budgetId:
+              type: number
+          required:
+            - order
+            - budgetId
+    required:
+      - name
+      - type
+      - used
+      - left
+      - exceeding
+      - persistant
+      - reported
+      - color
+  BudgetPatch:
+    description: A budget
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+      used:
+        type: number
+      left:
+        type: number
+      exceeding:
+        type: number
+      persistant:
+        type: boolean
+      reported:
+        type: boolean
+      color:
+        type: string
+      takesFrom:
+        type: array
+        items:
+          type: object
+          properties:
+            order:
+              type: number
+            budgetId:
+              type: number
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: api_key
+    in: header
