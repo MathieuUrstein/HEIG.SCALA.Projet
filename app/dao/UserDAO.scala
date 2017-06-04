@@ -1,15 +1,19 @@
 package dao
 
-import java.util
 import java.util.NoSuchElementException
 import javax.inject.Inject
 
-import models.{Password, User, UserDTO}
+import controllers.AuthenticatedRequest
+import models.{User, UserGETDTO, UserPATCHDTO}
+import org.mindrot.jbcrypt.BCrypt
+import pdi.jwt.JwtSession._
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{JsValue, Json}
 import play.db.NamedDatabase
 import slick.backend.DatabaseConfig
-import slick.driver.JdbcProfile
+import slick.driver
 import slick.driver.SQLiteDriver.api._
+import slick.driver.{JdbcProfile, SQLiteDriver}
 import slick.lifted.{Index, MappedProjection, ProvenShape}
 import utils.Const
 
@@ -20,46 +24,71 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
 
   private val users: TableQuery[UserTable] = TableQuery[UserTable]
 
-  def all(): Future[Seq[UserDTO]] = dbConfig.db.run(users.map(_.userInfo).result)
+  def insert(user: User): Future[Unit] = {
+    // hash the password before store it
+    val passwordHash = BCrypt.hashpw(user.password, BCrypt.gensalt())
+    user.password = passwordHash
 
-  def insert(user: User): Future[Unit] = dbConfig.db.run(users += user).map { _ => () }
-
-  def find(id: Int): Future[UserDTO] = dbConfig.db.run(users.filter(_.id === id).map(_.userInfo).result.head)
-
-  def fullUpdate(id: Int, user: UserDTO): Future[Unit] = {
-    dbConfig.db.run(users.filter(_.id === id).map(u => (u.lastName, u.firstName, u.email, u.currency))
-      .update(user.lastName, user.firstName, user.email, user.currency)).map {
-      case 0 => throw new NoSuchElementException
-      case _ => Unit
-    }
+    dbConfig.db.run(users += user).map { _ => () }
   }
 
-  def getPassword(id: Int): Future[Password] = dbConfig.db.run(users.filter(_.id === id).map(_.userPassword).result.head)
-
-  def updatePassword(id: Int, password: String): Future[Unit] = {
-    dbConfig.db.run(users.filter(_.id === id).map(_.password).update(password)).map { _ => () }
+  def getPassword(email: String): Future[String] = {
+    dbConfig.db.run(users.filter(_.email === email).map(_.userPassword).result.head)
   }
 
-  def delete(id: Int): Future[Unit] = {
-    dbConfig.db.run(users.filter(_.id === id).delete).map {
-      case 0 => throw new NoSuchElementException
-      case _ => Unit
+  def find(email: String): Future[UserGETDTO] = {
+    dbConfig.db.run(users.filter(_.email === email).map(_.userInfo).result.head)
+  }
+
+  private def updateRequest(email: String, field: UserTable => SQLiteDriver.api.Rep[String], value: String) = {
+    dbConfig.db.run(users.filter(_.email === email).map(field).update(value)).map { _ => () }
+  }
+
+  def update(email: String, user: UserPATCHDTO): Future[Unit] = {
+    // default future with success and do nothing
+    var futureToReturn = Future.successful(())
+
+    // we update only the not empty fields
+    if (!user.fullname.isEmpty) {
+      futureToReturn = updateRequest(email, _.fullname, user.fullname)
     }
+
+    if (!user.password.isEmpty) {
+      // hash the password before store it
+      val passwordHash = BCrypt.hashpw(user.password, BCrypt.gensalt())
+      user.password = passwordHash
+
+      futureToReturn = updateRequest(email, _.password, user.password)
+    }
+
+    if (!user.currency.isEmpty) {
+      futureToReturn = updateRequest(email, _.currency, user.currency)
+    }
+
+    if (!user.email.isEmpty) {
+      futureToReturn = updateRequest(email, _.email, user.email)
+    }
+
+    futureToReturn
+  }
+
+  def delete(email: String): Future[Unit] = {
+    dbConfig.db.run(users.filter(_.email === email).delete).map { _ => () }
   }
 
   private class UserTable(tag: Tag) extends Table[User](tag, "user") {
     def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    def lastName: Rep[String] = column[String]("lastName")
-    def firstName: Rep[String] = column[String]("firstName")
+    def fullname: Rep[String] = column[String]("fullname")
     def email: Rep[String] = column[String]("email")
+    // it is the hash of the password
     def password: Rep[String] = column[String]("password")
     def currency: Rep[String] = column[String]("currency")
 
-    def * : ProvenShape[User] = (lastName, firstName, email, password, currency) <> (User.tupled, User.unapply)
-    def userInfo: MappedProjection[UserDTO, (String, String, String, String)] = {
-      (lastName, firstName, email, currency) <> (UserDTO.tupled, UserDTO.unapply)
+    def * : ProvenShape[User] = (fullname, email, password, currency) <> ((User.apply _).tupled, User.unapply)
+    def userInfo: MappedProjection[UserGETDTO, (String, String, String)] = {
+      (fullname, email, currency) <> (UserGETDTO.tupled, UserGETDTO.unapply)
     }
-    def userPassword: MappedProjection[Password, String] = password <> (Password, Password.unapply)
+    def userPassword: driver.SQLiteDriver.api.Rep[String] = password
     // make email unique for each user
     def emailIndex: Index = index("unique_email", email, unique = true)
   }

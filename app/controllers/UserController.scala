@@ -3,50 +3,53 @@ package controllers
 import javax.inject.Inject
 
 import dao.UserDAO
-import models.{PasswordDTO, User, UserDTO}
+import models.{LoginForm, User, UserGETDTO, UserPATCHDTO}
+import org.mindrot.jbcrypt.BCrypt
 import org.sqlite.SQLiteException
+import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc._
 import utils.Const
+import pdi.jwt.JwtSession._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: ExecutionContext) extends Controller {
+class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: ExecutionContext)
+  extends Controller with Secured {
+  // defines a custom reads to be reused
+  // a reads that verifies your value is not equal to a given value
+  // used to refuse empty string in JSON in our case
+  def notEqual[T](v: T)(implicit r: Reads[T]): Reads[T] = {
+    Reads.filterNot(ValidationError("validate.error.empty.value", v))(_ == v)
+  }
+
   implicit val userReads: Reads[User] = (
-    (JsPath \ "lastName").read[String] and
-      (JsPath \ "firstName").read[String] and
+    (JsPath \ "fullname").read[String](notEqual("")) and
+      (JsPath \ "email").read[String](notEqual("")) and
+      (JsPath \ "password").read[String](notEqual("")) and
+      (JsPath \ "currency").read[String](notEqual(""))
+    ) (User.apply _)
+
+  implicit val userGETDTOWrites: Writes[UserGETDTO] = (
+    (JsPath \ "fullname").write[String] and
+      (JsPath \ "email").write[String] and
+      (JsPath \ "currency").write[String]
+    ) (unlift(UserGETDTO.unapply))
+
+  implicit val userPATCHDTOReads: Reads[UserPATCHDTO] = (
+    (JsPath \ "fullname").read[String] and
       (JsPath \ "email").read[String] and
       (JsPath \ "password").read[String] and
       (JsPath \ "currency").read[String]
-    ) (User.apply _)
+    ) (UserPATCHDTO.apply _)
 
-  implicit val userDTOReads: Reads[UserDTO] = (
-    (JsPath \ "lastName").read[String] and
-      (JsPath \ "firstName").read[String] and
-      (JsPath \ "email").read[String] and
-      (JsPath \ "currency").read[String]
-    ) (UserDTO.apply _)
+  implicit val loginFormReads: Reads[LoginForm] = (
+    (JsPath \ "email").read[String](notEqual("")) and
+      (JsPath \ "password").read[String](notEqual(""))
+    ) (LoginForm.apply _)
 
-  implicit val userDTOWrites: Writes[UserDTO] = (
-    (JsPath \ "lastName").write[String] and
-      (JsPath \ "firstName").write[String] and
-      (JsPath \ "email").write[String] and
-      (JsPath \ "currency").write[String]
-    ) (unlift(UserDTO.unapply))
-
-  implicit val passwordDTOReads: Reads[PasswordDTO] = (
-    (JsPath \ "oldPassword").read[String] and
-      (JsPath \ "newPassword").read[String]
-    ) (PasswordDTO.apply _)
-
-  def index: Action[AnyContent] = Action.async {
-    userDAO.all().map { users =>
-      Ok(Json.obj("status" -> "OK", "users" -> users))
-    }
-  }
-
-  def create(): Action[JsValue] = Action.async(BodyParsers.parse.json) { request =>
+  def create(): Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[User]
 
     result.fold(
@@ -55,40 +58,76 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
       },
       user => {
         userDAO.insert(user).map { _ =>
+          // we directly log in the user with a JWT
+          // the JWT is returned in the header name "Authorization" (request) by default
+          // we add the unique email of the user in the JWT to identify him
           Created(Json.obj("status" -> "OK", "message" -> "user '%s' created".format(user.email)))
+            .addingToJwtSession(Const.ValueStoredJWT, user.email)
         }.recover {
           // case in an error of conflict with the user email
           case e: SQLiteException if e.getResultCode.code == Const.SQLiteUniqueConstraintErrorCode =>
-            Conflict(Json.obj("status" -> "ERROR", "message" -> "user '%s' already exists".format(user.email)))
+            Conflict(Json.obj("status" -> "ERROR", "message" -> "email '%s' already exists".format(user.email)))
         }
       }
     )
   }
 
-  def read(id: String): Action[AnyContent] = Action.async {
-    userDAO.find(id.toInt).map { user =>
+  // TODO : cas ou l'utilisateur est deja authentifie => erreur 400
+  // TODO : amélioration pour invalider un JWT
+
+  def login: Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit request =>
+    val result = request.body.validate[LoginForm]
+
+    result.fold(
+      errors => Future.successful {
+        BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
+      },
+      login => {
+        userDAO.getPassword(login.email).map { correctPasswordHash =>
+          if (BCrypt.checkpw(login.password, correctPasswordHash)) {
+            // we add the unique email of the user in the JWT to identify him
+            Ok(Json.obj("status" -> "OK", "message" -> "user '%s' logged".format(login.email)))
+              .addingToJwtSession(Const.ValueStoredJWT, login.email)
+          }
+          else {
+            Unauthorized(Json.obj("status" -> "ERROR", "message" -> "authentication failed"))
+          }
+        }.recover {
+          // case in not found the specified user with its email
+          // we throw the same error if the password is not valid
+          case _: NoSuchElementException =>
+            Unauthorized(Json.obj("status" -> "ERROR", "message" -> "authentication failed"))
+        }
+      }
+    )
+  }
+
+  def read: Action[AnyContent] = Authenticated.async { implicit request =>
+    // we look for the user email in the JWT
+    userDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { user =>
       Ok(Json.obj("status" -> "OK", "user" -> user))
-    }.recover {
-      // case in not found the specified user with its id
-      case _: NoSuchElementException =>
-        NotFound(Json.obj("status" -> "ERROR", "message" -> "user with id '%s' doesn't exist".format(id)))
     }
   }
 
-  def fullUpdate(id: String): Action[JsValue] = Action.async(BodyParsers.parse.json) { request =>
-    val result = request.body.validate[UserDTO]
+  def update: Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
+    val result = request.body.validate[UserPATCHDTO]
 
     result.fold(
       errors => Future.successful {
         BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
       },
       user => {
-        userDAO.fullUpdate(id.toInt, user).map { _ =>
-          Ok(Json.obj("status" -> "OK", "message" -> "user with id '%s' updated".format(id)))
+        // we look for the user email in the JWT
+        userDAO.update(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, user).map { _ =>
+          // in case of a successful change of email, we must change the value contained in the JWT with the new email
+          if (!user.email.isEmpty) {
+            Ok(Json.obj("status" -> "OK", "message" -> "information updated"))
+              .addingToJwtSession(Const.ValueStoredJWT, user.email)
+          }
+          else {
+            Ok(Json.obj("status" -> "OK", "message" -> "information updated"))
+          }
         }.recover {
-          // case in not found the specified user with its id
-          case _: NoSuchElementException =>
-            NotFound(Json.obj("status" -> "ERROR", "message" -> "user with id '%s' doesn't exist".format(id)))
           // case in an error of conflict with the new user email
           case e: SQLiteException if e.getResultCode.code == Const.SQLiteUniqueConstraintErrorCode =>
             Conflict(Json.obj("status" -> "ERROR", "message" -> "user '%s' already exists".format(user.email)))
@@ -97,53 +136,10 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
     )
   }
 
-  def updatePassword(id: String): Action[JsValue] = Action.async(BodyParsers.parse.json) { request =>
-   val result = request.body.validate[PasswordDTO]
-
-   result.fold(
-     errors => Future.successful {
-       BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
-     },
-     password => {
-       // we verify that passwords correspond
-       userDAO.getPassword(id.toInt).map { p =>
-         if (p.password.equals(password.oldPassword)) {
-           userDAO.updatePassword(id.toInt, password.newPassword).map { _ => () }
-           Ok(Json.obj("status" -> "OK", "message" -> "password of user with id '%s' updated".format(id)))
-         }
-         else {
-           BadRequest(Json.obj("status" -> "ERROR", "message" -> "the old password is false"))
-         }
-       }.recover {
-         // case in not found the specified user with its id
-         case _: NoSuchElementException =>
-           NotFound(Json.obj("status" -> "ERROR", "message" -> "user with id '%s' doesn't exist".format(id)))
-       }
-     }
-   )
- }
-
-  def delete(id: String): Action[AnyContent] = Action.async {
-    userDAO.delete(id.toInt).map { _ =>
-      Ok(Json.obj("status" -> "OK", "user" -> "user with id '%s' deleted".format(id)))
-    }.recover {
-      // case in not found the specified user with its id
-      case _: NoSuchElementException =>
-        NotFound(Json.obj("status" -> "ERROR", "message" -> "user with id '%s' doesn't exist".format(id)))
+  def delete: Action[AnyContent] = Authenticated.async { implicit request =>
+    // we look for the user email in the JWT
+    userDAO.delete(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { _ =>
+      Ok(Json.obj("status" -> "OK", "user" -> "user deleted"))
     }
   }
-
-  /*def login: Action[JsValue] = Action(BodyParsers.parse.json) { implicit request =>
-  val result = request.body.validate[LoginForm]
-
-  result.fold(
-    errors => BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors))),
-    login => {
-      val username = login.username
-      val password = login.password
-
-      Ok(Json.obj("status" -> "OK", "message" -> (username + ":" + password)))
-    }
-  )
-}*/
 }

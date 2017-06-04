@@ -14,7 +14,11 @@ libraryDependencies ++= Seq(
   specs2 % Test,
   "com.typesafe.play" %% "play-slick" % "2.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
-  "org.xerial" % "sqlite-jdbc" % "latest.release"
+  "org.xerial" % "sqlite-jdbc" % "latest.release",
+  // to hash passwords
+  "org.mindrot" % "jbcrypt" % "latest.release",
+  // to use directly JWT based authentication
+  "com.pauldijou" %% "jwt-play" % "latest.release"
 )
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
