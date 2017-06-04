@@ -121,6 +121,8 @@ paths:
           description: Successful
         400:
           description: Field missing
+      security:
+        - api_key: []
   /transactions/{id}:
     parameters:
       - name: id
@@ -199,6 +201,8 @@ paths:
           description: Successful
         400:
           description: Field missing
+      security:
+        - api_key: []
   /exchanges/{id}:
     parameters:
       - name: id
@@ -302,7 +306,50 @@ paths:
           description: Error budget not found
       security:
         - api_key: []
-
+  /dashboard/spendings:
+    get:
+      summary: Get all outcoming budgets day by day for the authenticated user
+      parameters:
+        - name: Date
+          in: body
+          required: true
+          schema:
+            properties:
+              from:
+                $ref: "#/definitions/Date"
+              to:
+                $ref: "#/definitions/Date"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Spending"
+      security:
+        - api_key: []
+  /dashboard/usage:
+    get:
+      summary: Get all outcoming and incomming usage day by day for the authenticated user
+      parameters:
+        - name: Date
+          in: body
+          required: true
+          schema:
+            properties:
+              from:
+                $ref: "#/definitions/Date"
+              to:
+                $ref: "#/definitions/Date"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Usage"
+      security:
+        - api_key: []
 definitions:
   User:
     description: A PiggyBank user
@@ -511,6 +558,32 @@ definitions:
               type: number
             budgetId:
               type: number
+  Spending:
+    description: Outcoming budget spending amount for a specific date
+    properties:
+      date:
+        $ref: "#/definitions/Date"
+      budget:
+        type: string
+      amount:
+        type: number
+    required:
+      - date
+      - budget
+      - amount
+  Usage:
+    description: Total budget used and total budget left for a specific date
+    properties:
+      date:
+        $ref: "#/definitions/Date"
+      used:
+        type: number
+      left:
+        type: number
+    required:
+      - date
+      - used
+      - left
 securityDefinitions:
   api_key:
     type: apiKey
