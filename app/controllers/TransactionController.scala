@@ -5,7 +5,6 @@ import javax.inject.Inject
 
 import dao.TransactionDAO
 import models._
-import org.sqlite.SQLiteException
 import pdi.jwt.JwtSession._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -16,18 +15,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit executionContext: ExecutionContext)
   extends Controller with Secured {
-  implicit val dateDTOReads: Reads[DateDTO] = (
-    (JsPath \ "day").read[Int] and
-      (JsPath \ "month").read[Int] and
-      (JsPath \ "year").read[Int]
-  ) (DateDTO.apply _)
-
-  implicit val dateDTOWrites: Writes[DateDTO] = (
-    (JsPath \ "day").write[Int] and
-      (JsPath \ "month").write[Int] and
-      (JsPath \ "year").write[Int]
-    ) (unlift(DateDTO.unapply))
-
   implicit val transactionPOSTDTOReads: Reads[TransactionPOSTDTO] = (
     (JsPath \ "name").read[String](notEqual("")) and
       (JsPath \ "date").readNullable[DateDTO] and
@@ -53,11 +40,6 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
       (JsPath \ "amount").readNullable[Double]
     ) (TransactionPATCHDTO.apply _)
 
-  implicit val fromToDatesDTOReads: Reads[FromToDatesDTO] = (
-    (JsPath \ "from").readNullable[DateDTO] and
-      (JsPath \ "to").readNullable[DateDTO]
-    ) (FromToDatesDTO.apply _)
-
   def create(): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[TransactionPOSTDTO]
 
@@ -72,8 +54,6 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
       }
     )
   }
-
-  // TODO : ajouter from et do traitement dans le body (dates des transactions)
 
   def readAll: Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[FromToDatesDTO]

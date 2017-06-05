@@ -18,7 +18,18 @@ CREATE TABLE "transaction"(
   FOREIGN KEY(userId) REFERENCES "user"(id)
 );
 
+CREATE TABLE "exchange"(
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  userId INTEGER NOT NULL,
+  name VARCHAR(60) NOT NULL,
+  date DATE NOT NULL,
+  type VARCHAR(60) NOT NULL,
+  amount DOUBLE NOT NULL,
+  FOREIGN KEY(userId) REFERENCES "user"(id)
+);
+
 # --- !Downs
 
 DROP TABLE "user";
 DROP TABLE "transaction";
+DROP TABLE "exchange";

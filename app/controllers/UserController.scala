@@ -64,8 +64,8 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
     )
   }
 
-  // TODO : cas ou l'utilisateur est deja authentifie => erreur 400
-  // TODO : amelioration pour invalider un JWT
+  // TODO : case when an user is already authenticated => error 400
+  // TODO : improvement with invalidating JWT
 
   def login: Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[LoginFormDTO]

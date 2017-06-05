@@ -1,12 +1,15 @@
 package controllers
 
+import models.{DateDTO, FromToDatesDTO}
 import pdi.jwt.JwtSession._
 import play.api.data.validation.ValidationError
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.functional.syntax.unlift
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
 import play.api.mvc.Results._
 import play.api.mvc._
 import utils.Const
+import play.api.libs.functional.syntax._
 
 import scala.concurrent.Future
 
@@ -21,6 +24,23 @@ trait Secured {
   def notEqual[T](v: T)(implicit r: Reads[T]): Reads[T] = {
     Reads.filterNot(ValidationError("validate.error.empty.value", v))(_ == v)
   }
+
+  implicit val dateDTOReads: Reads[DateDTO] = (
+    (JsPath \ "day").read[Int] and
+      (JsPath \ "month").read[Int] and
+      (JsPath \ "year").read[Int]
+    ) (DateDTO.apply _)
+
+  implicit val dateDTOWrites: Writes[DateDTO] = (
+    (JsPath \ "day").write[Int] and
+      (JsPath \ "month").write[Int] and
+      (JsPath \ "year").write[Int]
+    ) (unlift(DateDTO.unapply))
+
+  implicit val fromToDatesDTOReads: Reads[FromToDatesDTO] = (
+    (JsPath \ "from").readNullable[DateDTO] and
+      (JsPath \ "to").readNullable[DateDTO]
+    ) (FromToDatesDTO.apply _)
 }
 
 object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] {

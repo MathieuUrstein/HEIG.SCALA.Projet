@@ -1,19 +1,15 @@
 package dao
 
 import java.sql.Date
-import java.text.SimpleDateFormat
 import java.util.{Calendar, NoSuchElementException}
 import javax.inject.Inject
 
 import models._
-import org.mindrot.jbcrypt.BCrypt
-import play.api.data.format
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 import slick.backend.DatabaseConfig
-import slick.driver
+import slick.driver.JdbcProfile
 import slick.driver.SQLiteDriver.api._
-import slick.driver.{JdbcProfile, SQLiteDriver}
 import slick.lifted.{ForeignKeyQuery, MappedProjection, ProvenShape}
 import utils.Const
 
@@ -121,6 +117,5 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
     def transactionInfo: MappedProjection[TransactionGET, (Int, String, Date, Double)] = {
       (id, name, date, amount) <> (TransactionGET.tupled, TransactionGET.unapply)
     }
-    def transactionId: Rep[Int] = id
   }
 }
