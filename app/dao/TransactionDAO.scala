@@ -50,6 +50,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
 
   def find(userEmail: String, id: Int): Future[TransactionGET] = {
     // with a join and the email of the connected user, we first verify that the asked transaction (id) belongs to this user
+    // or exists
     dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .filter(_._1.id === id).map(_._1.transactionInfo).result.head)
   }

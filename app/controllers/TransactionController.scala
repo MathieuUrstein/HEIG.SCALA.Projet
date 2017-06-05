@@ -48,6 +48,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
         BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
       },
       transaction => {
+        // we look for the user email in the JWT
         transactionDAO.insert(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, transaction).map { _ =>
           Created(Json.obj("status" -> "OK", "message" -> "transaction '%s' created".format(transaction.name)))
         }

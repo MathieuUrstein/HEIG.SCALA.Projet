@@ -47,58 +47,54 @@ class ExchangeDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Datab
       .map(_._1.exchangeInfo).result)
   }
 
-  def find(id: Int): Future[ExchangeGET] = {
-    dbConfig.db.run(exchanges.filter(_.id === id).map(_.exchangeInfo).result.head)
+  def find(userEmail: String, id: Int): Future[ExchangeGET] = {
+    // with a join and the email of the connected user, we first verify that the asked exchange (id) belongs to this user
+    // or exists
+    dbConfig.db.run(exchanges.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
+      .filter(_._1.id === id).map(_._1.exchangeInfo).result.head)
   }
 
-  def update(id: Int, exchange: ExchangePATCHDTO): Future[Unit] = {
-    // default future with success and do nothing
-    var futureToReturn = Future.successful(())
+  def update(userEmail: String, id: Int, exchange: ExchangePATCHDTO): Future[Unit] = {
+    // we first verify that the asked exchange (id) to update belongs to this user or exists
+    dbConfig.db.run(exchanges.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
+      .filter(_._1.id === id).map(_._1.exchangeInfo).result.head).map { _ =>
+      // default future with success and do nothing
+      var futureToReturn = Future.successful(())
 
-    // we update only the present fields
-    // not the value None
-    if (exchange.name.isDefined) {
-      futureToReturn = dbConfig.db.run(exchanges.filter(_.id === id).map(_.name).update(exchange.name.get))
-        .map {
-          case 0 => throw new NoSuchElementException
-          case _ => Unit
-        }
+      // we update only the present fields
+      // not the value None
+      if (exchange.name.isDefined) {
+        futureToReturn = dbConfig.db.run(exchanges.filter(_.id === id).map(_.name).update(exchange.name.get))
+          .map { _ => () }
+      }
+
+      if (exchange.date.isDefined) {
+        val dateToInsert = Date.valueOf(exchange.date.get.year + "-" + exchange.date.get.month +
+          "-" + exchange.date.get.day)
+
+        futureToReturn = dbConfig.db.run(exchanges.filter(_.id === id).map(_.date).update(dateToInsert))
+          .map { _ => () }
+      }
+
+      if (exchange.`type`.isDefined) {
+        futureToReturn = dbConfig.db.run(exchanges.filter(_.id === id).map(_.`type`).update(exchange.`type`.get))
+          .map { _ => () }
+      }
+
+      if (exchange.amount.isDefined) {
+        futureToReturn = dbConfig.db.run(exchanges.filter(_.id === id).map(_.amount).update(exchange.amount.get))
+          .map { _ => () }
+      }
+
+      futureToReturn
     }
-
-    if (exchange.date.isDefined) {
-      val dateToInsert = Date.valueOf(exchange.date.get.year + "-" + exchange.date.get.month +
-        "-" + exchange.date.get.day)
-
-      futureToReturn = dbConfig.db.run(exchanges.filter(_.id === id).map(_.date).update(dateToInsert))
-        .map {
-          case 0 => throw new NoSuchElementException
-          case _ => Unit
-        }
-    }
-
-    if (exchange.`type`.isDefined) {
-      futureToReturn = dbConfig.db.run(exchanges.filter(_.id === id).map(_.`type`).update(exchange.`type`.get))
-        .map {
-          case 0 => throw new NoSuchElementException
-          case _ => Unit
-        }
-    }
-
-    if (exchange.amount.isDefined) {
-      futureToReturn = dbConfig.db.run(exchanges.filter(_.id === id).map(_.amount).update(exchange.amount.get))
-        .map {
-          case 0 => throw new NoSuchElementException
-          case _ => Unit
-        }
-    }
-
-    futureToReturn
   }
 
-  def delete(id: Int): Future[Unit] = {
-    dbConfig.db.run(exchanges.filter(_.id === id).delete).map {
-      case 0 => throw new NoSuchElementException
-      case _ => Unit
+  def delete(userEmail: String, id: Int): Future[Unit] = {
+    // we first verify that the asked exchange (id) to delete belongs to this user or exists
+    dbConfig.db.run(exchanges.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
+      .filter(_._1.id === id).map(_._1.exchangeInfo).result.head).map { _ =>
+      dbConfig.db.run(exchanges.filter(_.id === id).delete).map { _ => () }
     }
   }
 

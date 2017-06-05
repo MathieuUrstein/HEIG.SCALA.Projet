@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionContext: ExecutionContext)
   extends Controller with Secured {
-  // TODO : control type values between borrow and lend
+  // TODO : control type values between borrow and lend (improvement)
   implicit val exchangePOSTDTOReads: Reads[ExchangePOSTDTO] = (
     (JsPath \ "name").read[String](notEqual("")) and
       (JsPath \ "date").readNullable[DateDTO] and
@@ -53,6 +53,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
         BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
       },
       exchange => {
+        // we look for the user email in the JWT
         exchangeDAO.insert(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, exchange).map { _ =>
           Created(Json.obj("status" -> "OK", "message" -> "exchange '%s' created".format(exchange.name)))
         }
@@ -105,10 +106,9 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
     )
   }
 
-  // TODO : protect API to access only what the user has the right (not strictly based on id)
-
-  def read(id: Int): Action[AnyContent] = Authenticated.async {
-    exchangeDAO.find(id).map { exchange =>
+  def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
+    // we look for the user email in the JWT
+    exchangeDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { exchange =>
       val dateToSend = Option(DateDTO(exchange.date.toString.substring(8, 10).toInt,
         exchange.date.toString.substring(5, 7).toInt, exchange.date.toString.substring(0, 4).toInt))
       val exchangeToSend = ExchangeGETDTO(exchange.name, dateToSend, exchange.`type`, exchange.amount)
@@ -129,7 +129,8 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
         BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
       },
       exchange => {
-        exchangeDAO.update(id, exchange).map { _ =>
+        // we look for the user email in the JWT
+        exchangeDAO.update(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id, exchange).map { _ =>
           Ok(Json.obj("status" -> "OK", "message" -> "exchange updated"))
         }.recover {
           // case in not found the specified exchange with its id
@@ -140,8 +141,9 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
     )
   }
 
-  def delete(id: Int): Action[AnyContent] = Authenticated.async {
-    exchangeDAO.delete(id).map { _ =>
+  def delete(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
+    // we look for the user email in the JWT
+    exchangeDAO.delete(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { _ =>
       Ok(Json.obj("status" -> "OK", "user" -> "exchange deleted"))
     }.recover {
       // case in not found the specified exchange with its id
