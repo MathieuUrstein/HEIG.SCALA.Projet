@@ -13,5 +13,12 @@ GET     /api/user                    controllers.UserController.read
 PATCH   /api/user                    controllers.UserController.update
 DELETE  /api/user                    controllers.UserController.delete
 
+# Transaction
+POST    /api/transactions            controllers.TransactionController.create
+GET     /api/transactions            controllers.TransactionController.readAll
+GET     /api/transactions/:id        controllers.TransactionController.read(id: Int)
+PATCH   /api/transactions/:id        controllers.TransactionController.update(id: Int)
+DELETE  /api/transactions/:id        controllers.TransactionController.delete(id: Int)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

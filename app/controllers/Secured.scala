@@ -1,8 +1,9 @@
 package controllers
 
 import pdi.jwt.JwtSession._
+import play.api.data.validation.ValidationError
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 import play.api.mvc.Results._
 import play.api.mvc._
 import utils.Const
@@ -13,6 +14,13 @@ class AuthenticatedRequest[A](userEmail: String, request: Request[A]) extends Wr
 
 trait Secured {
   def Authenticated = AuthenticatedAction
+
+  // defines a custom reads to be reused
+  // a reads that verifies your value is not equal to a given value
+  // used to refuse empty string in JSON in our case
+  def notEqual[T](v: T)(implicit r: Reads[T]): Reads[T] = {
+    Reads.filterNot(ValidationError("validate.error.empty.value", v))(_ == v)
+  }
 }
 
 object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] {

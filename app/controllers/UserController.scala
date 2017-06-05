@@ -3,27 +3,19 @@ package controllers
 import javax.inject.Inject
 
 import dao.UserDAO
-import models.{LoginForm, User, UserGETDTO, UserPATCHDTO}
+import models.{LoginFormDTO, User, UserGETDTO, UserPATCHDTO}
 import org.mindrot.jbcrypt.BCrypt
 import org.sqlite.SQLiteException
-import play.api.data.validation.ValidationError
+import pdi.jwt.JwtSession._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc._
 import utils.Const
-import pdi.jwt.JwtSession._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: ExecutionContext)
   extends Controller with Secured {
-  // defines a custom reads to be reused
-  // a reads that verifies your value is not equal to a given value
-  // used to refuse empty string in JSON in our case
-  def notEqual[T](v: T)(implicit r: Reads[T]): Reads[T] = {
-    Reads.filterNot(ValidationError("validate.error.empty.value", v))(_ == v)
-  }
-
   implicit val userReads: Reads[User] = (
     (JsPath \ "fullname").read[String](notEqual("")) and
       (JsPath \ "email").read[String](notEqual("")) and
@@ -44,10 +36,10 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
       (JsPath \ "currency").read[String]
     ) (UserPATCHDTO.apply _)
 
-  implicit val loginFormReads: Reads[LoginForm] = (
+  implicit val loginFormDTOReads: Reads[LoginFormDTO] = (
     (JsPath \ "email").read[String](notEqual("")) and
       (JsPath \ "password").read[String](notEqual(""))
-    ) (LoginForm.apply _)
+    ) (LoginFormDTO.apply _)
 
   def create(): Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[User]
@@ -73,10 +65,10 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
   }
 
   // TODO : cas ou l'utilisateur est deja authentifie => erreur 400
-  // TODO : amélioration pour invalider un JWT
+  // TODO : amelioration pour invalider un JWT
 
   def login: Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit request =>
-    val result = request.body.validate[LoginForm]
+    val result = request.body.validate[LoginFormDTO]
 
     result.fold(
       errors => Future.successful {
