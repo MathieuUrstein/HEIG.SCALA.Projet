@@ -100,15 +100,16 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
     )
   }
 
-  def read(id: Int): Action[AnyContent] = Authenticated.async {
-    transactionDAO.find(id).map { transaction =>
+  def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
+    // we look for the user email in the JWT
+    transactionDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { transaction =>
       val dateToSend = Option(DateDTO(transaction.date.toString.substring(8, 10).toInt,
         transaction.date.toString.substring(5, 7).toInt, transaction.date.toString.substring(0, 4).toInt))
       val transactionToSend = TransactionGETDTO(transaction.name, dateToSend, transaction.amount)
 
       Ok(Json.obj("status" -> "OK", "transaction" -> transactionToSend))
     }.recover {
-      // case in not found the specified transaction with its id
+      // case in not found the specified transaction with its id (or the transaction doesn't belong to this user)
       case _: NoSuchElementException =>
         NotFound(Json.obj("status" -> "ERROR", "message" -> "transaction with id '%s' not found".format(id)))
     }
@@ -122,10 +123,10 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
         BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
       },
       transaction => {
-        transactionDAO.update(id, transaction).map { _ =>
+        transactionDAO.update(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id, transaction).map { _ =>
           Ok(Json.obj("status" -> "OK", "message" -> "transaction updated"))
         }.recover {
-          // case in not found the specified transaction with its id
+          // case in not found the specified transaction with its id (or the transaction doesn't belong to this user)
           case _: NoSuchElementException =>
             NotFound(Json.obj("status" -> "ERROR", "message" -> "transaction with id '%s' not found".format(id)))
         }
@@ -133,11 +134,12 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
     )
   }
 
-  def delete(id: Int): Action[AnyContent] = Authenticated.async {
-    transactionDAO.delete(id).map { _ =>
+  def delete(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
+    // we look for the user email in the JWT
+    transactionDAO.delete(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { _ =>
       Ok(Json.obj("status" -> "OK", "user" -> "transaction deleted"))
     }.recover {
-      // case in not found the specified transaction with its id
+      // case in not found the specified transaction with its id (or the transaction doesn't belong to this user)
       case _: NoSuchElementException =>
         NotFound(Json.obj("status" -> "ERROR", "message" -> "transaction with id '%s' not found".format(id)))
     }

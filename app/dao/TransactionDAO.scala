@@ -43,54 +43,53 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
   }
 
   def findAll(userEmail: String): Future[Seq[TransactionGET]] = {
+    // we get all the transactions for the connected user (email)
     dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .map(_._1.transactionInfo).result)
   }
 
-  def find(id: Int): Future[TransactionGET] = {
-    dbConfig.db.run(transactions.filter(_.id === id).map(_.transactionInfo).result.head)
+  def find(userEmail: String, id: Int): Future[TransactionGET] = {
+    // with a join and the email of the connected user, we first verify that the asked transaction (id) belongs to this user
+    dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
+      .filter(_._1.id === id).map(_._1.transactionInfo).result.head)
   }
 
-  def update(id: Int, transaction: TransactionPATCHDTO): Future[Unit] = {
-    // default future with success and do nothing
-    var futureToReturn = Future.successful(())
+  def update(userEmail: String, id: Int, transaction: TransactionPATCHDTO): Future[Future[Unit]] = {
+    // we first verify that the asked transaction (id) to update belongs to this user or exists
+    dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
+      .filter(_._1.id === id).map(_._1.transactionInfo).result.head).map { _ =>
+      // default future with success and do nothing
+      var futureToReturn = Future.successful(())
 
-    // we update only the present fields
-    // not the value None
-    if (transaction.name.isDefined) {
-      futureToReturn = dbConfig.db.run(transactions.filter(_.id === id).map(_.name).update(transaction.name.get))
-        .map {
-          case 0 => throw new NoSuchElementException
-          case _ => Unit
-        }
+      // we update only the present fields
+      // not the value None
+      if (transaction.name.isDefined) {
+        futureToReturn = dbConfig.db.run(transactions.filter(_.id === id).map(_.name).update(transaction.name.get))
+        .map { _ => () }
+      }
+
+      if (transaction.date.isDefined) {
+        val dateToInsert = Date.valueOf(transaction.date.get.year + "-" + transaction.date.get.month +
+          "-" + transaction.date.get.day)
+
+        futureToReturn = dbConfig.db.run(transactions.filter(_.id === id).map(_.date).update(dateToInsert))
+          .map { _ => () }
+      }
+
+      if (transaction.amount.isDefined) {
+        futureToReturn = dbConfig.db.run(transactions.filter(_.id === id).map(_.amount).update(transaction.amount.get))
+          .map { _ => () }
+      }
+
+      futureToReturn
     }
-
-    if (transaction.date.isDefined) {
-      val dateToInsert = Date.valueOf(transaction.date.get.year + "-" + transaction.date.get.month +
-        "-" + transaction.date.get.day)
-
-      futureToReturn = dbConfig.db.run(transactions.filter(_.id === id).map(_.date).update(dateToInsert))
-        .map {
-          case 0 => throw new NoSuchElementException
-          case _ => Unit
-        }
-    }
-
-    if (transaction.amount.isDefined) {
-      futureToReturn = dbConfig.db.run(transactions.filter(_.id === id).map(_.amount).update(transaction.amount.get))
-        .map {
-          case 0 => throw new NoSuchElementException
-          case _ => Unit
-        }
-    }
-
-    futureToReturn
   }
 
-  def delete(id: Int): Future[Unit] = {
-    dbConfig.db.run(transactions.filter(_.id === id).delete).map {
-      case 0 => throw new NoSuchElementException
-      case _ => Unit
+  def delete(userEmail: String, id: Int): Future[Future[Unit]] = {
+    // we first verify that the asked transaction (id) to delete belongs to this user or exists
+    dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
+      .filter(_._1.id === id).map(_._1.transactionInfo).result.head).map { _ =>
+      dbConfig.db.run(transactions.filter(_.id === id).delete).map { _ => () }
     }
   }
 
