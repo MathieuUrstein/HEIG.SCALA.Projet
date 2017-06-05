@@ -1,5 +1,6 @@
 package controllers
 
+import java.sql.Date
 import javax.inject.Inject
 
 import dao.TransactionDAO
@@ -46,11 +47,16 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
       (JsPath \ "amount").write[Double]
     ) (unlift(TransactionAllGETDTO.unapply))
 
-  implicit val TransactionPATCHDTOReads: Reads[TransactionPATCHDTO] = (
+  implicit val transactionPATCHDTOReads: Reads[TransactionPATCHDTO] = (
     (JsPath \ "name").readNullable[String] and
       (JsPath \ "date").readNullable[DateDTO] and
       (JsPath \ "amount").readNullable[Double]
     ) (TransactionPATCHDTO.apply _)
+
+  implicit val fromToDatesDTOReads: Reads[FromToDatesDTO] = (
+    (JsPath \ "from").readNullable[DateDTO] and
+      (JsPath \ "to").readNullable[DateDTO]
+    ) (FromToDatesDTO.apply _)
 
   def create(): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[TransactionPOSTDTO]
@@ -69,19 +75,49 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
 
   // TODO : ajouter from et do traitement dans le body (dates des transactions)
 
-  def readAll: Action[AnyContent] = Authenticated.async { implicit request =>
-    // we look for the user email in the JWT
-    transactionDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { transactions =>
-      val transactionsToSend = transactions.map { t =>
-        val dateToSend = Option(DateDTO(t.date.toString.substring(8, 10).toInt, t.date.toString.substring(5, 7).toInt,
-          t.date.toString.substring(0, 4).toInt))
-        val transactionToSend = TransactionAllGETDTO(t.id, t.name, dateToSend, t.amount)
+  def readAll: Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
+    val result = request.body.validate[FromToDatesDTO]
 
-        transactionToSend
+    result.fold(
+      errors => Future.successful {
+        BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
+      },
+      dates => {
+        // we look for the user email in the JWT
+        transactionDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { transactions =>
+          // if from and to dates are presents (JSON), we keep only the corresponding transactions
+          val transactionsToSendToKeep = transactions.filter{ t =>
+            if (dates.from.isDefined) {
+              val dateFrom = Date.valueOf(dates.from.get.year + "-" + dates.from.get.month + "-" + dates.from.get.day)
+
+              t.date.equals(dateFrom) || t.date.after(dateFrom)
+            }
+            else {
+              true
+            }
+          }.filter { t =>
+            if (dates.to.isDefined) {
+              val dateTo = Date.valueOf(dates.to.get.year + "-" + dates.to.get.month + "-" + dates.to.get.day)
+
+              t.date.equals(dateTo) || t.date.before(dateTo)
+            }
+            else {
+              true
+            }
+          }
+
+          val transactionsToSend = transactionsToSendToKeep.map { t =>
+            val dateToSend = Option(DateDTO(t.date.toString.substring(8, 10).toInt, t.date.toString.substring(5, 7).toInt,
+              t.date.toString.substring(0, 4).toInt))
+            val transactionToSend = TransactionAllGETDTO(t.id, t.name, dateToSend, t.amount)
+
+            transactionToSend
+          }
+
+          Ok(Json.obj("status" -> "OK", "transactions" -> transactionsToSend))
+        }
       }
-
-      Ok(Json.obj("status" -> "OK", "transactions" -> transactionsToSend))
-    }
+    )
   }
 
   def read(id: Int): Action[AnyContent] = Authenticated.async {

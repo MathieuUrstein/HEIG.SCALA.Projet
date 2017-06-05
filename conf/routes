@@ -15,7 +15,8 @@ DELETE  /api/user                    controllers.UserController.delete
 
 # Transaction
 POST    /api/transactions            controllers.TransactionController.create
-GET     /api/transactions            controllers.TransactionController.readAll
+# TODO : change for GET when tests are finished (POSTMAN doesn't accept body for GET requests)
+OPTIONS /api/transactions            controllers.TransactionController.readAll
 GET     /api/transactions/:id        controllers.TransactionController.read(id: Int)
 PATCH   /api/transactions/:id        controllers.TransactionController.update(id: Int)
 DELETE  /api/transactions/:id        controllers.TransactionController.delete(id: Int)
