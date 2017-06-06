@@ -4,12 +4,11 @@ import models.{DateDTO, FromToDatesDTO}
 import pdi.jwt.JwtSession._
 import play.api.data.validation.ValidationError
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.libs.functional.syntax.unlift
+import play.api.libs.functional.syntax.{unlift, _}
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
 import play.api.mvc.Results._
 import play.api.mvc._
 import utils.Const
-import play.api.libs.functional.syntax._
 
 import scala.concurrent.Future
 

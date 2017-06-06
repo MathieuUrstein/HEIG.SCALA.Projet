@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import dao.BudgetDAO
-import models._
+import models.{BudgetAndTakesFromAllGETDTO, BudgetAndTakesFromGETDTO, BudgetPOSTDTO, TakesFromDTO}
 import org.sqlite.SQLiteException
 import pdi.jwt.JwtSession._
 import play.api.libs.functional.syntax._
