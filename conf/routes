@@ -32,9 +32,9 @@ DELETE  /api/exchanges/:id           controllers.ExchangeController.delete(id: I
 # Budget
 POST    /api/budgets                 controllers.BudgetController.create
 GET     /api/budgets                 controllers.BudgetController.readAll
-#GET     /api/budgets/:id             controllers.BudgetController.read(id: Int)
+GET     /api/budgets/:id             controllers.BudgetController.read(id: Int)
 #PATCH   /api/budgets/:id             controllers.BudgetController.update(id: Int)
-#DELETE  /api/budgets/:id             controllers.BudgetController.delete(id: Int)
+DELETE  /api/budgets/:id             controllers.BudgetController.delete(id: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

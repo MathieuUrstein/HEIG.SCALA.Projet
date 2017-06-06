@@ -48,25 +48,25 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
     // default future with success and do nothing
     var futureToReturn = Future.successful(())
 
-    // we update only the not empty fields
-    if (!user.fullname.isEmpty) {
-      futureToReturn = updateRequest(email, _.fullname, user.fullname)
+    // we update only the present fields (not None value)
+    if (user.fullname.isDefined) {
+      futureToReturn = updateRequest(email, _.fullname, user.fullname.get)
     }
 
-    if (!user.password.isEmpty) {
+    if (user.password.isDefined) {
       // hash the password before store it
-      val passwordHash = BCrypt.hashpw(user.password, BCrypt.gensalt())
-      user.password = passwordHash
+      val passwordHash = BCrypt.hashpw(user.password.get, BCrypt.gensalt())
+      user.password = Option(passwordHash)
 
-      futureToReturn = updateRequest(email, _.password, user.password)
+      futureToReturn = updateRequest(email, _.password, user.password.get)
     }
 
-    if (!user.currency.isEmpty) {
-      futureToReturn = updateRequest(email, _.currency, user.currency)
+    if (user.currency.isDefined) {
+      futureToReturn = updateRequest(email, _.currency, user.currency.get)
     }
 
-    if (!user.email.isEmpty) {
-      futureToReturn = updateRequest(email, _.email, user.email)
+    if (user.email.isDefined) {
+      futureToReturn = updateRequest(email, _.email, user.email.get)
     }
 
     futureToReturn

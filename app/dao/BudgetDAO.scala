@@ -6,16 +6,19 @@ import models._
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 import slick.backend.DatabaseConfig
-import slick.driver.{JdbcProfile, SQLiteDriver}
+import slick.driver.JdbcProfile
 import slick.driver.SQLiteDriver.api._
 import slick.lifted.{ForeignKeyQuery, Index, MappedProjection, ProvenShape}
 import utils.Const
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseConfigProvider, userDAO: UserDAO)
                          (implicit executionContext: ExecutionContext) {
   private val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+  dbConfig.db.run(DBIO.seq(sqlu"PRAGMA foreign_keys = ON;")).map { _ => () }
 
   private val budgets: TableQuery[BudgetTable] = TableQuery[BudgetTable]
   private val takesFromBudgets: TableQuery[TakesFromTable] = TableQuery[TakesFromTable]
@@ -33,7 +36,7 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
       val budgetToInsert = Budget(budget.name, budget.`type`, budget.used, budget.left, budget.exceeding,
         budget.persistent, budget.reported, budget.color, userId)
 
-      dbConfig.db.run(budgets += budgetToInsert)
+      dbConfig.db.run(budgets returning budgets.map(_.id) += budgetToInsert)
     }
   }
 
@@ -58,29 +61,42 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
   }
 
   def findAll(userEmail: String): Future[Seq[BudgetAndTakesFromAllGETDTO]] = {
-    val budgetsToReturn: Seq[BudgetAndTakesFromAllGETDTO] = null
+    val budgetsToReturn: ArrayBuffer[BudgetAndTakesFromAllGETDTO] = ArrayBuffer()
 
     dbConfig.db.run(budgets.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .map(_._1.budgetInfo).result).map { retrievedBudgets =>
       retrievedBudgets.foreach { b =>
-        dbConfig.db.run(takesFromBudgets.filter(_.budgetGoesToId === b.id).map(_.takesFromInfo).result).map { t =>
-          budgetsToReturn :+ BudgetAndTakesFromAllGETDTO(b.id, b.name, b.`type`, b.used, b.left, b.exceeding,
+        // we need to wait that requests are completed
+        Await.ready(dbConfig.db.run(takesFromBudgets.filter(_.budgetGoesToId === b.id).map(_.takesFromInfo).result).map { t =>
+          budgetsToReturn += BudgetAndTakesFromAllGETDTO(b.id, b.name, b.`type`, b.used, b.left, b.exceeding,
             b.persistent, b.reported, b.color, Option(t))
-        }
+        }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       budgetsToReturn
     }
   }
 
-  /*def find(userEmail: String, id: Int): Future[BudgetAndTakesFromAllGETDTO] = {
+  def find(userEmail: String, id: Int): Future[BudgetAndTakesFromGETDTO] = {
+    var budgetToReturn: BudgetAndTakesFromGETDTO = null
+
     // with a join and the email of the connected user, we first verify that the asked budgets (id) belongs to this user
     // or exists
-    dbConfig.db.run(exchanges.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
-      .filter(_._1.id === id).map(_._1.exchangeInfo).result.head)
+    dbConfig.db.run(budgets.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
+      .filter(_._1.id === id).map(_._1.budgetInfo).result.head).map { retrievedBudget =>
+      // we need to wait that request is completed
+      Await.ready(dbConfig.db.run(takesFromBudgets.filter(_.budgetGoesToId === retrievedBudget.id)
+        .map(_.takesFromInfo).result).map { t =>
+        budgetToReturn = BudgetAndTakesFromGETDTO(retrievedBudget.name, retrievedBudget.`type`, retrievedBudget.used,
+          retrievedBudget.left, retrievedBudget.exceeding, retrievedBudget.persistent, retrievedBudget.reported,
+          retrievedBudget.color, Option(t))
+      }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+
+      budgetToReturn
+    }
   }
 
-  def update(userEmail: String, id: Int, exchange: ExchangePATCHDTO): Future[Unit] = {
+  /*def update(userEmail: String, id: Int, exchange: ExchangePATCHDTO): Future[Unit] = {
     // we first verify that the asked exchange (id) to update belongs to this user or exists
     dbConfig.db.run(exchanges.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .filter(_._1.id === id).map(_._1.exchangeInfo).result.head).map { _ =>
@@ -114,15 +130,18 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
 
       futureToReturn
     }
-  }
+  }*/
 
   def delete(userEmail: String, id: Int): Future[Unit] = {
-    // we first verify that the asked exchange (id) to delete belongs to this user or exists
-    dbConfig.db.run(exchanges.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
-      .filter(_._1.id === id).map(_._1.exchangeInfo).result.head).map { _ =>
-      dbConfig.db.run(exchanges.filter(_.id === id).delete).map { _ => () }
+    // we need this first SQL request to enable the foreign key constraint in this case
+    //dbConfig.db.run(DBIO.seq(sqlu"PRAGMA foreign_keys = ON;")).map { _ =>
+      // we first verify that the asked exchange (id) to delete belongs to this user or exists
+      dbConfig.db.run(budgets.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
+        .filter(_._1.id === id).result.head).map { _ =>
+        dbConfig.db.run(budgets.filter(_.id === id).delete).map { _ => () }
+     // }
     }
-  }*/
+  }
 
   private class BudgetTable(tag: Tag) extends Table[Budget](tag, "budget") {
     def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)

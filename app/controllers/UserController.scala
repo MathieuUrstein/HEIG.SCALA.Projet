@@ -30,10 +30,10 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
     ) (unlift(UserGETDTO.unapply))
 
   implicit val userPATCHDTOReads: Reads[UserPATCHDTO] = (
-    (JsPath \ "fullname").read[String] and
-      (JsPath \ "email").read[String] and
-      (JsPath \ "password").read[String] and
-      (JsPath \ "currency").read[String]
+    (JsPath \ "fullname").readNullable[String] and
+      (JsPath \ "email").readNullable[String] and
+      (JsPath \ "password").readNullable[String] and
+      (JsPath \ "currency").readNullable[String]
     ) (UserPATCHDTO.apply _)
 
   implicit val loginFormDTOReads: Reads[LoginFormDTO] = (
@@ -112,7 +112,7 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
         // we look for the user email in the JWT
         userDAO.update(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, user).map { _ =>
           // in case of a successful change of email, we must change the value contained in the JWT with the new email
-          if (!user.email.isEmpty) {
+          if (user.email.isDefined) {
             Ok(Json.obj("status" -> "OK", "message" -> "information updated"))
               .addingToJwtSession(Const.ValueStoredJWT, user.email)
           }

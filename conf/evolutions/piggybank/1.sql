@@ -20,7 +20,7 @@ CREATE TABLE "budget"(
   persistent INTEGER NOT NULL,
   reported BOOLEAN NOT NULL,
   color VARCHAR(60) NOT NULL,
-  FOREIGN KEY(userId) REFERENCES "user"(id)
+  FOREIGN KEY(userId) REFERENCES "user"(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE "takes_from"(
@@ -28,8 +28,8 @@ CREATE TABLE "takes_from"(
   budgetGoesToId INTEGER NOT NULL,
   budgetTakesFromId INTEGER NOT NULL,
   "order" INTEGER NOT NULL,
-  FOREIGN KEY(budgetGoesToId) REFERENCES "budget"(id),
-  FOREIGN KEY(budgetTakesFromId) REFERENCES "budget"(id),
+  FOREIGN KEY(budgetGoesToId) REFERENCES "budget"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY(budgetTakesFromId) REFERENCES "budget"(id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT "unique_row" UNIQUE(budgetGoesToId, budgetTakesFromId)
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE "transaction"(
   name VARCHAR(60) NOT NULL,
   date DATE NOT NULL,
   amount DOUBLE NOT NULL,
-  FOREIGN KEY(userId) REFERENCES "user"(id)
+  FOREIGN KEY(userId) REFERENCES "user"(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE "exchange"(
@@ -49,7 +49,7 @@ CREATE TABLE "exchange"(
   date DATE NOT NULL,
   type VARCHAR(60) NOT NULL,
   amount DOUBLE NOT NULL,
-  FOREIGN KEY(userId) REFERENCES "user"(id)
+  FOREIGN KEY(userId) REFERENCES "user"(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 # --- !Downs

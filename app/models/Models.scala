@@ -4,7 +4,8 @@ import java.sql.Date
 
 case class User(fullname: String, email: String, var password: String, currency: String)
 case class UserGETDTO(fullname: String, email: String, currency: String)
-case class UserPATCHDTO(fullname: String, email: String, var password: String, currency: String)
+case class UserPATCHDTO(fullname: Option[String], email: Option[String], var password: Option[String],
+                        currency: Option[String])
 case class LoginFormDTO(email: String, password: String)
 
 case class DateDTO(day: Int, month: Int, year: Int)
@@ -36,3 +37,6 @@ case class BudgetGET(id: Int, name: String, `type`: String, used: Double, left: 
 case class BudgetAndTakesFromAllGETDTO(id: Int, name: String, `type`: String, used: Double, left: Double,
                                        exceeding: Double, persistent: Int, reported: Boolean, color: String,
                                        takesFrom: Option[Seq[TakesFromDTO]])
+case class BudgetAndTakesFromGETDTO(name: String, `type`: String, used: Double, left: Double, exceeding: Double,
+                                    persistent: Int, reported: Boolean, color: String,
+                                    takesFromDTO: Option[Seq[TakesFromDTO]])

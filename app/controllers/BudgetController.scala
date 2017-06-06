@@ -52,15 +52,19 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
       (JsPath \ "takesFrom").writeNullable[Seq[TakesFromDTO]]
     ) (unlift(BudgetAndTakesFromAllGETDTO.unapply))
 
-  /*implicit val exchangeAllGETDTOWrites: Writes[ExchangeAllGETDTO] = (
-    (JsPath \ "id").write[Int] and
-      (JsPath \ "name").write[String] and
-      (JsPath \ "date").writeNullable[DateDTO] and
+  implicit val budgetAndTakesFromGETDTOWrites: Writes[BudgetAndTakesFromGETDTO] = (
+    (JsPath \ "name").write[String] and
       (JsPath \ "type").write[String] and
-      (JsPath \ "amount").write[Double]
-    ) (unlift(ExchangeAllGETDTO.unapply))
+      (JsPath \ "used").write[Double] and
+      (JsPath \ "left").write[Double] and
+      (JsPath \ "exceeding").write[Double] and
+      (JsPath \ "persistent").write[Int] and
+      (JsPath \ "reported").write[Boolean] and
+      (JsPath \ "color").write[String] and
+      (JsPath \ "takesFrom").writeNullable[Seq[TakesFromDTO]]
+    ) (unlift(BudgetAndTakesFromGETDTO.unapply))
 
-  implicit val exchangePATCHDTOReads: Reads[ExchangePATCHDTO] = (
+  /*implicit val exchangePATCHDTOReads: Reads[ExchangePATCHDTO] = (
     (JsPath \ "name").readNullable[String] and
       (JsPath \ "date").readNullable[DateDTO] and
       (JsPath \ "type").readNullable[String] and
@@ -133,26 +137,22 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
   def readAll: Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     budgetDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { budgets =>
-      Ok(Json.obj("status" -> "OK", "exchanges" -> budgets))
+      Ok(Json.obj("status" -> "OK", "budgets" -> budgets))
     }
   }
 
-  /*def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
+  def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
-    exchangeDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { exchange =>
-      val dateToSend = Option(DateDTO(exchange.date.toString.substring(8, 10).toInt,
-        exchange.date.toString.substring(5, 7).toInt, exchange.date.toString.substring(0, 4).toInt))
-      val exchangeToSend = ExchangeGETDTO(exchange.name, dateToSend, exchange.`type`, exchange.amount)
-
-      Ok(Json.obj("status" -> "OK", "exchange" -> exchangeToSend))
+    budgetDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { budget =>
+      Ok(Json.obj("status" -> "OK", "budget" -> budget))
     }.recover {
-      // case in not found the specified exchange with its id
+      // case in not found the specified budget with its id
       case _: NoSuchElementException =>
-        NotFound(Json.obj("status" -> "ERROR", "message" -> "exchange with id '%s' not found".format(id)))
+        NotFound(Json.obj("status" -> "ERROR", "message" -> "budget with id '%s' not found".format(id)))
     }
   }
 
-  def update(id: Int): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
+  /*def update(id: Int): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[ExchangePATCHDTO]
 
     result.fold(
@@ -170,16 +170,16 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
         }
       }
     )
-  }
+  }*/
 
   def delete(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
-    exchangeDAO.delete(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { _ =>
-      Ok(Json.obj("status" -> "OK", "user" -> "exchange deleted"))
+    budgetDAO.delete(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { _ =>
+      Ok(Json.obj("status" -> "OK", "user" -> "budget deleted"))
     }.recover {
-      // case in not found the specified exchange with its id
+      // case in not found the specified budget with its id
       case _: NoSuchElementException =>
-        NotFound(Json.obj("status" -> "ERROR", "message" -> "exchange with id '%s' not found".format(id)))
+        NotFound(Json.obj("status" -> "ERROR", "message" -> "budget with id '%s' not found".format(id)))
     }
-  }*/
+  }
 }

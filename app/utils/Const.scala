@@ -9,6 +9,8 @@ object Const {
   final val format = new SimpleDateFormat("yyyy-MM-dd")
   final val errorMessageEmptyStringJSON = "validate.error.empty.value"
   final val errorMessageEmptyArrayJSON = "validate.error.empty.array"
+  final val maxTimeToWaitInSeconds = 10
+  final val timeToWaitUnit = "seconds"
 
 
   final val SQLiteUniqueConstraintErrorCode = 2067
