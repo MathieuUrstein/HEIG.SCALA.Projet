@@ -17,10 +17,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: ExecutionContext)
   extends Controller with Secured {
   implicit val userReads: Reads[User] = (
-    (JsPath \ "fullname").read[String](notEqual("")) and
-      (JsPath \ "email").read[String](notEqual("")) and
-      (JsPath \ "password").read[String](notEqual("")) and
-      (JsPath \ "currency").read[String](notEqual(""))
+    (JsPath \ "fullname").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
+      (JsPath \ "email").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
+      (JsPath \ "password").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
+      (JsPath \ "currency").read[String](notEqual(Const.errorMessageEmptyStringJSON, ""))
     ) (User.apply _)
 
   implicit val userGETDTOWrites: Writes[UserGETDTO] = (
@@ -37,8 +37,8 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
     ) (UserPATCHDTO.apply _)
 
   implicit val loginFormDTOReads: Reads[LoginFormDTO] = (
-    (JsPath \ "email").read[String](notEqual("")) and
-      (JsPath \ "password").read[String](notEqual(""))
+    (JsPath \ "email").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
+      (JsPath \ "password").read[String](notEqual(Const.errorMessageEmptyStringJSON, ""))
     ) (LoginFormDTO.apply _)
 
   def create(): Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit request =>
@@ -64,8 +64,8 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
     )
   }
 
-  // TODO : case when an user is already authenticated => error 400 (improvement)
-  // TODO : invalidating JWT (improvement)
+  // TODO: case when an user is already authenticated => error 400 (improvement)
+  // TODO: invalidating JWT (form of logout) (improvement)
 
   def login: Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[LoginFormDTO]

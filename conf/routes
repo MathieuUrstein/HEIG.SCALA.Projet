@@ -23,11 +23,18 @@ DELETE  /api/transactions/:id        controllers.TransactionController.delete(id
 
 # Exchange
 POST    /api/exchanges               controllers.ExchangeController.create
-# TODO : change for GET when tests are finished (POSTMAN doesn't accept body for GET requests)
+# TODO: change for GET when tests are finished (POSTMAN doesn't accept body for GET requests)
 OPTIONS /api/exchanges               controllers.ExchangeController.readAll
 GET     /api/exchanges/:id           controllers.ExchangeController.read(id: Int)
 PATCH   /api/exchanges/:id           controllers.ExchangeController.update(id: Int)
 DELETE  /api/exchanges/:id           controllers.ExchangeController.delete(id: Int)
+
+# Budget
+POST    /api/budgets                 controllers.BudgetController.create
+GET     /api/budgets                 controllers.BudgetController.readAll
+#GET     /api/budgets/:id             controllers.BudgetController.read(id: Int)
+#PATCH   /api/budgets/:id             controllers.BudgetController.update(id: Int)
+#DELETE  /api/budgets/:id             controllers.BudgetController.delete(id: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

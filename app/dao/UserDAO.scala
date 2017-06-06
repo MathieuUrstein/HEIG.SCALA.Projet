@@ -84,13 +84,15 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
     def password: Rep[String] = column[String]("password")
     def currency: Rep[String] = column[String]("currency")
 
+    // make email unique for each user
+    def emailIndex: Index = index("unique_email", email, unique = true)
+
     def * : ProvenShape[User] = (fullname, email, password, currency) <> ((User.apply _).tupled, User.unapply)
+
     def userInfo: MappedProjection[UserGETDTO, (String, String, String)] = {
       (fullname, email, currency) <> (UserGETDTO.tupled, UserGETDTO.unapply)
     }
     def userId: Rep[Int] = id
     def userPassword: Rep[String] = password
-    // make email unique for each user
-    def emailIndex: Index = index("unique_email", email, unique = true)
   }
 }

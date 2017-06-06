@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit executionContext: ExecutionContext)
   extends Controller with Secured {
   implicit val transactionPOSTDTOReads: Reads[TransactionPOSTDTO] = (
-    (JsPath \ "name").read[String](notEqual("")) and
+    (JsPath \ "name").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
       (JsPath \ "date").readNullable[DateDTO] and
       (JsPath \ "amount").read[Double]
     ) (TransactionPOSTDTO.apply _)

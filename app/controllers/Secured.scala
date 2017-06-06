@@ -21,8 +21,8 @@ trait Secured {
   // defines a custom reads to be reused
   // a reads that verifies your value is not equal to a given value
   // used to refuse empty string in JSON in our case
-  def notEqual[T](v: T)(implicit r: Reads[T]): Reads[T] = {
-    Reads.filterNot(ValidationError("validate.error.empty.value", v))(_ == v)
+  def notEqual[T](message: String, value: T)(implicit r: Reads[T]): Reads[T] = {
+    Reads.filterNot(ValidationError(message, value))(_ == value)
   }
 
   implicit val dateDTOReads: Reads[DateDTO] = (

@@ -1,7 +1,7 @@
 package dao
 
 import java.sql.Date
-import java.util.{Calendar, NoSuchElementException}
+import java.util.Calendar
 import javax.inject.Inject
 
 import models._
@@ -108,12 +108,13 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
       foreignKey("user_FK", userId, userDAO.users)(_.id, onDelete = ForeignKeyAction.Cascade,
         onUpdate = ForeignKeyAction.Cascade)
     }
-    // TODO : ajouter foreign key sur budget correspondant n to one relation
+    // TODO: ajouter foreign key sur budget correspondant n to one relation
     //def budgetId = foreignKey("budget_FK", id, suppliers)(_.id)
 
     def * : ProvenShape[Transaction] = {
       (name, date, amount, userId) <> ((Transaction.apply _).tupled, Transaction.unapply)
     }
+
     def transactionInfo: MappedProjection[TransactionGET, (Int, String, Date, Double)] = {
       (id, name, date, amount) <> (TransactionGET.tupled, TransactionGET.unapply)
     }

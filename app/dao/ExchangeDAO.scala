@@ -117,6 +117,7 @@ class ExchangeDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Datab
     def * : ProvenShape[Exchange] = {
       (name, date, `type`, amount, userId) <> ((Exchange.apply _).tupled, Exchange.unapply)
     }
+
     def exchangeInfo: MappedProjection[ExchangeGET, (Int, String, Date, String, Double)] = {
       (id, name, date, `type`, amount) <> (ExchangeGET.tupled, ExchangeGET.unapply)
     }

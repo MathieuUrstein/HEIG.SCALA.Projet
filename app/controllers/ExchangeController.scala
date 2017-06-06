@@ -16,10 +16,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionContext: ExecutionContext)
   extends Controller with Secured {
   // TODO : control type values between borrow and lend (improvement)
+
   implicit val exchangePOSTDTOReads: Reads[ExchangePOSTDTO] = (
-    (JsPath \ "name").read[String](notEqual("")) and
+    (JsPath \ "name").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
       (JsPath \ "date").readNullable[DateDTO] and
-      (JsPath \ "type").read[String](notEqual("")) and
+      (JsPath \ "type").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
       (JsPath \ "amount").read[Double]
     ) (ExchangePOSTDTO.apply _)
 
