@@ -25,7 +25,7 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
       (JsPath \ "budgetId").write[Int]
     ) (unlift(TakesFromDTO.unapply))
 
-  // TODO: control type values between income and outcome (improvement)
+  // TODO: check type values between income and outcome (improvement)
 
   implicit val budgetPOSTDTOReads: Reads[BudgetPOSTDTO] = (
     (JsPath \ "name").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and

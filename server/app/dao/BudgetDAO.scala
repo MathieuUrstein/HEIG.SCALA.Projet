@@ -6,7 +6,7 @@ import models._
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 import slick.backend.DatabaseConfig
-import slick.driver.JdbcProfile
+import slick.driver.{JdbcProfile, SQLiteDriver}
 import slick.driver.SQLiteDriver.api._
 import slick.lifted.{ForeignKeyQuery, Index, MappedProjection, ProvenShape}
 import utils.Const
@@ -15,13 +15,15 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseConfigProvider, userDAO: UserDAO)
+class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseConfigProvider, val userDAO: UserDAO)
                          (implicit executionContext: ExecutionContext) {
   private val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
   dbConfig.db.run(DBIO.seq(sqlu"PRAGMA foreign_keys = ON;")).map { _ => () }
 
-  private val budgets: TableQuery[BudgetTable] = TableQuery[BudgetTable]
+  val budgets: TableQuery[BudgetTable] = TableQuery[BudgetTable]
   private val takesFromBudgets: TableQuery[TakesFromTable] = TableQuery[TakesFromTable]
+
+  def getBudgetName(id: Int): Future[String] = dbConfig.db.run(budgets.filter(_.id === id).map(_.name).result.head)
 
   def isBudgetExisting(userEmail: String, id: Int): Future[Future[Boolean]] = {
     // we get the id of the connected user
@@ -41,7 +43,7 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
   }
 
   def insertTakesFrom(budgetGoesToId: Int, takesFrom: TakesFromDTO): Future[Future[Unit]] = {
-    // we control that the two budgets are different
+    // we check that the two budgets are different
     if (budgetGoesToId == takesFrom.budgetId) {
       throw new Exception("can't specify the same budget twice")
     }
@@ -143,7 +145,7 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     }
   }
 
-  private class BudgetTable(tag: Tag) extends Table[Budget](tag, "budget") {
+  class BudgetTable(tag: Tag) extends Table[Budget](tag, "budget") {
     def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def userId: Rep[Int] = column[Int]("userId")
     def name: Rep[String] = column[String]("name")
@@ -171,8 +173,6 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     def budgetInfo: MappedProjection[BudgetGET, (Int, String, String, Double, Double, Double, Int, Boolean, String)] = {
       (id, name, `type`, used, left, exceeding, persistent, reported, color) <> (BudgetGET.tupled, BudgetGET.unapply)
     }
-    def budgetId: Rep[Int] = id
-    def budgetType: Rep[String] = `type`
   }
 
   private class TakesFromTable(tag: Tag) extends Table[TakesFrom](tag, "takes_from") {

@@ -17,8 +17,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseConfigProvider)
                        (implicit executionContext: ExecutionContext) {
   private val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+  // initialisation of foreign key in SQLite
+  dbConfig.db.run(DBIO.seq(sqlu"PRAGMA foreign_keys = ON;")).map { _ => () }
 
   val users: TableQuery[UserTable] = TableQuery[UserTable]
+
+  // TODO: check email validity (improvement)
 
   def insert(user: User): Future[Unit] = {
     // hash the password before store it
@@ -29,18 +33,18 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
   }
 
   def getId(email: String): Future[Int] = {
-    dbConfig.db.run(users.filter(_.email === email).map(_.userId).result.head)
+    dbConfig.db.run(users.filter(_.email === email).map(_.id).result.head)
   }
 
   def getPassword(email: String): Future[String] = {
-    dbConfig.db.run(users.filter(_.email === email).map(_.userPassword).result.head)
+    dbConfig.db.run(users.filter(_.email === email).map(_.password).result.head)
   }
 
   def find(email: String): Future[UserGETDTO] = {
     dbConfig.db.run(users.filter(_.email === email).map(_.userInfo).result.head)
   }
 
-  private def updateRequest(email: String, field: UserTable => SQLiteDriver.api.Rep[String], value: String) = {
+  private def updateRequest(email: String, field: UserTable => Rep[String], value: String) = {
     dbConfig.db.run(users.filter(_.email === email).map(field).update(value)).map { _ => () }
   }
 
@@ -73,7 +77,10 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
   }
 
   def delete(email: String): Future[Unit] = {
-    dbConfig.db.run(users.filter(_.email === email).delete).map { _ => () }
+    dbConfig.db.run(users.filter(_.email === email).delete).map {
+      case 0 => throw new NoSuchElementException
+      case _ => Unit
+    }
   }
 
   class UserTable(tag: Tag) extends Table[User](tag, "user") {
@@ -92,7 +99,5 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
     def userInfo: MappedProjection[UserGETDTO, (String, String, String)] = {
       (fullname, email, currency) <> (UserGETDTO.tupled, UserGETDTO.unapply)
     }
-    def userId: Rep[Int] = id
-    def userPassword: Rep[String] = password
   }
 }

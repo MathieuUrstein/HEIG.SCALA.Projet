@@ -8,16 +8,19 @@ case class UserPATCHDTO(fullname: Option[String], email: Option[String], var pas
                         currency: Option[String])
 case class LoginFormDTO(email: String, password: String)
 
+// TODO: delete the error with a 0 in front of a number (improvement)
+
 case class DateDTO(day: Int, month: Int, year: Int)
 case class FromToDatesDTO(from: Option[DateDTO], to: Option[DateDTO])
 
-case class Transaction(name: String, date: Date, amount: Double, userId: Int)
-case class TransactionPOSTDTO(name: String, date: Option[DateDTO], amount: Double)
-// TODO: ajouter budget
-case class TransactionGET(id: Int, name: String, date: Date, amount: Double)
-case class TransactionAllGETDTO(id: Int, name: String, date: Option[DateDTO], amount: Double)
-case class TransactionGETDTO(name: String, date: Option[DateDTO], amount: Double)
-case class TransactionPATCHDTO(name: Option[String], date: Option[DateDTO], amount: Option[Double])
+case class Transaction(name: String, date: Date, amount: Double, userId: Int, budgetId: Int)
+case class TransactionPOSTDTO(name: String, date: Option[DateDTO], budgetId: Int, amount: Double)
+case class TransactionGET(id: Int, name: String, date: Date, budgetId: Int, amount: Double)
+case class TransactionAllGETDTO(id: Int, name: String, date: Option[DateDTO],
+                                transaction: TransactionBudgetGETDTO, amount: Double)
+case class TransactionGETDTO(name: String, date: Option[DateDTO], transaction: TransactionBudgetGETDTO, amount: Double)
+case class TransactionPATCHDTO(name: Option[String], date: Option[DateDTO], budgetId: Option[Int], amount: Option[Double])
+case class TransactionBudgetGETDTO(id: Int, name: String)
 
 case class Exchange(name: String, date: Date, `type`: String, amount: Double, userId: Int)
 case class ExchangePOSTDTO(name: String, date: Option[DateDTO], `type`: String, amount: Double)
@@ -39,4 +42,4 @@ case class BudgetAndTakesFromAllGETDTO(id: Int, name: String, `type`: String, us
                                        takesFrom: Option[Seq[TakesFromDTO]])
 case class BudgetAndTakesFromGETDTO(name: String, `type`: String, used: Double, left: Double, exceeding: Double,
                                     persistent: Int, reported: Boolean, color: String,
-                                    takesFromDTO: Option[Seq[TakesFromDTO]])
+                                    takesFrom: Option[Seq[TakesFromDTO]])

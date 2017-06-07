@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionContext: ExecutionContext)
   extends Controller with Secured {
-  // TODO : control type values between borrow and lend (improvement)
+  // TODO: check type values between borrow and lend (improvement)
 
   implicit val exchangePOSTDTOReads: Reads[ExchangePOSTDTO] = (
     (JsPath \ "name").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
