@@ -169,9 +169,8 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
           throw new Exception("new budget doesn't exist")
         }
 
-        // we retrieve the type of the budgets
-        
-        Await.ready(budgetDAO.isBudgetExisting(userEmail, transaction.budgetId.get).map { r =>
+        // we retrieve the type of the new budget to makes checks
+        Await.ready(budgetDAO.find(userEmail, transaction.budgetId.get).map { r =>
           r.map { v =>
             budgetExist = v
           }
