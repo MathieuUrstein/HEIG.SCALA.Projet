@@ -3,7 +3,7 @@ package utils
 import java.text.SimpleDateFormat
 
 object Const {
-  final val DbName = "evolutions/piggybank"
+  final val DbName = "piggybank"
   final val ValueStoredJWT = "userEmail"
   final val CreatedEntityHeaderName = "Location"
   final val format = new SimpleDateFormat("yyyy-MM-dd")
