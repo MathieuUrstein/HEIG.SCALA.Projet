@@ -1,12 +1,11 @@
 package example
 
-import org.scalajs.dom
-import shared.SharedMessages
+import org.scalajs.dom.ext.Ajax
 
 import scala.scalajs.js
 
 object ScalaJSExample extends js.JSApp {
   def main(): Unit = {
-    dom.document.getElementById("scalajsShoutOut").textContent = SharedMessages.itWorks
+    Ajax.get("")
   }
 }
