@@ -1,274 +1,297 @@
 h1 {
-   color: #a04063;
+    color: #a04063;
 }
 h1 span {
-   color: #e0b848;
+    color: #e0b848;
 }
 .modal-footer {
-   display: block;
+    display: block;
 }
 .header {
-   background: #fffdf8;
-   padding: 60px 0 40px;
+    background: #fffdf8;
+    padding: 60px 0 40px;
 }
 .menu {
-   background: #fff8dc;
-   padding: 15px 0 20px;
+    background: #fff8dc;
+    padding: 15px 0 20px;
 }
 .content {
-   padding: 30px 0 140px;
+    padding: 0 0 140px;
 }
 #global-stats {
-   position: fixed;
-   bottom: 0;
-   width: 100%;
-   border-top: 1px solid #c6527b;
-   padding: 20px 0 25px;
-   background: #fff8dc;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #c6527b;
+    padding: 20px 0 25px;
+    background: #fff8dc;
 }
 .btn, button {
-   cursor: pointer;
+    cursor: pointer;
 }
 .btn:focus, button:focus {
-   outline: none;
-   box-shadow: none;
+    outline: none;
+    box-shadow: none;
 }
 .container {
-   position: relative;
+    position: relative;
 }
 .account {
-   position: absolute;
-   top: -40px;
-   right: 0;
+    position: absolute;
+    top: -40px;
+    right: 0;
 }
 .account .btn {
-   border: 1px solid #fff8dc;
-   font-size: 20px;
+    border: 1px solid #fff8dc;
+    font-size: 20px;
 }
 #main-menu {
-   font-size: 18px;
+    font-size: 18px;
 }
 #global-stats .progress {
-   text-align: center;
+    text-align: center;
 }
 
 #global-stats .progress-bar {
-   height: 30px;
-   line-height: 30px;
-   vertical-align: middle;
+    height: 30px;
+    line-height: 30px;
+    vertical-align: middle;
 }
 .details {
-   font-size: 12px;
-   color: gray;
+    font-size: 12px;
+    color: gray;
 }
 .dashboard .cat {
-   margin-top: 30px;
-   margin-bottom: 60px;
+    margin-top: 30px;
+    margin-bottom: 60px;
 }
 .dashboard #income-outcome-details .recap {
-   margin-top: 30px;
+    margin-top: 30px;
 }
 .dashboard #income-outcome-details .progress-bar, .dashboard .full-budget .progress-bar {
-   height: 45px;
-   line-height: 45px;
-   vertical-align: middle;
+    height: 45px;
+    line-height: 45px;
+    vertical-align: middle;
 }
 .dashboard .full-budget h4 span {
-   color: gray;
+    color: gray;
 }
 .dashboard #income-outcome-budgets h6 {
-   margin-top: 15px;
-   margin-bottom: 5px;
+    margin-top: 15px;
+    margin-bottom: 5px;
 }
 .dashboard #income-outcome-budgets .left {
-   color: black;
+    color: black;
 }
 .dashboard #income-outcome-budgets h6 span {
-   color: gray;
+    color: gray;
 }
 .dashboard #income-outcome-budgets h6 span i {
-   margin-left: 10px;
+    margin-left: 10px;
 }
 .transactions .amount {
-   text-align: right;
-   font-weight: bold;
+    text-align: right;
+    font-weight: bold;
 }
 .transactions .add > div {
-   padding: 0 15px;
+    padding: 0 15px;
 }
 .transactions .add .col1 {
-   width: 50%;
+    width: 50%;
 }
 .transactions .add .col2 {
-   width: 30%;
-   padding: 0;
+    width: 30%;
+    padding: 0;
 }
 .transactions .add .col2 .btn {
-   text-align: left;
+    text-align: left;
 }
 .transactions .add .col2 .dropdown-toggle::after {
-   right: 15px;
-   top: 16px;
-   position: absolute;
+    right: 15px;
+    top: 16px;
+    position: absolute;
 }
 .transactions .add .col3 {
-   width: 20%;
+    width: 20%;
 }
 .transactions .col3 .input-group-addon {
-   font-size: 10px;
+    font-size: 10px;
 }
 .transactions label {
-   font-size: 20px;
-   font-weight: bold;
-   padding: 0 15px;
-   display: block;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 0 15px;
+    display: block;
 }
 .transactions input, .transactions td, .transactions select {
-   padding-left: 15px;
-   padding-right: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 .transactions .col3 label {
-   text-align: right;
+    text-align: right;
 }
 #add-transaction, #add-exchange, #add-budget {
-   text-align: center;
-   margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 20px;
 }
 #add-transaction button, #add-exchange button, #add-budget button {
-   border: 1px solid #e0b848;
-   background: white;
-   border-radius: 100%;
-   color: #e0b848;
-   font-size: 20px;
-   width: 50px;
-   height: 50px;
-   line-height: 40px;
-   vertical-align: middle;
+    border: 1px solid #e0b848;
+    background: white;
+    border-radius: 100%;
+    color: #e0b848;
+    font-size: 20px;
+    width: 50px;
+    height: 50px;
+    line-height: 40px;
+    vertical-align: middle;
 }
 #add-transaction button:hover, #add-exchange button:hover, #add-budget button:hover {
-   background: #fff8dc;
+    background: #fff8dc;
 }
 .transactions .widgets span, .exchanges .widgets span {
-   font-size: .875rem;
-   color: gray;
+    font-size: .875rem;
+    color: gray;
 }
 .transactions table .date {
-   font-size: 12px;
-   color: gray;
-   float: right;
-   margin-top: 5px;
-   margin-right: 15px;
+    font-size: 12px;
+    color: gray;
+    float: right;
+    margin-top: 5px;
+    margin-right: 15px;
 }
 .transactions table .edit {
-   padding: 0;
+    padding: 0;
 }
 .transactions table .name {
-   padding-left: 5px;
+    padding-left: 5px;
 }
 .transactions table button {
-   background: transparent;
-   padding: 15px;
-   border-radius: 0;
+    background: transparent;
+    padding: 15px;
+    border-radius: 0;
 }
 .transactions table button:hover {
-   background: #fff8dc;
+    background: #fff8dc;
 }
 .exchanges .cols div:first-child {
-   border-right: 1px solid gray;
+    border-right: 1px solid gray;
 }
 .exchanges .cols .amount {
-   font-weight: bold;
-   padding-left: 15px;
-   padding-right: 15px;
+    font-weight: bold;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 .exchanges table .date {
-   font-size: 12px;
-   color: gray;
-   float: right;
-   margin-top: 5px;
-   margin-right: 15px;
+    font-size: 12px;
+    color: gray;
+    float: right;
+    margin-top: 5px;
+    margin-right: 15px;
 }
 .exchanges td {
-   padding-left: 15px;
-   padding-right: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 .exchanges h4 {
-   padding: 0 15px;
+    padding: 0 15px;
 }
 .exchanges .right span {
-   float: left;
+    float: left;
 }
 .exchanges .edit {
-   padding: 0;
+    padding: 0;
 }
 .exchanges .edit button {
-   background: transparent;
-   padding: 15px;
-   border-radius: 0;
+    background: transparent;
+    padding: 15px;
+    border-radius: 0;
 }
 .exchanges .edit button:hover {
-   background-color: #fff8dc;
+    background-color: #fff8dc;
 }
 .exchanges .name {
-   padding-left: 5px;
+    padding-left: 5px;
 }
 .exchanges .right .name {
-   padding-left: 15px;
-   padding-right: 5px;
+    padding-left: 15px;
+    padding-right: 5px;
 }
 .budgets .budget .progress-bar {
-   height: 45px;
-   line-height: 45px;
-   vertical-align: middle;
+    height: 45px;
+    line-height: 45px;
+    vertical-align: middle;
 }
 .budgets .budget {
-   margin-bottom: 30px;
+    margin-bottom: 30px;
 }
 .budgets .budget h4 {
-   padding: 0 15px 0 0;
-   margin-bottom: 0;
+    padding: 0 15px 0 0;
+    margin-bottom: 0;
 }
 .budgets .budget .left {
-   color: black;
+    color: black;
 }
 .budgets .budget.default h4 {
-   padding-bottom: 7px;
+    padding-bottom: 7px;
 }
 .budgets .budget h4 span {
-   font-size: 18px;
-   color: gray;
-   margin-top: 5px;
+    font-size: 18px;
+    color: gray;
+    margin-top: 5px;
 }
 .budgets .budget h4 span i {
-   margin-left: 10px;
+    margin-left: 10px;
 }
 .budgets h4 .edit {
-   background: transparent;
-   padding-bottom: 7px;
+    background: transparent;
+    padding-bottom: 7px;
 }
 .budgets h4 .edit:hover {
-   background-color: #fff8dc;
+    background-color: #fff8dc;
 }
 #exchanges-modal .nav, #budgets-modal .nav {
-   margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 #budgets-modal .related-income {
-   padding: 5px;
+    padding: 5px;
 }
 #budgets-modal .related-income .order {
-   font-weight: bold;
-   margin-right: 15px;
+    font-weight: bold;
+    margin-right: 15px;
 }
 #budgets-modal .related-income .remove {
-   float: right;
+    float: right;
 }
 #budgets-modal .preview-color {
-   width: 14px;
-   height: 14px;
-   border-radius: 5px;
-   display: inline-block;
-   margin-right: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-right: 5px;
 }
 .bg-debt {
-   background-color: black;
+    background-color: black;
+}
+.login .wrapper {
+    background-color: #fffdf8;
+    border-radius: 5px;
+    padding: 15px 30px;
+}
+.login h2 {
+    margin: 10px 0 20px;
+}
+.login .smaller {
+    padding: 86px 0;
+}
+.login .rc {
+    border-left: 1px solid white;
+}
+.login button {
+    margin: 0 auto !important;
+    display: block;
+}
+.flash {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    min-height: 1px;
 }

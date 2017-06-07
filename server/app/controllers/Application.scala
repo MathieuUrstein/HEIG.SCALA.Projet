@@ -20,6 +20,10 @@ class Application extends Controller {
     Ok(views.html.pages.budgets())
   }
 
+  def config = Action {
+    Ok(views.html.pages.config())
+  }
+
   def login = Action {
     Ok(views.html.pages.login())
   }

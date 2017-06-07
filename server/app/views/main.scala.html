@@ -19,14 +19,14 @@
                         <i class="fa fa-user" aria-hidden="true"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right text-right">
-                        <button class="dropdown-item" type="button">
+                        <a class="dropdown-item" href="@routes.Application.config()">
                             Settings
                             <i class="fa fa-cog" aria-hidden="true"></i>
-                        </button>
-                        <button class="dropdown-item" type="button">
+                        </a>
+                        <a class="dropdown-item" href="@routes.Application.login()">
                             Disconnect
                             <i class="fa fa-sign-out" aria-hidden="true"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
                 <div id="logo" class="text-center">
@@ -63,6 +63,34 @@
                     </li>
                 </ul>
             </div>
+        </div>
+        <div class="flash container">
+            <!--
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                success
+            </div>
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                info
+            </div>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                warning
+            </div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                danger
+            </div>
+            -->
         </div>
 
         @content
