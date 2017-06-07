@@ -1,0 +1,209 @@
+@main("Transactions") {
+    <div class="content">
+        <div class="container">
+            <div class="transactions">
+                <div class="row widgets">
+                    <div class="col-4">
+                        <span>From :</span>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Month
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#">January</a>
+                                <a class="dropdown-item" href="#">February</a>
+                                <a class="dropdown-item" href="#">March</a>
+                                <a class="dropdown-item" href="#">April</a>
+                                <a class="dropdown-item" href="#">Mai</a>
+                                <a class="dropdown-item" href="#">June</a>
+                                <a class="dropdown-item" href="#">July</a>
+                                <a class="dropdown-item" href="#">August</a>
+                                <a class="dropdown-item" href="#">September</a>
+                                <a class="dropdown-item" href="#">October</a>
+                                <a class="dropdown-item" href="#">November</a>
+                                <a class="dropdown-item" href="#">December</a>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Year
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#">2017</a>
+                                <a class="dropdown-item" href="#">2016</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="add-transaction" class="col-4">
+                        <button>
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="col-4 text-right">
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Month
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right text-right">
+                                <a class="dropdown-item" href="#">January</a>
+                                <a class="dropdown-item" href="#">February</a>
+                                <a class="dropdown-item" href="#">March</a>
+                                <a class="dropdown-item" href="#">April</a>
+                                <a class="dropdown-item" href="#">Mai</a>
+                                <a class="dropdown-item" href="#">June</a>
+                                <a class="dropdown-item" href="#">July</a>
+                                <a class="dropdown-item" href="#">August</a>
+                                <a class="dropdown-item" href="#">September</a>
+                                <a class="dropdown-item" href="#">October</a>
+                                <a class="dropdown-item" href="#">November</a>
+                                <a class="dropdown-item" href="#">December</a>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Year
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right text-right">
+                                <a class="dropdown-item" href="#">2017</a>
+                                <a class="dropdown-item" href="#">2016</a>
+                            </div>
+                        </div>
+                        <span>: To</span>
+                    </div>
+                </div>
+                <div class="add row">
+                    <div class="col1 form-group">
+                        <label for="transaction-name">Name</label>
+                        <input type="text" class="form-control" id="transaction-name" placeholder="Transaction name">
+                    </div>
+                    <div class="col2">
+                        <label for="transaction-name">Budget</label>
+                        <div class="dropdown">
+                            <a class="btn btn-secondary btn-block dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Choose
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="#">Extra</a>
+                                <a class="dropdown-item" href="#">Transportation</a>
+                                <a class="dropdown-item" href="#">Nutrition</a>
+                                <a class="dropdown-item" href="#">Magic money</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#"><i class="fa fa-plus" aria-hidden="true"></i> Add budget</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col3 form-group">
+                        <label for="transaction-amount">Amount</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="transaction-amount" placeholder="">
+                            <div class="input-group-addon">CHF</div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td width="3%" class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td width="47%" class="name">Mc Donald <span class="date">23 sept 2017</span></td>
+                            <td width="30%"><a href="#">Extra</a></td>
+                            <td width="20%" class="amount">-12.30 CHF</td>
+                        </tr>
+                        <tr>
+                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td class="name">Car BMW x3 <span class="date">2 sept 2017</span></td>
+                            <td><a href="#">Transportation</a></td>
+                            <td class="amount">-34'123.30 CHF</td>
+                        </tr>
+                        <tr>
+                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td class="name">Grocery <span class="date">1 sept 2017</span></td>
+                            <td><a href="#">Nutrition</a></td>
+                            <td class="amount">-54.30 CHF</td>
+                        </tr>
+                        <tr style="background: #fffdf8">
+                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td class="name">Grandma gift <span class="date">29 oct 2016</span></td>
+                            <td><a href="#">Magic money</a></td>
+                            <td class="amount">+ 250 CHF</td>
+                        </tr>
+                        <tr>
+                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td class="name">Grocery <span class="date">1 sept 2017</span></td>
+                            <td><a href="#">Nutrition</a></td>
+                            <td class="amount">-54.30 CHF</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="global-stats">
+        <div class="container">
+            <div class="progress">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 25%;">2300 CHF</div>
+                <div class="progress-bar" role="progressbar" style="width: 75%;">5100 CHF</div>
+            </div>
+            <div class="details row">
+                <div class="col-3 text-left">
+                    | 0 CHF
+                </div>
+                <div class="col-6 text-center">
+                    June budget usage - 30%
+                </div>
+                <div class="col-3 text-right">
+                    7400 CHF |
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Modal -->
+    <div class="modal fade" id="edit-transaction-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit transaction</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" placeholder="Transaction name">
+                        </div>
+                        <div class="form-group">
+                            <label>Budget</label>
+                            <div class="dropdown">
+                                <a class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Choose
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <a class="dropdown-item" href="#">Extra</a>
+                                    <a class="dropdown-item" href="#">Transportation</a>
+                                    <a class="dropdown-item" href="#">Nutrition</a>
+                                    <a class="dropdown-item" href="#">Magic money</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#"><i class="fa fa-plus" aria-hidden="true"></i> Add budget</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="">
+                                <div class="input-group-addon">CHF</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger float-left">Delete</button>
+                    <button type="button" class="btn btn-success float-right">Save</button>
+                    <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

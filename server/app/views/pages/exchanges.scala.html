@@ -1,0 +1,197 @@
+@main("Exchanges") {
+    <div class="content">
+        <div class="container">
+            <div class="exchanges">
+                <div class="row widgets">
+                    <div class="col-4">
+                        <span>From :</span>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Month
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#">January</a>
+                                <a class="dropdown-item" href="#">February</a>
+                                <a class="dropdown-item" href="#">March</a>
+                                <a class="dropdown-item" href="#">April</a>
+                                <a class="dropdown-item" href="#">Mai</a>
+                                <a class="dropdown-item" href="#">June</a>
+                                <a class="dropdown-item" href="#">July</a>
+                                <a class="dropdown-item" href="#">August</a>
+                                <a class="dropdown-item" href="#">September</a>
+                                <a class="dropdown-item" href="#">October</a>
+                                <a class="dropdown-item" href="#">November</a>
+                                <a class="dropdown-item" href="#">December</a>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Year
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#">2017</a>
+                                <a class="dropdown-item" href="#">2016</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="add-exchange" class="col-4">
+                        <button data-toggle="modal" data-target="#exchanges-modal">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="col-4 text-right">
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Month
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right text-right">
+                                <a class="dropdown-item" href="#">January</a>
+                                <a class="dropdown-item" href="#">February</a>
+                                <a class="dropdown-item" href="#">March</a>
+                                <a class="dropdown-item" href="#">April</a>
+                                <a class="dropdown-item" href="#">Mai</a>
+                                <a class="dropdown-item" href="#">June</a>
+                                <a class="dropdown-item" href="#">July</a>
+                                <a class="dropdown-item" href="#">August</a>
+                                <a class="dropdown-item" href="#">September</a>
+                                <a class="dropdown-item" href="#">October</a>
+                                <a class="dropdown-item" href="#">November</a>
+                                <a class="dropdown-item" href="#">December</a>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Year
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right text-right">
+                                <a class="dropdown-item" href="#">2017</a>
+                                <a class="dropdown-item" href="#">2016</a>
+                            </div>
+                        </div>
+                        <span>: To</span>
+                    </div>
+                </div>
+                <div class="row cols">
+                    <div class="col-6">
+                        <h4>Borrow</h4>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="5%" class="edit"><button class="btn" data-toggle="modal" data-target="#exchanges-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                                    <td width="65%" class="name">Michel Roland <span class="date">23 sept 2017</span></td>
+                                    <td width="30%" class="amount text-right">12.30 CHF</td>
+                                </tr>
+                                <tr>
+                                    <td class="edit"><button class="btn" data-toggle="modal" data-target="#exchanges-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                                    <td class="name">Sébastien Boson <span class="date">2 sept 2017</span></td>
+                                    <td class="amount text-right">300 CHF</td>
+                                </tr>
+                                <tr>
+                                    <td class="edit"><button class="btn" data-toggle="modal" data-target="#exchanges-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                                    <td class="name">Sébastien Boson <span class="date">2 sept 2017</span></td>
+                                    <td class="amount text-right">54 CHF</td>
+                                </tr>
+                                <tr>
+                                    <td class="edit"><button class="btn" data-toggle="modal" data-target="#exchanges-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                                    <td class="name">Sébastien Boson <span class="date">2 sept 2017</span></td>
+                                    <td class="amount text-right">3.50 CHF</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-6 right">
+                        <h4 class="text-right">Lend</h4>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="30%" class="amount">12.30 CHF</td>
+                                    <td width="70%" class="name text-right">Michel Roland <span class="date">23 sept 2017</span></td>
+                                    <td width="5%" class="edit"><button class="btn" data-toggle="modal" data-target="#exchanges-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td class="amount">300 CHF</td>
+                                    <td class="name text-right">Sébastien Boson <span class="date">2 sept 2017</span></td>
+                                    <td class="edit"><button class="btn" data-toggle="modal" data-target="#exchanges-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td class="amount">54 CHF</td>
+                                    <td class="name text-right">Sébastien Boson <span class="date">2 sept 2017</span></td>
+                                    <td class="edit"><button class="btn" data-toggle="modal" data-target="#exchanges-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td class="amount">3.50 CHF</td>
+                                    <td class="name text-right">Sébastien Boson <span class="date">2 sept 2017</span></td>
+                                    <td class="edit"><button class="btn" data-toggle="modal" data-target="#exchanges-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="global-stats">
+        <div class="container">
+            <div class="progress">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: 65%;">600 CHF</div>
+                <div class="progress-bar bg-success" role="progressbar" style="width: 35%;">200 CHF</div>
+            </div>
+            <div class="details row">
+                <div class="col-3 text-left">
+                    | Borrowed
+                </div>
+                <div class="col-6 text-center">
+                    Borrow 45% - 55% Lend
+                </div>
+                <div class="col-3 text-right">
+                    Lent |
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="exchanges-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add or edit exchange</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-pills nav-fill">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#borrow-tab" data-toggle="tab" role="tab">Borrow</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#land-tab" data-toggle="tab" role="tab">Lend</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="borrow-tab" role="tabpanel"></div>
+                        <div class="tab-pane" id="land-tab" role="tabpanel"></div>
+                    </div>
+                    <form>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" placeholder="Transaction name">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="">
+                                <div class="input-group-addon">CHF</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger float-left">Delete</button>
+                    <button type="button" class="btn btn-success float-right">Save</button>
+                    <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
