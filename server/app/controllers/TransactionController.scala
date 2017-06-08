@@ -28,7 +28,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
 
   implicit val transactionGETDTOWrites: Writes[TransactionGETDTO] = (
     (JsPath \ "name").write[String] and
-      (JsPath \ "date").writeNullable[DateDTO] and
+      (JsPath \ "date").write[DateDTO] and
       (JsPath \ "budget").write[TransactionBudgetGETDTO] and
       (JsPath \ "amount").write[Double]
     ) (unlift(TransactionGETDTO.unapply))
@@ -36,7 +36,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
   implicit val transactionAllGETDTOWrites: Writes[TransactionAllGETDTO] = (
     (JsPath \ "id").write[Int] and
       (JsPath \ "name").write[String] and
-      (JsPath \ "date").writeNullable[DateDTO] and
+      (JsPath \ "date").write[DateDTO] and
       (JsPath \ "budget").write[TransactionBudgetGETDTO] and
       (JsPath \ "amount").write[Double]
     ) (unlift(TransactionAllGETDTO.unapply))
@@ -81,7 +81,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
       dates => {
         // we look for the user email in the JWT
         transactionDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, dates).map { transactions =>
-          Ok(Json.obj("status" -> "OK", "transactions" -> transactions))
+          Ok(Json.toJson(transactions))
         }
       }
     )
@@ -90,7 +90,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
   def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     transactionDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { transaction =>
-      Ok(Json.obj("status" -> "OK", "transaction" -> transaction))
+      Ok(Json.toJson(transaction))
     }.recover {
       // case in not found the specified transaction with its id (or the transaction doesn't belong to this user)
       case _: NoSuchElementException =>

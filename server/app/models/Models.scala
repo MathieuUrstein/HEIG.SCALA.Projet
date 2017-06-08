@@ -2,6 +2,8 @@ package models
 
 import java.sql.Date
 
+import slick.jdbc.GetResult
+
 case class User(fullname: String, email: String, var password: String, currency: String)
 case class UserGETDTO(fullname: String, email: String, currency: String)
 case class UserPATCHDTO(fullname: Option[String], email: Option[String], var password: Option[String],
@@ -16,17 +18,17 @@ case class FromToDatesDTO(from: Option[DateDTO], to: Option[DateDTO])
 case class Transaction(name: String, date: Date, amount: Double, userId: Int, budgetId: Int)
 case class TransactionPOSTDTO(name: String, date: Option[DateDTO], budgetId: Int, amount: Double)
 case class TransactionGET(id: Int, name: String, date: Date, budgetId: Int, amount: Double)
-case class TransactionAllGETDTO(id: Int, name: String, date: Option[DateDTO],
-                                transaction: TransactionBudgetGETDTO, amount: Double)
-case class TransactionGETDTO(name: String, date: Option[DateDTO], transaction: TransactionBudgetGETDTO, amount: Double)
+case class TransactionAllGETDTO(id: Int, name: String, date: DateDTO, transaction: TransactionBudgetGETDTO,
+                                amount: Double)
+case class TransactionGETDTO(name: String, date: DateDTO, transaction: TransactionBudgetGETDTO, amount: Double)
 case class TransactionPATCHDTO(name: Option[String], date: Option[DateDTO], budgetId: Option[Int], amount: Option[Double])
 case class TransactionBudgetGETDTO(id: Int, name: String)
 
 case class Exchange(name: String, date: Date, `type`: String, amount: Double, userId: Int)
 case class ExchangePOSTDTO(name: String, date: Option[DateDTO], `type`: String, amount: Double)
 case class ExchangeGET(id: Int, name: String, date: Date, `type`: String, amount: Double)
-case class ExchangeAllGETDTO(id: Int, name: String, date: Option[DateDTO], `type`: String, amount: Double)
-case class ExchangeGETDTO(name: String, date: Option[DateDTO], `type`: String, amount: Double)
+case class ExchangeAllGETDTO(id: Int, name: String, date: DateDTO, `type`: String, amount: Double)
+case class ExchangeGETDTO(name: String, date: DateDTO, `type`: String, amount: Double)
 case class ExchangePATCHDTO(name: Option[String], date: Option[DateDTO], `type`: Option[String], amount: Option[Double])
 
 case class Budget(name: String, `type`: String, used: Double, left: Double, exceeding: Double, persistent: Int,
@@ -47,3 +49,9 @@ case class BudgetPATCHDTO(name: Option[String], used: Option[Double], left: Opti
                           persistent: Option[Int], reported: Option[Boolean], color: Option[String],
                           takesFrom: Option[Seq[TakesFromDTO]])
 
+case class SpendingGETDTO(date: DateDTO, budget: String, amount: Double)
+case class SpendingGET(date: Date, budget: String, amount: Double)
+
+object SpendingGET {
+  implicit val spendingGETResult = GetResult(r => SpendingGET(r.nextDate, r.nextString, r.nextDouble))
+}

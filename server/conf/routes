@@ -36,5 +36,10 @@ GET     /api/budgets/:id             controllers.BudgetController.read(id: Int)
 PATCH   /api/budgets/:id             controllers.BudgetController.update(id: Int)
 DELETE  /api/budgets/:id             controllers.BudgetController.delete(id: Int)
 
+# Dashboard
+# TODO: change for GET when tests are finished (POSTMAN doesn't accept body for GET requests)
+OPTIONS /api/dashboard/spendings     controllers.DashboardController.spendings
+OPTIONS /api/dashboard/usage         controllers.DashboardController.usage
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

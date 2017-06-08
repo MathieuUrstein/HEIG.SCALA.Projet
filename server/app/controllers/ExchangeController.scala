@@ -1,6 +1,5 @@
 package controllers
 
-import java.sql.Date
 import javax.inject.Inject
 
 import dao.ExchangeDAO
@@ -26,7 +25,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
 
   implicit val exchangeGETDTOWrites: Writes[ExchangeGETDTO] = (
     (JsPath \ "name").write[String] and
-      (JsPath \ "date").writeNullable[DateDTO] and
+      (JsPath \ "date").write[DateDTO] and
       (JsPath \ "type").write[String] and
       (JsPath \ "amount").write[Double]
     ) (unlift(ExchangeGETDTO.unapply))
@@ -34,7 +33,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
   implicit val exchangeAllGETDTOWrites: Writes[ExchangeAllGETDTO] = (
     (JsPath \ "id").write[Int] and
       (JsPath \ "name").write[String] and
-      (JsPath \ "date").writeNullable[DateDTO] and
+      (JsPath \ "date").write[DateDTO] and
       (JsPath \ "type").write[String] and
       (JsPath \ "amount").write[Double]
     ) (unlift(ExchangeAllGETDTO.unapply))
@@ -72,7 +71,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
       dates => {
         // we look for the user email in the JWT
         exchangeDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, dates).map { exchanges =>
-          Ok(Json.obj("status" -> "OK", "exchanges" -> exchanges))
+          Ok(Json.toJson(exchanges))
         }
       }
     )
@@ -81,7 +80,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
   def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     exchangeDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { exchange =>
-      Ok(Json.obj("status" -> "OK", "exchange" -> exchange))
+      Ok(Json.toJson(exchange))
     }.recover {
       // case in not found the specified exchange with its id
       case _: NoSuchElementException =>

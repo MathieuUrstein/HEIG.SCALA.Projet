@@ -17,13 +17,13 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseConfigProvider,
-                               userDAO: UserDAO, budgetDAO: BudgetDAO)
+                               val userDAO: UserDAO, val budgetDAO: BudgetDAO)
                               (implicit executionContext: ExecutionContext) {
   private val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
   // initialisation of foreign key in SQLite
   dbConfig.db.run(DBIO.seq(sqlu"PRAGMA foreign_keys = ON;")).map { _ => () }
 
-  private val transactions: TableQuery[TransactionTable] = TableQuery[TransactionTable]
+  val transactions: TableQuery[TransactionTable] = TableQuery[TransactionTable]
 
   def insert(userEmail: String, transaction: TransactionPOSTDTO): Future[Future[Unit]] = {
     var userId: Int = 0
@@ -91,8 +91,8 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
       }
 
       val transactionsToSend = transactionsToSendToKeep.map { t =>
-        val dateToSend = Option(DateDTO(t.date.toString.substring(8, 10).toInt, t.date.toString.substring(5, 7).toInt,
-          t.date.toString.substring(0, 4).toInt))
+        val dateToSend = DateDTO(t.date.toString.substring(8, 10).toInt, t.date.toString.substring(5, 7).toInt,
+          t.date.toString.substring(0, 4).toInt)
         var budgetName: String = ""
 
         // we need this value before to continue
@@ -115,8 +115,8 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
     // or exists
     dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .filter(_._1.id === id).map(_._1.transactionInfo).result.head).map { transaction =>
-      val dateToSend = Option(DateDTO(transaction.date.toString.substring(8, 10).toInt,
-        transaction.date.toString.substring(5, 7).toInt, transaction.date.toString.substring(0, 4).toInt))
+      val dateToSend = DateDTO(transaction.date.toString.substring(8, 10).toInt,
+        transaction.date.toString.substring(5, 7).toInt, transaction.date.toString.substring(0, 4).toInt)
       var budgetName: String = ""
 
       // we need this value before to continue
@@ -196,7 +196,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
     }
   }
 
-  private class TransactionTable(tag: Tag) extends Table[Transaction](tag, "transaction") {
+  class TransactionTable(tag: Tag) extends Table[Transaction](tag, "transaction") {
     def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def userId: Rep[Int] = column[Int]("userId")
     def budgetId: Rep[Int] = column[Int]("budgetId")

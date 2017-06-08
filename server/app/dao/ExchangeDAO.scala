@@ -48,7 +48,7 @@ class ExchangeDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Datab
     dbConfig.db.run(exchanges.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .map(_._1.exchangeInfo).result).map { e =>
       // if from and to dates are presents (JSON), we keep only the corresponding exchanges
-      val exchangesToSendToKeep = e.filter{ t =>
+      val exchangesToSendToKeep = e.filter { t =>
         if (dates.from.isDefined) {
           val dateFrom = Date.valueOf(dates.from.get.year + "-" + dates.from.get.month + "-" + dates.from.get.day)
 
@@ -69,8 +69,8 @@ class ExchangeDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Datab
       }
 
       val exchangesToSend = exchangesToSendToKeep.map { t =>
-        val dateToSend = Option(DateDTO(t.date.toString.substring(8, 10).toInt, t.date.toString.substring(5, 7).toInt,
-          t.date.toString.substring(0, 4).toInt))
+        val dateToSend = DateDTO(t.date.toString.substring(8, 10).toInt, t.date.toString.substring(5, 7).toInt,
+          t.date.toString.substring(0, 4).toInt)
         val exchangeToSend = ExchangeAllGETDTO(t.id, t.name, dateToSend, t.`type`, t.amount)
 
         exchangeToSend
@@ -85,8 +85,8 @@ class ExchangeDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Datab
     // or exists
     dbConfig.db.run(exchanges.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .filter(_._1.id === id).map(_._1.exchangeInfo).result.head).map { e =>
-      val dateToSend = Option(DateDTO(e.date.toString.substring(8, 10).toInt, e.date.toString.substring(5, 7).toInt,
-        e.date.toString.substring(0, 4).toInt))
+      val dateToSend = DateDTO(e.date.toString.substring(8, 10).toInt, e.date.toString.substring(5, 7).toInt,
+        e.date.toString.substring(0, 4).toInt)
       val exchangeToSend = ExchangeGETDTO(e.name, dateToSend, e.`type`, e.amount)
 
       exchangeToSend

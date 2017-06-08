@@ -99,7 +99,7 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
   def read: Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     userDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { user =>
-      Ok(Json.obj("status" -> "OK", "user" -> user))
+      Ok(Json.toJson(user))
     }.recover {
       // case in not found the specified user with its email
       // case if the user gives the old token (after changed his email)

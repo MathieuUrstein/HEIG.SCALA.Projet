@@ -5,7 +5,6 @@ import javax.inject.Inject
 import models._
 import org.sqlite.SQLiteException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
 import play.db.NamedDatabase
 import slick.backend.DatabaseConfig
 import slick.driver.JdbcProfile

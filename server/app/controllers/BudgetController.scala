@@ -76,6 +76,8 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
       (JsPath \ "takesFrom").readNullable[Seq[TakesFromDTO]]
     ) (BudgetPATCHDTO.apply _)
 
+  // TODO: check for no negative values for left field
+
   def create(): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[BudgetPOSTDTO]
 
@@ -97,14 +99,14 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
   def readAll: Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     budgetDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { budgets =>
-      Ok(Json.obj("status" -> "OK", "budgets" -> budgets))
+      Ok(Json.toJson(budgets))
     }
   }
 
   def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     budgetDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { budget =>
-      Ok(Json.obj("status" -> "OK", "budget" -> budget))
+      Ok(Json.toJson(budget))
     }.recover {
       // case in not found the specified budget with its id
       case _: NoSuchElementException =>
