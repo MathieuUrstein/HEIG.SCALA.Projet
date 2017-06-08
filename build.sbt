@@ -23,7 +23,9 @@ lazy val server = (project in file("server")).settings(
     // to hash passwords
     "org.mindrot" % "jbcrypt" % "latest.release",
     // to use directly JWT based authentication
-    "com.pauldijou" %% "jwt-play" % "latest.release"
+    "com.pauldijou" %% "jwt-play" % "latest.release",
+    // to validate emails
+    "uk.gov.hmrc" %% "emailaddress" % "latest.release"
   ),
   // Compile the project before generating Eclipse files, so that generated .scala or .class files for views and routes are present
   EclipseKeys.preTasks := Seq(compile in Compile)

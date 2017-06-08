@@ -44,7 +44,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
   implicit val transactionPATCHDTOReads: Reads[TransactionPATCHDTO] = (
     (JsPath \ "name").readNullable[String] and
       (JsPath \ "date").readNullable[DateDTO] and
-      (JsPath \ "budget").readNullable[Int] and
+      (JsPath \ "budgetId").readNullable[Int] and
       (JsPath \ "amount").readNullable[Double]
     ) (TransactionPATCHDTO.apply _)
 
@@ -113,6 +113,9 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
           // case in not found the specified transaction with its id (or the transaction doesn't belong to this user)
           case _: NoSuchElementException =>
             NotFound(Json.obj("status" -> "ERROR", "message" -> "transaction with id '%s' not found".format(id)))
+          // case in problem with the update of the new budget
+          case e: Exception =>
+            NotFound(Json.obj("status" -> "ERROR", "message" -> e.getMessage))
         }
       }
     )

@@ -37,8 +37,6 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
     // we check that the specified budgetId exists for this user
     budgetDAO.find(userEmail, transaction.budgetId).map { budget =>
       // we check that a positive number for the amount is associated to an income and inversely
-
-      // TODO : TESTS
       if (transaction.amount < 0 && budget.`type` == "income") {
         throw new Exception("transaction amount negative associated to an income budget")
       }
@@ -133,64 +131,60 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
     }
   }
 
-  def update(userEmail: String, id: Int, transaction: TransactionPATCHDTO): Future[Future[Unit]] = {
+  def update(userEmail: String, id: Int, transaction: TransactionPATCHDTO): Future[Any] = {
     // we first verify that the asked transaction (id) to update belongs to this user or exists
     dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .filter(_._1.id === id).result.head).map { _ =>
-      // default future with success and do nothing
-      var futureToReturn = Future.successful(())
-
       // we update only the present fields
       // not the value None
       if (transaction.name.isDefined) {
-        futureToReturn = dbConfig.db.run(transactions.filter(_.id === id).map(_.name).update(transaction.name.get))
-        .map { _ => () }
+        dbConfig.db.run(transactions.filter(_.id === id).map(_.name).update(transaction.name.get)).map { _ => () }
       }
 
       if (transaction.date.isDefined) {
         val dateToInsert = Date.valueOf(transaction.date.get.year + "-" + transaction.date.get.month +
           "-" + transaction.date.get.day)
 
-        futureToReturn = dbConfig.db.run(transactions.filter(_.id === id).map(_.date).update(dateToInsert))
-          .map { _ => () }
+        dbConfig.db.run(transactions.filter(_.id === id).map(_.date).update(dateToInsert)).map { _ => () }
+      }
+
+      if (transaction.amount.isDefined) {
+        dbConfig.db.run(transactions.filter(_.id === id).map(_.amount).update(transaction.amount.get)).map { _ => () }
       }
 
       if (transaction.budgetId.isDefined) {
+        // we wait if an error is coming for the new budget
         var budgetExist: Boolean = true
 
         // we check that the new budget exists
         Await.ready(budgetDAO.isBudgetExisting(userEmail, transaction.budgetId.get).map { r =>
-          r.map { v =>
+          Await.ready(r.map { v =>
             budgetExist = v
-          }
+          }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
         }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
         if (!budgetExist) {
-          throw new Exception("new budget doesn't exist")
+          throw new Exception("new budget doesn't exist, budget not updated")
         }
+
+        var budgetType: String = ""
 
         // we retrieve the type of the new budget to makes checks
-        Await.ready(budgetDAO.find(userEmail, transaction.budgetId.get).map { r =>
-          r.map { v =>
-            budgetExist = v
-          }
+        Await.ready(budgetDAO.find(userEmail, transaction.budgetId.get).map { b =>
+          budgetType = b.`type`
         }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
-        if (transaction.amount < 0 && budget.`type` == "income") {
-          throw new Exception("transaction amount negative associated to an income budget")
+        // check for the association
+        if (transaction.amount.get < 0 && budgetType == "income") {
+          throw new Exception("transaction amount negative associated to an income budget, budget not updated")
         }
 
-        if (transaction.amount > 0 && budget.`type` == "outcome") {
-          throw new Exception("transaction amount positive associated to an outcome budget")
+        if (transaction.amount.get > 0 && budgetType == "outcome") {
+          throw new Exception("transaction amount positive associated to an outcome budget, budget not updated")
         }
-      }
 
-      if (transaction.amount.isDefined) {
-        futureToReturn = dbConfig.db.run(transactions.filter(_.id === id).map(_.amount).update(transaction.amount.get))
-          .map { _ => () }
+        dbConfig.db.run(transactions.filter(_.id === id).map(_.budgetId).update(transaction.budgetId.get)).map { _ => () }
       }
-
-      futureToReturn
     }
   }
 

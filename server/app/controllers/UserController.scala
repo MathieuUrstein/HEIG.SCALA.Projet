@@ -59,6 +59,9 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
           // case in an error of conflict with the user email
           case e: SQLiteException if e.getResultCode.code == Const.SQLiteUniqueConstraintErrorCode =>
             Conflict(Json.obj("status" -> "ERROR", "message" -> "email '%s' already exists".format(user.email)))
+          // case in an error with the user email (invalid)
+          case e: Exception  =>
+            BadRequest(Json.obj("status" -> "ERROR", "message" -> e.getMessage))
         }
       }
     )
@@ -127,11 +130,15 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
         }.recover {
           // case in an error of conflict with the new user email
           case e: SQLiteException if e.getResultCode.code == Const.SQLiteUniqueConstraintErrorCode =>
-            Conflict(Json.obj("status" -> "ERROR", "message" -> "user '%s' already exists".format(user.email.get)))
+            Conflict(Json.obj("status" -> "ERROR", "message" -> "user '%s' already exists, email not updated"
+              .format(user.email.get)))
           // case in not found the specified user with its email
           // case if the user gives the old token (after changed his email)
           case _: NoSuchElementException =>
             Unauthorized(Json.obj("status" -> "ERROR", "message" -> "user not found, wrong JWT"))
+          // case in an error with the new user email (invalid)
+          case e: Exception  =>
+            BadRequest(Json.obj("status" -> "ERROR", "message" -> e.getMessage))
         }
       }
     )
