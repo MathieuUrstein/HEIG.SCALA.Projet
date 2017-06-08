@@ -71,37 +71,8 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
       },
       dates => {
         // we look for the user email in the JWT
-        exchangeDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { exchanges =>
-          // if from and to dates are presents (JSON), we keep only the corresponding exchanges
-          val exchangesToSendToKeep = exchanges.filter{ t =>
-            if (dates.from.isDefined) {
-              val dateFrom = Date.valueOf(dates.from.get.year + "-" + dates.from.get.month + "-" + dates.from.get.day)
-
-              t.date.equals(dateFrom) || t.date.after(dateFrom)
-            }
-            else {
-              true
-            }
-          }.filter { t =>
-            if (dates.to.isDefined) {
-              val dateTo = Date.valueOf(dates.to.get.year + "-" + dates.to.get.month + "-" + dates.to.get.day)
-
-              t.date.equals(dateTo) || t.date.before(dateTo)
-            }
-            else {
-              true
-            }
-          }
-
-          val exchangesToSend = exchangesToSendToKeep.map { t =>
-            val dateToSend = Option(DateDTO(t.date.toString.substring(8, 10).toInt, t.date.toString.substring(5, 7).toInt,
-              t.date.toString.substring(0, 4).toInt))
-            val exchangeToSend = ExchangeAllGETDTO(t.id, t.name, dateToSend, t.`type`, t.amount)
-
-            exchangeToSend
-          }
-
-          Ok(Json.obj("status" -> "OK", "exchanges" -> exchangesToSend))
+        exchangeDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, dates).map { exchanges =>
+          Ok(Json.obj("status" -> "OK", "exchanges" -> exchanges))
         }
       }
     )
@@ -110,11 +81,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
   def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     exchangeDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { exchange =>
-      val dateToSend = Option(DateDTO(exchange.date.toString.substring(8, 10).toInt,
-        exchange.date.toString.substring(5, 7).toInt, exchange.date.toString.substring(0, 4).toInt))
-      val exchangeToSend = ExchangeGETDTO(exchange.name, dateToSend, exchange.`type`, exchange.amount)
-
-      Ok(Json.obj("status" -> "OK", "exchange" -> exchangeToSend))
+      Ok(Json.obj("status" -> "OK", "exchange" -> exchange))
     }.recover {
       // case in not found the specified exchange with its id
       case _: NoSuchElementException =>
