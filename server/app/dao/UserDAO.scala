@@ -4,7 +4,6 @@ import javax.inject.Inject
 
 import models.{User, UserGETDTO, UserPATCHDTO}
 import org.mindrot.jbcrypt.BCrypt
-import org.sqlite.SQLiteException
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 import slick.backend.DatabaseConfig

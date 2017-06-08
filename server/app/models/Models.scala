@@ -43,3 +43,7 @@ case class BudgetAndTakesFromAllGETDTO(id: Int, name: String, `type`: String, us
 case class BudgetAndTakesFromGETDTO(name: String, `type`: String, used: Double, left: Double, exceeding: Double,
                                     persistent: Int, reported: Boolean, color: String,
                                     takesFrom: Option[Seq[TakesFromDTO]])
+case class BudgetPATCHDTO(name: Option[String], used: Option[Double], left: Option[Double], exceeding: Option[Double],
+                          persistent: Option[Int], reported: Option[Boolean], color: Option[String],
+                          takesFrom: Option[Seq[TakesFromDTO]])
+

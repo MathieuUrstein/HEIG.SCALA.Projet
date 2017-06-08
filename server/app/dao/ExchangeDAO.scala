@@ -18,6 +18,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class ExchangeDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseConfigProvider, userDAO: UserDAO)
                            (implicit executionContext: ExecutionContext) {
   private val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+  // initialisation of foreign key in SQLite
+  dbConfig.db.run(DBIO.seq(sqlu"PRAGMA foreign_keys = ON;")).map { _ => () }
 
   private val exchanges: TableQuery[ExchangeTable] = TableQuery[ExchangeTable]
 

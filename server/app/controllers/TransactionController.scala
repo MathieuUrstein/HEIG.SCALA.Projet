@@ -65,8 +65,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
           case _: NoSuchElementException =>
             NotFound(Json.obj("status" -> "ERROR", "message" -> "budget with id '%s' not found".format(transaction.budgetId)))
           // case in problem with insertion
-          case e: Exception =>
-            NotFound(Json.obj("status" -> "ERROR", "message" -> e.getMessage))
+          case e: Exception => BadRequest(Json.obj("status" -> "ERROR", "message" -> e.getMessage))
         }
       }
     )
@@ -114,8 +113,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
           case _: NoSuchElementException =>
             NotFound(Json.obj("status" -> "ERROR", "message" -> "transaction with id '%s' not found".format(id)))
           // case in problem with the update of the new budget
-          case e: Exception =>
-            NotFound(Json.obj("status" -> "ERROR", "message" -> e.getMessage))
+          case e: Exception => BadRequest(Json.obj("status" -> "ERROR", "message" -> e.getMessage))
         }
       }
     )
