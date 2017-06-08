@@ -13,6 +13,7 @@ import slick.driver.SQLiteDriver.api._
 import slick.lifted.{ForeignKeyQuery, MappedProjection, ProvenShape}
 import utils.Const
 
+import scala.collection.immutable.ListMap
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
@@ -20,12 +21,228 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
                                val userDAO: UserDAO, val budgetDAO: BudgetDAO)
                               (implicit executionContext: ExecutionContext) {
   private val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
-  // initialisation of foreign key in SQLite
+  // initialisation of foreign keys in SQLite
   dbConfig.db.run(DBIO.seq(sqlu"PRAGMA foreign_keys = ON;")).map { _ => () }
 
   val transactions: TableQuery[TransactionTable] = TableQuery[TransactionTable]
 
-  def insert(userEmail: String, transaction: TransactionPOSTDTO): Future[Future[Unit]] = {
+  private def updateBudgetIncome(budgetId: Int, amount: Double) = {
+    var usedActualValue: Double = 0
+    var leftActualValue: Double = 0
+    var exceedingActualValue: Double = 0
+
+    // we need these values before to continue
+    Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.budgetTransactionInfo)
+      .result.head).map { v =>
+      usedActualValue = v._1
+      leftActualValue = v._2
+      exceedingActualValue = v._3
+    }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+
+    // we check if we have a positive exceeding
+    if (usedActualValue == 0) {
+      // it is a positive exceeding
+      val newExceedingValue = amount + exceedingActualValue
+
+      // we update the exceeding
+      dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(newExceedingValue))
+        .map { _ => () }
+    }
+    else {
+      val newUsedActualValue = usedActualValue - amount
+
+      if (newUsedActualValue < 0) {
+        // it is a positive exceeding
+        val newExceedingValue = -newUsedActualValue
+
+        // we update the exceeding
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(newExceedingValue))
+          .map { _ => () }
+
+        // we put the used value to 0
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.used).update(0))
+          .map { _ => () }
+
+        // we put the left value to max
+        val newLeftValue = leftActualValue + usedActualValue
+
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.left).update(newLeftValue))
+          .map { _ => () }
+      }
+      else {
+        // we update the new used value
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.used).update(newUsedActualValue))
+          .map { _ => () }
+
+        // we change the left value
+        val newLeftValue = leftActualValue + amount
+
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.left).update(newLeftValue))
+          .map { _ => () }
+      }
+    }
+  }
+
+  private def updateBudgetOutcome(budgetId: Int, amount: Double) = {
+    var usedActualValue: Double = 0
+    var leftActualValue: Double = 0
+    var exceedingActualValue: Double = 0
+
+    // we need these values before to continue
+    Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.budgetTransactionInfo)
+      .result.head).map { v =>
+      usedActualValue = v._1
+      leftActualValue = v._2
+      exceedingActualValue = v._3
+    }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+
+    // we check if we are in exceeding
+    if (leftActualValue == 0) {
+      // it is a negative exceeding
+      val newExceedingValue = exceedingActualValue + (-amount)
+
+      // only update exceeding value
+      dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(newExceedingValue))
+        .map { _ => () }
+    }
+    else {
+      val newLeftActualValue = leftActualValue + amount
+
+      if (newLeftActualValue < 0) {
+        // it is a negative exceeding
+        val newExceedingValue = -newLeftActualValue
+
+        // we update the exceeding
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(newExceedingValue))
+          .map { _ => () }
+
+        // we put the left value to 0
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.left).update(0))
+          .map { _ => () }
+
+        // we update the used value to max
+        val newUsedValue = leftActualValue + usedActualValue
+
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.used).update(newUsedValue))
+          .map { _ => () }
+      }
+      else {
+        // we update the new left value
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.left).update(newLeftActualValue))
+          .map { _ => () }
+
+        // we change the used value
+        val newUsedValue = usedActualValue + (-amount)
+
+        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.used).update(newUsedValue))
+          .map { _ => () }
+      }
+    }
+  }
+
+  private def updateBudgetIncomeAsOutcome(budgetId: Int, amount: Double) = {
+    var usedActualValue: Double = 0
+    var leftActualValue: Double = 0
+    var exceedingActualValue: Double = 0
+
+    // we need these values before to continue
+    Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.budgetTransactionInfo)
+      .result.head).map { v =>
+      usedActualValue = v._1
+      leftActualValue = v._2
+      exceedingActualValue = v._3
+    }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+
+    // we check if we are in exceeding
+    if (leftActualValue == 0) {
+      // it is a negative exceeding
+      // we do nothing (we will eventually look for the next income budget to take money from)
+      amount
+    }
+    else {
+      // if we have an exceeding
+      if (exceedingActualValue > 0) {
+        var newExceedingValue: Double = 0
+
+        newExceedingValue = exceedingActualValue + amount
+
+        if (newExceedingValue >= 0) {
+          // we update only the exceeding value
+          dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(newExceedingValue))
+            .map { _ => () }
+
+          0.0
+        }
+        else {
+          // we update the exceeding to 0
+          dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(0)).map { _ => () }
+
+          val newLeftValue = leftActualValue + newExceedingValue
+
+          if (newLeftValue < 0) {
+            // we put the left value to 0
+            dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.left).update(0))
+              .map { _ => () }
+
+            // we update the used value to max
+            val newUsedValue = leftActualValue + usedActualValue
+
+            dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.used).update(newUsedValue))
+              .map { _ => () }
+
+            // we will report the exceeding on the eventually next income budget to take money from
+            newLeftValue
+          }
+          else {
+            // we update the new left value
+            dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.left).update(newLeftValue))
+              .map { _ => () }
+
+            // we change the used value
+            val newUsedValue = usedActualValue + (-newExceedingValue)
+
+            dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.used).update(newUsedValue))
+              .map { _ => () }
+
+            0.0
+          }
+        }
+      }
+      else {
+        val newLeftValue = leftActualValue + amount
+
+        if (newLeftValue < 0) {
+          // we put the left value to 0
+          dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.left).update(0))
+            .map { _ => () }
+
+          // we update the used value to max
+          val newUsedValue = leftActualValue + usedActualValue
+
+          dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.used).update(newUsedValue))
+            .map { _ => () }
+
+          // we will report the exceeding on the eventually next income budget to take money from
+          newLeftValue
+        }
+        else {
+          // we update the new left value
+          dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.left).update(newLeftValue))
+            .map { _ => () }
+
+          // we change the used value
+          val newUsedValue = usedActualValue + (-amount)
+
+          dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.used).update(newUsedValue))
+            .map { _ => () }
+
+          0.0
+        }
+      }
+    }
+  }
+
+  def insert(userEmail: String, transaction: TransactionPOSTDTO): Future[Any] = {
     var userId: Int = 0
 
     // we get the id of the connected user
@@ -61,6 +278,38 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
         transaction.budgetId)
 
       dbConfig.db.run(transactions += transactionToInsert).map { _ => () }
+
+
+      // we update the corresponding budget (left, used and exceeding values)
+      if (budget.`type` == "income") {
+        updateBudgetIncome(transaction.budgetId, transaction.amount)
+      }
+      else {
+        updateBudgetOutcome(transaction.budgetId, transaction.amount)
+
+        var budgetsMap: Map[Int, Int] = Map()
+
+        // we look for the order to treat the income budgets
+        budget.takesFrom.get.foreach { b =>
+          budgetsMap += b.order -> b.budgetId
+        }
+
+        val sortedMap = ListMap(budgetsMap.toSeq.sortWith(_._1 < _._1):_*)
+        var returnedExceeding: Double = transaction.amount
+
+        // TODO: add debt when all incomes are exhausted (improvement)
+
+        // we stop when we have a null exceeding or all income budgets have been processed
+        sortedMap.takeWhile(_ => returnedExceeding != 0).foreach { e =>
+          // updates takesFrom budgets (income) in order
+          // we must wait
+          Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === e._2).map(_.id).result.head)
+            .map { budgetIncomeId =>
+              // income budgets are considered as outcome
+              returnedExceeding = updateBudgetIncomeAsOutcome(budgetIncomeId, returnedExceeding)
+            }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+        }
+      }
     }
   }
 

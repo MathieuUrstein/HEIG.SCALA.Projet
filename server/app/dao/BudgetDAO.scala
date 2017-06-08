@@ -7,7 +7,7 @@ import org.sqlite.SQLiteException
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 import slick.backend.DatabaseConfig
-import slick.driver.JdbcProfile
+import slick.driver.{JdbcProfile, SQLiteDriver}
 import slick.driver.SQLiteDriver.api._
 import slick.lifted.{ForeignKeyQuery, Index, MappedProjection, ProvenShape}
 import utils.Const
@@ -19,6 +19,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseConfigProvider, val userDAO: UserDAO)
                          (implicit executionContext: ExecutionContext) {
   private val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+  // initialisation of foreign keys in SQLite
   dbConfig.db.run(DBIO.seq(sqlu"PRAGMA foreign_keys = ON;")).map { _ => () }
 
   val budgets: TableQuery[BudgetTable] = TableQuery[BudgetTable]
@@ -225,6 +226,8 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
       (name, `type`, used, left, exceeding, persistent, reported, color, userId) <>
         ((Budget.apply _).tupled, Budget.unapply)
     }
+
+    def budgetTransactionInfo: (Rep[Double], Rep[Double], Rep[Double]) = (used, left, exceeding)
 
     def budgetInfo: MappedProjection[BudgetGET, (Int, String, String, Double, Double, Double, Int, Boolean, String)] = {
       (id, name, `type`, used, left, exceeding, persistent, reported, color) <> (BudgetGET.tupled, BudgetGET.unapply)

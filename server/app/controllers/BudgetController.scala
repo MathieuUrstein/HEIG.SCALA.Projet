@@ -76,7 +76,8 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
       (JsPath \ "takesFrom").readNullable[Seq[TakesFromDTO]]
     ) (BudgetPATCHDTO.apply _)
 
-  // TODO: check for no negative values for left field
+  // TODO: check for no negative values for left and used fields (improvement)
+  // TODO: check that the order for the takesFrom values are correct (improvement)
 
   def create(): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[BudgetPOSTDTO]
