@@ -7,7 +7,7 @@ import org.sqlite.SQLiteException
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 import slick.backend.DatabaseConfig
-import slick.driver.{JdbcProfile, SQLiteDriver}
+import slick.driver.JdbcProfile
 import slick.driver.SQLiteDriver.api._
 import slick.lifted.{ForeignKeyQuery, Index, MappedProjection, ProvenShape}
 import utils.Const
@@ -158,7 +158,7 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     }
   }
 
-  def update(userEmail: String, id: Int, budget: BudgetPATCHDTO): Future[Any] = {
+  def update(userEmail: String, id: Int, budget: BudgetPUTDTO): Future[Any] = {
     // we first verify that the asked budget (id) to update belongs to this user or exists
     dbConfig.db.run(budgets.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .filter(_._1.id === id).result.head).map { _ =>

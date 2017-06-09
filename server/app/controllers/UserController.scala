@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import dao.UserDAO
-import models.{LoginFormDTO, User, UserGETDTO, UserPATCHDTO}
+import models._
 import org.mindrot.jbcrypt.BCrypt
 import org.sqlite.SQLiteException
 import pdi.jwt.JwtSession._
@@ -29,12 +29,12 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
       (JsPath \ "currency").write[String]
     ) (unlift(UserGETDTO.unapply))
 
-  implicit val userPATCHDTOReads: Reads[UserPATCHDTO] = (
+  implicit val userPATCHDTOReads: Reads[UserPUTDTO] = (
     (JsPath \ "fullname").readNullable[String] and
       (JsPath \ "email").readNullable[String] and
       (JsPath \ "password").readNullable[String] and
       (JsPath \ "currency").readNullable[String]
-    ) (UserPATCHDTO.apply _)
+    ) (UserPUTDTO.apply _)
 
   implicit val loginFormDTOReads: Reads[LoginFormDTO] = (
     (JsPath \ "email").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
@@ -109,7 +109,7 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
   }
 
   def update: Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
-    val result = request.body.validate[UserPATCHDTO]
+    val result = request.body.validate[UserPUTDTO]
 
     result.fold(
       errors => Future.successful {
