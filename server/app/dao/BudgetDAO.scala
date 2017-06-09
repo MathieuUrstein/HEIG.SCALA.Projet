@@ -194,6 +194,8 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     }
   }
 
+  // TODO: when delete a budget, update the eventual corresponding takesFrom values (improvement)
+
   def delete(userEmail: String, id: Int): Future[Future[Unit]] = {
     // we first verify that the asked exchange (id) to delete belongs to this user or exists
     dbConfig.db.run(budgets.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)

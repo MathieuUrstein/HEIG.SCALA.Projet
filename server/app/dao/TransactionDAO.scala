@@ -380,6 +380,8 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
     }
   }
 
+  // TODO: when updating the amount field or delete a transaction, update the corresponding budgets (improvement)
+
   def update(userEmail: String, id: Int, transaction: TransactionPATCHDTO): Future[Any] = {
     // we first verify that the asked transaction (id) to update belongs to this user or exists
     dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
@@ -440,7 +442,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
   def delete(userEmail: String, id: Int): Future[Future[Unit]] = {
     // we first verify that the asked transaction (id) to delete belongs to this user or exists
     dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
-      .filter(_._1.id === id).result.head).map { _ =>
+      .filter(_._1.id === id).map(_._1.transactionInfo).result.head).map { transaction =>
       dbConfig.db.run(transactions.filter(_.id === id).delete).map { _ => () }
     }
   }
