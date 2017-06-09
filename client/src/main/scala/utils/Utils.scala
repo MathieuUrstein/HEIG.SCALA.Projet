@@ -2,7 +2,7 @@ import org.scalajs.dom._
 import API._
 import scala.scalajs.js.annotation.JSExportTopLevel
 
-package object utils {
+package object Utils {
 
   def checkConnection(): Unit = {
     document.location.pathname match {

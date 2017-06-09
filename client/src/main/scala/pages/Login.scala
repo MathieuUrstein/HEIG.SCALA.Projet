@@ -4,7 +4,6 @@ import API._
 import API.Models._
 import org.scalajs.dom
 import org.scalajs.dom._
-import scala.scalajs.js
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.scalajs.js.JSON
@@ -30,7 +29,7 @@ object Login {
         document.cookie = "Authorization=" + token
         document.location.pathname = "/"
       case Failure(e: dom.ext.AjaxException) =>
-        utils.addAlert("danger", JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
+        Utils.addAlert("danger", JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
     }
   }
 
@@ -49,7 +48,7 @@ object Login {
         document.cookie = "Authorization=" + token
         document.location.pathname = "/"
       case Failure(e: dom.ext.AjaxException) =>
-        utils.addAlert("danger", JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
+        Utils.addAlert("danger", JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
     }
   }
 }

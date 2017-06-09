@@ -1,7 +1,7 @@
 import scala.scalajs.js
 import org.scalajs.dom
 import pages._
-import utils._
+import Utils._
 
 object Main extends js.JSApp {
 
