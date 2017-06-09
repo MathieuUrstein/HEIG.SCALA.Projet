@@ -1,15 +1,104 @@
-@(title: String)(content: Html)
+@(page: String)(content: Html)
 
 <!DOCTYPE html>
-
 <html>
-  <head>
-    <title>@title</title>
-    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
-    <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
-  </head>
-  <body>
-   @content
-   @scalajs.html.scripts("client", routes.Assets.versioned(_).toString, name => getClass.getResource(s"/public/$name") != null)
-  </body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>@page - PiggyBank</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("css/bootstrap.min.css")">
+        <link rel="stylesheet" href="@routes.Assets.versioned("css/styles.css")">
+        <link rel="stylesheet" href="@routes.Assets.versioned("css/font-awesome.min.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+    </head>
+    <body>
+        <div class="header">
+            <div class="container">
+                <div class="account">
+                    <button class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-user" aria-hidden="true"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right text-right">
+                        <a class="dropdown-item" href="@routes.Application.config()">
+                            Settings
+                            <i class="fa fa-cog" aria-hidden="true"></i>
+                        </a>
+                        <a id="disconnect" class="dropdown-item" onclick="disconnect()">
+                            Disconnect
+                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                <div id="logo" class="text-center">
+                    <h1>Piggy<span>Bank</span></h1>
+                </div>
+            </div>
+        </div>
+        <div class="menu">
+            <div class="container">
+                <ul id="main-menu" class="nav nav-pills nav-justified">
+                    <li class="nav-item">
+                        <a class="nav-link @if(page == "Dashboard"){active}" href="@routes.Application.dashboard()">
+                            <i class="fa fa-tachometer" aria-hidden="true"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @if(page == "Transactions"){active}" href="@routes.Application.transactions()">
+                            <i class="fa fa-list-ul" aria-hidden="true"></i>
+                            Transactions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @if(page == "Exchanges"){active}" href="@routes.Application.exchanges()">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                            Exchanges
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @if(page == "Budgets"){active}" href="@routes.Application.budgets()">
+                            <i class="fa fa-tasks" aria-hidden="true"></i>
+                            Budgets
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="flash" class="container">
+            <!--
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                success
+            </div>
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                info
+            </div>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                warning
+            </div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                danger
+            </div>
+            -->
+        </div>
+
+        @content
+
+        @scalajs.html.scripts("client", routes.Assets.versioned(_).toString, name => getClass.getResource(s"/public/$name") != null)
+        <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+        <script src="@routes.Assets.versioned("js/bootstrap.min.js")"></script>
+        <script src="@routes.Assets.versioned("js/Chart.bundle.min.js")"></script>
+    </body>
 </html>

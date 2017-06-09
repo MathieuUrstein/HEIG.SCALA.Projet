@@ -3,7 +3,12 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET     /                           controllers.Application.dashboard
+GET     /login                      controllers.Application.login
+GET     /config                     controllers.Application.config
+GET     /transactions               controllers.Application.transactions
+GET     /exchanges                  controllers.Application.exchanges
+GET     /budgets                    controllers.Application.budgets
 
 # API
 # User

@@ -1,0 +1,50 @@
+@main("Login") {
+    <div class="content">
+        <div class="container">
+            <div class="login">
+                <div class="row">
+                    <div class="col-12 wrapper">
+                        <div class="row">
+                            <div class="col-6 lc">
+                                <h2>Login</h2>
+                                <form class="smaller">
+                                    <div class="form-group">
+                                        <label for="login-email">Email address</label>
+                                        <input id="login-email" type="email" class="form-control" aria-describedby="emailHelp" placeholder="Enter email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="login-password">Password</label>
+                                        <input id="login-password" type="password" class="form-control" placeholder="Password">
+                                    </div>
+                                    <a class="btn btn-primary" onclick="login()">Login</a>
+                                </form>
+                            </div>
+                            <div class="col-6 rc text-right rc">
+                                <h2>Register</h2>
+                                <form>
+                                    <div class="form-group">
+                                        <label for="register-email">Email address</label>
+                                        <input id="register-email" type="email" class="form-control" aria-describedby="emailHelp" placeholder="Enter email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="register-fullname">Fullname</label>
+                                        <input id="register-fullname" type="tel" class="form-control" aria-describedby="emailHelp" placeholder="Enter fullname">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="register-password">Password</label>
+                                        <input id="register-password" type="password" class="form-control" placeholder="Password">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="register-currency">Currency</label>
+                                        <input id="register-currency" type="tel" class="form-control" aria-describedby="emailHelp" placeholder="Enter currency">
+                                    </div>
+                                    <a class="btn btn-primary" onclick="register()">Register</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
