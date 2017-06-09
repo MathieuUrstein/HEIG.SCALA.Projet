@@ -290,7 +290,7 @@ h1 span {
     margin: 0 auto !important;
     display: block;
 }
-.flash {
+#flash {
     margin-top: 20px;
     margin-bottom: 20px;
     min-height: 1px;
