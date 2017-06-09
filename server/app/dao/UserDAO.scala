@@ -2,25 +2,34 @@ package dao
 
 import javax.inject.Inject
 
-import models.{User, UserGETDTO, UserPATCHDTO}
+import models.{User, UserGETDTO, UserPUTDTO}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
 import slick.backend.DatabaseConfig
+import slick.driver.JdbcProfile
 import slick.driver.SQLiteDriver.api._
-import slick.driver.{JdbcProfile, SQLiteDriver}
 import slick.lifted.{Index, MappedProjection, ProvenShape}
+import uk.gov.hmrc.emailaddress._
 import utils.Const
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseConfigProvider)
                        (implicit executionContext: ExecutionContext) {
   private val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
+  // initialisation of foreign keys in SQLite
+  dbConfig.db.run(DBIO.seq(sqlu"PRAGMA foreign_keys = ON;")).map { _ => () }
 
   val users: TableQuery[UserTable] = TableQuery[UserTable]
 
   def insert(user: User): Future[Unit] = {
+    // check the validity of the email
+    if (!EmailAddress.isValid(user.email)) {
+      return Future.failed(new Exception("invalid email"))
+    }
+
     // hash the password before store it
     val passwordHash = BCrypt.hashpw(user.password, BCrypt.gensalt())
     user.password = passwordHash
@@ -29,51 +38,59 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
   }
 
   def getId(email: String): Future[Int] = {
-    dbConfig.db.run(users.filter(_.email === email).map(_.userId).result.head)
+    dbConfig.db.run(users.filter(_.email === email).map(_.id).result.head)
   }
 
   def getPassword(email: String): Future[String] = {
-    dbConfig.db.run(users.filter(_.email === email).map(_.userPassword).result.head)
+    dbConfig.db.run(users.filter(_.email === email).map(_.password).result.head)
   }
 
   def find(email: String): Future[UserGETDTO] = {
     dbConfig.db.run(users.filter(_.email === email).map(_.userInfo).result.head)
   }
 
-  private def updateRequest(email: String, field: UserTable => SQLiteDriver.api.Rep[String], value: String) = {
+  private def updateRequest(email: String, field: UserTable => Rep[String], value: String) = {
     dbConfig.db.run(users.filter(_.email === email).map(field).update(value)).map { _ => () }
   }
 
-  def update(email: String, user: UserPATCHDTO): Future[Unit] = {
-    // default future with success and do nothing
-    var futureToReturn = Future.successful(())
+  def update(email: String, user: UserPUTDTO): Future[Unit] = {
+    // we first verify that this user exists
+    dbConfig.db.run(users.filter(_.email === email).result.head).map { _ =>
+      // we update only the present fields (not None value)
+      if (user.fullname.isDefined) {
+        updateRequest(email, _.fullname, user.fullname.get)
+      }
 
-    // we update only the present fields (not None value)
-    if (user.fullname.isDefined) {
-      futureToReturn = updateRequest(email, _.fullname, user.fullname.get)
+      if (user.password.isDefined) {
+        // hash the password before store it
+        val passwordHash = BCrypt.hashpw(user.password.get, BCrypt.gensalt())
+        user.password = Option(passwordHash)
+
+        updateRequest(email, _.password, user.password.get)
+      }
+
+      if (user.currency.isDefined) {
+        updateRequest(email, _.currency, user.currency.get)
+      }
+
+      if (user.email.isDefined) {
+        // check the validity of the email
+        if (!EmailAddress.isValid(user.email.get)) {
+          return Future.failed(new Exception("invalid email, email not updated"))
+        }
+
+        // wait for an potential error with the new email
+        Await.result(updateRequest(email, _.email, user.email.get), Duration(Const.maxTimeToWaitInSeconds,
+          Const.timeToWaitUnit))
+      }
     }
-
-    if (user.password.isDefined) {
-      // hash the password before store it
-      val passwordHash = BCrypt.hashpw(user.password.get, BCrypt.gensalt())
-      user.password = Option(passwordHash)
-
-      futureToReturn = updateRequest(email, _.password, user.password.get)
-    }
-
-    if (user.currency.isDefined) {
-      futureToReturn = updateRequest(email, _.currency, user.currency.get)
-    }
-
-    if (user.email.isDefined) {
-      futureToReturn = updateRequest(email, _.email, user.email.get)
-    }
-
-    futureToReturn
   }
 
   def delete(email: String): Future[Unit] = {
-    dbConfig.db.run(users.filter(_.email === email).delete).map { _ => () }
+    dbConfig.db.run(users.filter(_.email === email).delete).map {
+      case 0 => throw new NoSuchElementException
+      case _ => Unit
+    }
   }
 
   class UserTable(tag: Tag) extends Table[User](tag, "user") {
@@ -92,7 +109,5 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
     def userInfo: MappedProjection[UserGETDTO, (String, String, String)] = {
       (fullname, email, currency) <> (UserGETDTO.tupled, UserGETDTO.unapply)
     }
-    def userId: Rep[Int] = id
-    def userPassword: Rep[String] = password
   }
 }

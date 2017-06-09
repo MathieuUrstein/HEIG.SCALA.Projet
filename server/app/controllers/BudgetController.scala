@@ -3,8 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import dao.BudgetDAO
-import models.{BudgetAndTakesFromAllGETDTO, BudgetAndTakesFromGETDTO, BudgetPOSTDTO, TakesFromDTO}
-import org.sqlite.SQLiteException
+import models._
 import pdi.jwt.JwtSession._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -25,7 +24,7 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
       (JsPath \ "budgetId").write[Int]
     ) (unlift(TakesFromDTO.unapply))
 
-  // TODO: control type values between income and outcome (improvement)
+  // TODO: check type values between income and outcome (improvement)
 
   implicit val budgetPOSTDTOReads: Reads[BudgetPOSTDTO] = (
     (JsPath \ "name").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
@@ -64,12 +63,21 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
       (JsPath \ "takesFrom").writeNullable[Seq[TakesFromDTO]]
     ) (unlift(BudgetAndTakesFromGETDTO.unapply))
 
-  /*implicit val exchangePATCHDTOReads: Reads[ExchangePATCHDTO] = (
+  // TODO: patch (update) type and takesFrom values (improvement)
+
+  implicit val budgetPATCHDTOReads: Reads[BudgetPUTDTO] = (
     (JsPath \ "name").readNullable[String] and
-      (JsPath \ "date").readNullable[DateDTO] and
-      (JsPath \ "type").readNullable[String] and
-      (JsPath \ "amount").readNullable[Double]
-    ) (ExchangePATCHDTO.apply _)*/
+      (JsPath \ "used").readNullable[Double] and
+      (JsPath \ "left").readNullable[Double] and
+      (JsPath \ "exceeding").readNullable[Double] and
+      (JsPath \ "persistent").readNullable[Int] and
+      (JsPath \ "reported").readNullable[Boolean] and
+      (JsPath \ "color").readNullable[String] and
+      (JsPath \ "takesFrom").readNullable[Seq[TakesFromDTO]]
+    ) (BudgetPUTDTO.apply _)
+
+  // TODO: check for no negative values for left and used fields (improvement)
+  // TODO: check that the order for the takesFrom values are correct (improvement)
 
   def create(): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[BudgetPOSTDTO]
@@ -80,55 +88,10 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
       },
       budget => {
         // we look for the user email in the JWT
-        val userEmail = request.jwtSession.getAs[String](Const.ValueStoredJWT).get
-
-        // test if takesFrom is defined or not (if we must or not add entries in table takes_from)
-        if (budget.takesFrom.isDefined) {
-          // it is an error to define a takesFrom tab with the type income for the budget to create
-          if (budget.`type`.equals("income")) {
-            Future.successful {
-              BadRequest(Json.obj("status" -> "ERROR", "message" ->
-                "takesFrom hast to be define only for outcome budgets"))
-            }
-          }
-          else {
-            // insert the budget
-            budgetDAO.insertBudget(userEmail, budget).map { f =>
-              f.map { insertedBudgetId =>
-                // verify that the specified budgets (id) in takesFrom field exist among the budgets of this user
-                budget.takesFrom.get.foreach { b =>
-                  budgetDAO.isBudgetExisting(userEmail, b.budgetId).map { r =>
-                    r.map { v =>
-                      // TODO: show an error for the client of the api for not existing budgets specified in takesFrom values and to not respect conditions (improvement)
-
-                      // the insertion in takes_from table is made only if the specified budget exists (field takesFrom)
-                      // and if the conditions are respected
-                      if (v) {
-                        // FIXME: this message returned
-
-                        budgetDAO.insertTakesFrom(insertedBudgetId, b).map { _ => }.recover {
-                          case e: Exception => println(e.getMessage)
-                          case e: SQLiteException if e.getResultCode.code == Const.SQLiteUniqueConstraintErrorCode =>
-                            println(e.getMessage)
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-
-              // FIXME: this message returned
-
-              Created(Json.obj("status" -> "OK", "message" ->
-                "budget '%s' created with existing and conditions respectful budgets in takesFrom values"
-                  .format(budget.name)))
-            }
-          }
-        }
-        else {
-          budgetDAO.insertBudget(userEmail, budget).map { _ =>
-            Created(Json.obj("status" -> "OK", "message" -> "budget '%s' created".format(budget.name)))
-          }
+        budgetDAO.insert(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, budget).map { _ =>
+          Created(Json.obj("status" -> "OK", "message" -> "budget '%s' created with the eventual takesFrom values".format(budget.name)))
+        }.recover {
+          case e: Exception => BadRequest(Json.obj("status" -> "ERROR", "message" -> e.getMessage))
         }
       }
     )
@@ -137,14 +100,14 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
   def readAll: Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     budgetDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { budgets =>
-      Ok(Json.obj("status" -> "OK", "budgets" -> budgets))
+      Ok(Json.toJson(budgets))
     }
   }
 
   def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     budgetDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { budget =>
-      Ok(Json.obj("status" -> "OK", "budget" -> budget))
+      Ok(Json.toJson(budget))
     }.recover {
       // case in not found the specified budget with its id
       case _: NoSuchElementException =>
@@ -152,25 +115,25 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
     }
   }
 
-  /*def update(id: Int): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
-    val result = request.body.validate[ExchangePATCHDTO]
+  def update(id: Int): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
+    val result = request.body.validate[BudgetPUTDTO]
 
     result.fold(
       errors => Future.successful {
         BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
       },
-      exchange => {
+      budget => {
         // we look for the user email in the JWT
-        exchangeDAO.update(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id, exchange).map { _ =>
-          Ok(Json.obj("status" -> "OK", "message" -> "exchange updated"))
+        budgetDAO.update(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id, budget).map { _ =>
+          Ok(Json.obj("status" -> "OK", "message" -> "budget updated"))
         }.recover {
-          // case in not found the specified exchange with its id
+          // case in not found the specified budget with its id
           case _: NoSuchElementException =>
-            NotFound(Json.obj("status" -> "ERROR", "message" -> "exchange with id '%s' not found".format(id)))
+            NotFound(Json.obj("status" -> "ERROR", "message" -> "budget with id '%s' not found".format(id)))
         }
       }
     )
-  }*/
+  }
 
   def delete(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT

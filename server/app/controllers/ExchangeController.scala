@@ -1,6 +1,5 @@
 package controllers
 
-import java.sql.Date
 import javax.inject.Inject
 
 import dao.ExchangeDAO
@@ -15,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionContext: ExecutionContext)
   extends Controller with Secured {
-  // TODO : control type values between borrow and lend (improvement)
+  // TODO: check type values between borrow and lend (improvement)
 
   implicit val exchangePOSTDTOReads: Reads[ExchangePOSTDTO] = (
     (JsPath \ "name").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
@@ -26,7 +25,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
 
   implicit val exchangeGETDTOWrites: Writes[ExchangeGETDTO] = (
     (JsPath \ "name").write[String] and
-      (JsPath \ "date").writeNullable[DateDTO] and
+      (JsPath \ "date").write[DateDTO] and
       (JsPath \ "type").write[String] and
       (JsPath \ "amount").write[Double]
     ) (unlift(ExchangeGETDTO.unapply))
@@ -34,17 +33,17 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
   implicit val exchangeAllGETDTOWrites: Writes[ExchangeAllGETDTO] = (
     (JsPath \ "id").write[Int] and
       (JsPath \ "name").write[String] and
-      (JsPath \ "date").writeNullable[DateDTO] and
+      (JsPath \ "date").write[DateDTO] and
       (JsPath \ "type").write[String] and
       (JsPath \ "amount").write[Double]
     ) (unlift(ExchangeAllGETDTO.unapply))
 
-  implicit val exchangePATCHDTOReads: Reads[ExchangePATCHDTO] = (
+  implicit val exchangePATCHDTOReads: Reads[ExchangePUTDTO] = (
     (JsPath \ "name").readNullable[String] and
       (JsPath \ "date").readNullable[DateDTO] and
       (JsPath \ "type").readNullable[String] and
       (JsPath \ "amount").readNullable[Double]
-    ) (ExchangePATCHDTO.apply _)
+    ) (ExchangePUTDTO.apply _)
 
   def create(): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[ExchangePOSTDTO]
@@ -71,37 +70,8 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
       },
       dates => {
         // we look for the user email in the JWT
-        exchangeDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { exchanges =>
-          // if from and to dates are presents (JSON), we keep only the corresponding exchanges
-          val exchangesToSendToKeep = exchanges.filter{ t =>
-            if (dates.from.isDefined) {
-              val dateFrom = Date.valueOf(dates.from.get.year + "-" + dates.from.get.month + "-" + dates.from.get.day)
-
-              t.date.equals(dateFrom) || t.date.after(dateFrom)
-            }
-            else {
-              true
-            }
-          }.filter { t =>
-            if (dates.to.isDefined) {
-              val dateTo = Date.valueOf(dates.to.get.year + "-" + dates.to.get.month + "-" + dates.to.get.day)
-
-              t.date.equals(dateTo) || t.date.before(dateTo)
-            }
-            else {
-              true
-            }
-          }
-
-          val exchangesToSend = exchangesToSendToKeep.map { t =>
-            val dateToSend = Option(DateDTO(t.date.toString.substring(8, 10).toInt, t.date.toString.substring(5, 7).toInt,
-              t.date.toString.substring(0, 4).toInt))
-            val exchangeToSend = ExchangeAllGETDTO(t.id, t.name, dateToSend, t.`type`, t.amount)
-
-            exchangeToSend
-          }
-
-          Ok(Json.obj("status" -> "OK", "exchanges" -> exchangesToSend))
+        exchangeDAO.findAll(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, dates).map { exchanges =>
+          Ok(Json.toJson(exchanges))
         }
       }
     )
@@ -110,11 +80,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
   def read(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     exchangeDAO.find(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { exchange =>
-      val dateToSend = Option(DateDTO(exchange.date.toString.substring(8, 10).toInt,
-        exchange.date.toString.substring(5, 7).toInt, exchange.date.toString.substring(0, 4).toInt))
-      val exchangeToSend = ExchangeGETDTO(exchange.name, dateToSend, exchange.`type`, exchange.amount)
-
-      Ok(Json.obj("status" -> "OK", "exchange" -> exchangeToSend))
+      Ok(Json.toJson(exchange))
     }.recover {
       // case in not found the specified exchange with its id
       case _: NoSuchElementException =>
@@ -123,7 +89,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
   }
 
   def update(id: Int): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
-    val result = request.body.validate[ExchangePATCHDTO]
+    val result = request.body.validate[ExchangePUTDTO]
 
     result.fold(
       errors => Future.successful {
