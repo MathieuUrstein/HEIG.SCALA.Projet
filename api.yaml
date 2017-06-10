@@ -3,6 +3,7 @@ swagger: "2.0"
 info:
   version: "0.1"
   title: PiggyBank API
+  description: Be aware that numbers in given JSON must not begin with a "0" to be correctly treated and only the present fields will be updated in given JSON with a PATCH request
 
 basePath: /api
 schemes: [http]
@@ -30,7 +31,7 @@ paths:
               description: The api_key token
               type: string
         400:
-          description: Field missing
+          description: Field missing or invalid email
         409:
           description: Error email already exist
   /auth:
@@ -44,14 +45,14 @@ paths:
           schema:
             $ref: "#/definitions/Credentials"
       responses:
-        201:
+        200:
           description: Successful
           headers:
             Authorization:
               description: The api_key token
               type: string
         400:
-          description: User already authenticated
+          description: Field missing
         401:
           description: Authentication failed
   /user:
@@ -62,6 +63,8 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/UserPublic"
+        401:
+          description: wrong JWT
       security:
         - api_key: []
     patch:
@@ -69,13 +72,23 @@ paths:
       parameters:
         - name: UserPatch
           in: body
-          description: The user edited values
+          description: The user edited values. If the email is updated, we receive a new token for authentication
           required: true
           schema:
             $ref: "#/definitions/UserPatch"
       responses:
         200:
           description: OK
+          headers:
+            Authorization:
+              description: The new api_key token if the email was changed
+              type: string
+        400:
+          description: Invalid email (if modified)
+        401:
+          description: wrong JWT
+        409:
+          description: Error new email already exist
       security:
         - api_key: []
     delete:
@@ -83,6 +96,8 @@ paths:
       responses:
         200:
           description: OK
+        401:
+          description: wrong JWT
       security:
         - api_key: []
   /transactions:
@@ -101,10 +116,12 @@ paths:
       responses:
         200:
           description: OK
+        400:
+          description: Invalid fields from and to
           schema:
             type: array
             items:
-              $ref: "#/definitions/Transaction"
+              $ref: "#/definitions/TransactionWithId"
       security:
         - api_key: []
     post:
@@ -120,7 +137,9 @@ paths:
         201:
           description: Successful
         400:
-          description: Field missing
+          description: Field missing or problem with the specified budget
+        404:
+          description: BudgetId not found
       security:
         - api_key: []
   /transactions/{id}:
@@ -152,6 +171,8 @@ paths:
       responses:
         200:
           description: OK
+        400:
+          description: Problem with the new specified budget
         404:
           description: Error transaction not found
       security:
@@ -181,10 +202,12 @@ paths:
       responses:
         200:
           description: OK
+        400:
+          description: Problem with the fields from and to
           schema:
             type: array
             items:
-              $ref: "#/definitions/Exchange"
+              $ref: "#/definitions/ExchangeWithId"
       security:
         - api_key: []
     post:
@@ -254,9 +277,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/Budget"
-        404:
-          description: Error budget not found
+              $ref: "#/definitions/BudgetWithId"
       security:
         - api_key: []
     post:
@@ -272,7 +293,7 @@ paths:
         201:
           description: Successful
         400:
-          description: Field missing
+          description: Field missing or error with the creation
       security:
         - api_key: []
   /budgets/{id}:
@@ -281,8 +302,19 @@ paths:
         in: path
         required: true
         type: number
+    get:
+      summary: Retrieve the budget from the ID
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Budget"
+        404:
+          description: Budget with specified ID not found
+      security:
+        - api_key: []
     patch:
-      summary: patch the specified budget
+      summary: Patch the specified budget
       parameters:
         - name: Budget
           in: body
@@ -298,7 +330,7 @@ paths:
       security:
         - api_key: []
     delete:
-      summary: delete the specified budget
+      summary: Delete the specified budget
       responses:
         200:
           description: OK
@@ -322,6 +354,8 @@ paths:
       responses:
         200:
           description: OK
+        400:
+          description: Invalid fields from and to
           schema:
             type: array
             items:
@@ -344,12 +378,15 @@ paths:
       responses:
         200:
           description: OK
+        400:
+          description: Invalid fields from and to
           schema:
             type: array
             items:
               $ref: "#/definitions/Usage"
       security:
         - api_key: []
+
 definitions:
   User:
     description: A PiggyBank user
@@ -413,6 +450,23 @@ definitions:
       amount:
         type: number
     required:
+      - name
+      - amount
+  TransactionWithId:
+    description: Transaction of a PiggyBank user with ID
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      date:
+        $ref: "#/definitions/Date"
+      budget:
+        $ref: "#/definitions/TransactionBudget"
+      amount:
+        type: number
+    required:
+      - id
       - name
       - amount
   TransactionPost:
@@ -479,6 +533,24 @@ definitions:
       - name
       - type
       - amount
+  ExchangeWithId:
+    description: The exchange of a PiggyBank user with ID
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      date:
+        $ref: "#/definitions/Date"
+      type:
+        type: string
+      amount:
+        type: number
+    required:
+      - id
+      - name
+      - type
+      - amount
   ExchangePatch:
     description: The exchange edited values
     properties:
@@ -490,6 +562,49 @@ definitions:
         type: string
       amount:
         type: number
+  BudgetWithId:
+    description: A budget
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      type:
+        type: string
+      used:
+        type: number
+      left:
+        type: number
+      exceeding:
+        type: number
+      persistent:
+        type: number
+      reported:
+        type: boolean
+      color:
+        type: string
+      takesFrom:
+        type: array
+        items:
+          type: object
+          properties:
+            order:
+              type: number
+            budgetId:
+              type: number
+          required:
+            - order
+            - budgetId
+    required:
+      - id
+      - name
+      - type
+      - used
+      - left
+      - exceeding
+      - persistent
+      - reported
+      - color
   Budget:
     description: A budget
     properties:
@@ -503,7 +618,7 @@ definitions:
         type: number
       exceeding:
         type: number
-      persistant:
+      persistent:
         type: number
       reported:
         type: boolean
@@ -527,7 +642,7 @@ definitions:
       - used
       - left
       - exceeding
-      - persistant
+      - persistent
       - reported
       - color
   BudgetPatch:
@@ -535,29 +650,18 @@ definitions:
     properties:
       name:
         type: string
-      type:
-        type: string
       used:
         type: number
       left:
         type: number
       exceeding:
         type: number
-      persistant:
-        type: boolean
+      persistent:
+        type: number
       reported:
         type: boolean
       color:
         type: string
-      takesFrom:
-        type: array
-        items:
-          type: object
-          properties:
-            order:
-              type: number
-            budgetId:
-              type: number
   Spending:
     description: Outcoming budget spending amount for a specific date
     properties:
@@ -584,8 +688,9 @@ definitions:
       - date
       - used
       - left
+
 securityDefinitions:
   api_key:
     type: apiKey
-    name: api_key
+    name: Autorization
     in: header
