@@ -12,6 +12,10 @@ object Main extends js.JSApp {
 
     pathname match {
       case "/login" => new Login
+      case "/transactions" =>
+        Utils.setRange()
+        Utils.refresh = Transactions.list
+        new Transactions()
       case "/exchanges" =>
         Utils.setRange()
         Utils.refresh = Exchanges.list
