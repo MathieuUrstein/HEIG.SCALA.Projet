@@ -6,227 +6,229 @@
                     <div class="col-4">
                     </div>
                     <div id="add-budget" class="col-4">
-                        <button data-toggle="modal" data-target="#budgets-modal">
+                        <button onclick="budgetsSetEditedID(0)" data-toggle="modal" data-target="#budgets-modal">
                             <i class="fa fa-plus" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div class="col-4 text-right">
                     </div>
                 </div>
-                <div class="budget">
-                    <h4>
-                        <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
-                        Extra
-                        <span class="float-right">
-                            <i class="fa fa-retweet" aria-hidden="true"></i>
-                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: 10%; background: blueviolet">2300 CHF</div>
-                        <div class="progress-bar bg-faded left" role="progressbar" style="width: 90%;">3000 CHF</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
+                <div id="budgets-wrapper">
+                    <div class="budget">
+                        <h4>
+                            <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
+                            Extra
+                            <span class="float-right">
+                                <i class="fa fa-retweet" aria-hidden="true"></i>
+                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                            </span>
+                        </h4>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 10%; background: blueviolet">2300 CHF</div>
+                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 90%;">3000 CHF</div>
                         </div>
-                        <div class="col-6 text-center">
-                            Used 10% - 90% Left
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
-                        </div>
-                    </div>
-                </div>
-                <div class="budget">
-                    <h4>
-                        <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
-                        Nutrition
-                        <span class="float-right">
-                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: 40%; background: cadetblue">2300 CHF</div>
-                        <div class="progress-bar bg-faded left" role="progressbar" style="width: 60%;">3000 CHF</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
-                        </div>
-                        <div class="col-6 text-center">
-                            Used 40% - 60% Left
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
+                        <div class="details row">
+                            <div class="col-3 text-left">
+                                | 0 CHF
+                            </div>
+                            <div class="col-6 text-center">
+                                Used 10% - 90% Left
+                            </div>
+                            <div class="col-3 text-right">
+                                7400 CHF |
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="budget">
-                    <h4>
-                        <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
-                        Exceeding exemple
-                        <span class="float-right">
-                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: 90%; background: chocolate">2300 CHF</div>
-                        <div class="progress-bar" role="progressbar" style="width: 10%; background: red">3000 CHF</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
+                    <div class="budget">
+                        <h4>
+                            <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
+                            Nutrition
+                            <span class="float-right">
+                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                            </span>
+                        </h4>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 40%; background: cadetblue">2300 CHF</div>
+                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 60%;">3000 CHF</div>
                         </div>
-                        <div class="col-6 text-center">
-                            Used 100% - 10% Exceeding
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
-                        </div>
-                    </div>
-                </div>
-                <div class="budget">
-                    <h4>
-                        <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
-                        Salary
-                        <span class="float-right">
-                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-faded left" role="progressbar" style="width: 30%;">3000 CHF</div>
-                        <div class="progress-bar" role="progressbar" style="width: 70%; background: darkblue;">2300 CHF</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
-                        </div>
-                        <div class="col-6 text-center">
-                            Used 30% - 70% Left
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
+                        <div class="details row">
+                            <div class="col-3 text-left">
+                                | 0 CHF
+                            </div>
+                            <div class="col-6 text-center">
+                                Used 40% - 60% Left
+                            </div>
+                            <div class="col-3 text-right">
+                                7400 CHF |
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="budget">
-                    <h4>
-                        <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
-                        Gifts
-                        <span class="float-right">
-                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-faded left" role="progressbar" style="width: 80%;">3000 CHF</div>
-                        <div class="progress-bar" role="progressbar" style="width: 20%; background: darksalmon">2300 CHF</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
+                    <div class="budget">
+                        <h4>
+                            <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
+                            Exceeding exemple
+                            <span class="float-right">
+                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                            </span>
+                        </h4>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 90%; background: chocolate">2300 CHF</div>
+                            <div class="progress-bar" role="progressbar" style="width: 10%; background: red">3000 CHF</div>
                         </div>
-                        <div class="col-6 text-center">
-                            Used 80% - 20% Left
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
-                        </div>
-                    </div>
-                </div>
-                <div class="budget">
-                    <h4>
-                        <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
-                        Full example
-                        <span class="float-right">
-                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-faded left" role="progressbar" style="width: 100%;">3000 CHF</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
-                        </div>
-                        <div class="col-6 text-center">
-                            Used 100% - 0% Left
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
+                        <div class="details row">
+                            <div class="col-3 text-left">
+                                | 0 CHF
+                            </div>
+                            <div class="col-6 text-center">
+                                Used 100% - 10% Exceeding
+                            </div>
+                            <div class="col-3 text-right">
+                                7400 CHF |
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="budget default">
-                    <h4 style="padding-left: 15px">
-                        Exchanges
-                        <span class="float-right">
-                            <i class="fa fa-refresh" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: 45%;">3000 CHF</div>
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 55%;">2300 CHF</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
+                    <div class="budget">
+                        <h4>
+                            <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
+                            Salary
+                            <span class="float-right">
+                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                            </span>
+                        </h4>
+                        <div class="progress">
+                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 30%;">3000 CHF</div>
+                            <div class="progress-bar" role="progressbar" style="width: 70%; background: darkblue;">2300 CHF</div>
                         </div>
-                        <div class="col-6 text-center">
-                            Borrow 45% - 55% Lend
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
-                        </div>
-                    </div>
-                </div>
-                <div class="budget default">
-                    <h4 style="padding-left: 15px">
-                        Balance
-                        <span class="float-right">
-                            <i class="fa fa-balance-scale" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: 60%;">3000 CHF - 60%</div>
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 40%;">2300 CHF - 40%</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
-                        </div>
-                        <div class="col-6 text-center">
-                            Outcome 60% - 40% Income
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
+                        <div class="details row">
+                            <div class="col-3 text-left">
+                                | 0 CHF
+                            </div>
+                            <div class="col-6 text-center">
+                                Used 30% - 70% Left
+                            </div>
+                            <div class="col-3 text-right">
+                                7400 CHF |
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="budget default">
-                    <h4 style="padding-left: 15px">
-                        Debt
-                        <span class="float-right">
-                            <i class="fa fa-asterisk" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-debt" role="progressbar" style="width: 100%;">3000 CHF</div>
+                    <div class="budget">
+                        <h4>
+                            <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
+                            Gifts
+                            <span class="float-right">
+                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                            </span>
+                        </h4>
+                        <div class="progress">
+                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 80%;">3000 CHF</div>
+                            <div class="progress-bar" role="progressbar" style="width: 20%; background: darksalmon">2300 CHF</div>
+                        </div>
+                        <div class="details row">
+                            <div class="col-3 text-left">
+                                | 0 CHF
+                            </div>
+                            <div class="col-6 text-center">
+                                Used 80% - 20% Left
+                            </div>
+                            <div class="col-3 text-right">
+                                7400 CHF |
+                            </div>
+                        </div>
                     </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
+                    <div class="budget">
+                        <h4>
+                            <button class="btn edit" data-toggle="modal" data-target="#budgets-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>
+                            Full example
+                            <span class="float-right">
+                                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                            </span>
+                        </h4>
+                        <div class="progress">
+                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 100%;">3000 CHF</div>
                         </div>
-                        <div class="col-6 text-center">
-                            When all incomes are used, the outcomes uses debt
+                        <div class="details row">
+                            <div class="col-3 text-left">
+                                | 0 CHF
+                            </div>
+                            <div class="col-6 text-center">
+                                Used 100% - 0% Left
+                            </div>
+                            <div class="col-3 text-right">
+                                7400 CHF |
+                            </div>
                         </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
+                    </div>
+                    <div class="budget default">
+                        <h4 style="padding-left: 15px">
+                            Exchanges
+                            <span class="float-right">
+                                <i class="fa fa-refresh" aria-hidden="true"></i>
+                            </span>
+                        </h4>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 45%;">3000 CHF</div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 55%;">2300 CHF</div>
+                        </div>
+                        <div class="details row">
+                            <div class="col-3 text-left">
+                                | 0 CHF
+                            </div>
+                            <div class="col-6 text-center">
+                                Borrow 45% - 55% Lend
+                            </div>
+                            <div class="col-3 text-right">
+                                7400 CHF |
+                            </div>
+                        </div>
+                    </div>
+                    <div class="budget default">
+                        <h4 style="padding-left: 15px">
+                            Balance
+                            <span class="float-right">
+                                <i class="fa fa-balance-scale" aria-hidden="true"></i>
+                            </span>
+                        </h4>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 60%;">3000 CHF - 60%</div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 40%;">2300 CHF - 40%</div>
+                        </div>
+                        <div class="details row">
+                            <div class="col-3 text-left">
+                                | 0 CHF
+                            </div>
+                            <div class="col-6 text-center">
+                                Outcome 60% - 40% Income
+                            </div>
+                            <div class="col-3 text-right">
+                                7400 CHF |
+                            </div>
+                        </div>
+                    </div>
+                    <div class="budget default">
+                        <h4 style="padding-left: 15px">
+                            Debt
+                            <span class="float-right">
+                                <i class="fa fa-asterisk" aria-hidden="true"></i>
+                            </span>
+                        </h4>
+                        <div class="progress">
+                            <div class="progress-bar bg-debt" role="progressbar" style="width: 100%;">3000 CHF</div>
+                        </div>
+                        <div class="details row">
+                            <div class="col-3 text-left">
+                                | 0 CHF
+                            </div>
+                            <div class="col-6 text-center">
+                                When all incomes are used, the outcomes uses debt
+                            </div>
+                            <div class="col-3 text-right">
+                                7400 CHF |
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -288,21 +290,21 @@
                 <div class="modal-body">
                     <ul class="nav nav-pills nav-fill">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#income-tab" data-toggle="tab" role="tab"><i class="fa fa-arrow-down" aria-hidden="true"></i> Income</a>
+                            <a id="income-tab-link" class="nav-link active" href="#income-tab" data-toggle="tab" role="tab"><i class="fa fa-arrow-down" aria-hidden="true"></i> Income</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#outcome-tab" data-toggle="tab" role="tab"><i class="fa fa-arrow-up" aria-hidden="true"></i> Outcome</a>
+                            <a id="outcome-tab-link" class="nav-link" href="#outcome-tab" data-toggle="tab" role="tab"><i class="fa fa-arrow-up" aria-hidden="true"></i> Outcome</a>
                         </li>
                     </ul>
                     <form>
                         <div class="form-group">
                             <label>Income name</label>
-                            <input type="text" class="form-control" placeholder="Ex : Salary">
+                            <input id="budget-name" type="text" class="form-control" placeholder="Ex : Salary">
                         </div>
                         <div class="form-group">
                             <label>Income amount</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="">
+                                <input id="budget-amount" type="text" class="form-control" placeholder="">
                                 <div class="input-group-addon">CHF</div>
                             </div>
                         </div>
@@ -311,15 +313,15 @@
                                 <div class="form-group">
                                     <label><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Persistant</label>
                                     <div class="dropdown">
-                                        <a class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <a id="persistent-selector" class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             None
                                         </a>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                            <a class="dropdown-item" href="#">None</a>
-                                            <a class="dropdown-item" href="#">Every day</a>
-                                            <a class="dropdown-item" href="#">Every week</a>
-                                            <a class="dropdown-item" href="#">Every month</a>
-                                            <a class="dropdown-item" href="#">Every year</a>
+                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">None</a>
+                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">Every day</a>
+                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">Every week</a>
+                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">Every month</a>
+                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">Every year</a>
                                         </div>
                                     </div>
                                 </div>
@@ -328,12 +330,12 @@
                                 <div class="form-group">
                                     <label><i class="fa fa-retweet" aria-hidden="true"></i> Reported</label>
                                     <div class="dropdown">
-                                        <a class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <a id="reported-selector" class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             No
                                         </a>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                            <a class="dropdown-item" href="#">No</a>
-                                            <a class="dropdown-item" href="#">Yes</a>
+                                            <a onclick="setReported(this)" class="dropdown-item" href="#">No</a>
+                                            <a onclick="setReported(this)" class="dropdown-item" href="#">Yes</a>
                                         </div>
                                     </div>
                                 </div>
@@ -342,38 +344,38 @@
                         <div class="form-group">
                             <label>Color</label>
                             <div class="dropdown">
-                                <a class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Choose
+                                <a id="color-selector" class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="preview-color" style="background: chocolate"></span> Chocolate
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: aquamarine"></span> Aquamarine</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: blueviolet"></span> Blue violet</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: brown"></span> Brown</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: cadetblue"></span> CadetBlue</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: chartreuse"></span> Chartreuse</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: chocolate"></span> Chocolate</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: coral"></span> Coral</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: cornflowerblue"></span> Cornflower blue</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: darkblue"></span> Dark blue</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: darkcyan"></span> Dark cyan</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: darkgoldenrod"></span> Dark golden rod</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: darkgreen"></span> Dark green</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: darkkhaki"></span> Dark khaki</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: darkmagenta"></span> Dark magenta</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: darkorange"></span> Dark orange</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: darksalmon"></span> Dark salmon</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: darkturquoise"></span> Dark turquoise</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: deeppink"></span> Deep pink</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: deepskyblue"></span> Deep sky blue</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: goldenrod"></span> Golden rod</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: green"></span> Green</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: indianred"></span> Indian red</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: indigo"></span> Indigo</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: lightslategray"></span> Light slate gray</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: limegreen"></span> Lime green</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: mediumblue"></span> Medium blue</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: olive"></span> Olive</a>
-                                    <a class="dropdown-item" href="#"><span class="preview-color" style="background: orange"></span> Orange</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: aquamarine"></span> Aquamarine</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: blueviolet"></span> Blue violet</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: brown"></span> Brown</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: cadetblue"></span> CadetBlue</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: chartreuse"></span> Chartreuse</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: chocolate"></span> Chocolate</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: coral"></span> Coral</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: cornflowerblue"></span> Cornflower blue</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: darkblue"></span> Dark blue</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: darkcyan"></span> Dark cyan</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: darkgoldenrod"></span> Dark golden rod</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: darkgreen"></span> Dark green</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: darkkhaki"></span> Dark khaki</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: darkmagenta"></span> Dark magenta</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: darkorange"></span> Dark orange</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: darksalmon"></span> Dark salmon</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: darkturquoise"></span> Dark turquoise</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: deeppink"></span> Deep pink</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: deepskyblue"></span> Deep sky blue</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: goldenrod"></span> Golden rod</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: green"></span> Green</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: indianred"></span> Indian red</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: indigo"></span> Indigo</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: lightslategray"></span> Light slate gray</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: limegreen"></span> Lime green</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: mediumblue"></span> Medium blue</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: olive"></span> Olive</a>
+                                    <a onclick="setColor(this)" class="dropdown-item" href="#"><span class="preview-color" style="background: orange"></span> Orange</a>
                                 </div>
                             </div>
                         </div>
@@ -399,8 +401,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger float-left">Delete</button>
-                    <button type="button" class="btn btn-success float-right">Save</button>
+                    <button onclick="budgetsDelete()" type="button" class="btn btn-danger float-left">Delete</button>
+                    <button onclick="budgetsSave()" type="button" class="btn btn-success float-right">Save</button>
                     <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
                 </div>
             </div>

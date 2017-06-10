@@ -5,12 +5,21 @@ import Utils._
 
 object Main extends js.JSApp {
 
+  val pathname: String = dom.document.location.pathname
+
   def main(): Unit = {
     checkConnection()
 
-    dom.document.location.pathname match {
+    pathname match {
       case "/login" => new Login
-      case _ => ()
+      case "/exchanges" =>
+        Utils.setRange()
+        Utils.refresh = Exchanges.list
+        new Exchanges
+      case "/budgets" =>
+        new Budgets
+      case _ =>
+        new Dashboard
     }
   }
 }

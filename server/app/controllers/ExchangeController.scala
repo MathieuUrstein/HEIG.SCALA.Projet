@@ -111,7 +111,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
   def delete(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     exchangeDAO.delete(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { _ =>
-      Ok(Json.obj("status" -> "OK", "user" -> "exchange deleted"))
+      Ok(Json.obj("status" -> "OK", "message" -> "exchange deleted"))
     }.recover {
       // case in not found the specified exchange with its id
       case _: NoSuchElementException =>
