@@ -44,7 +44,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
                          INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
                          INNER JOIN "user" ON "transaction".userId = "user".id
                          WHERE "user".email = '#$userEmail' AND "budget".type = 'outcome'
-                         AND 'transaction'.date BETWEEN '#$dateFrom' AND '#$dateTo'
+                         AND "transaction".date BETWEEN '#$dateFrom' AND '#$dateTo'
                          GROUP BY "transaction".date, "budget".id
                       """
     }
@@ -57,7 +57,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
                          INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
                          INNER JOIN "user" ON "transaction".userId = "user".id
                          WHERE "user".email = '#$userEmail' AND "budget".type = 'outcome'
-                         AND 'transaction'.date BETWEEN '#$dateFrom' AND '#$dateTo'
+                         AND "transaction".date BETWEEN '#$dateFrom' AND '#$dateTo'
                          GROUP BY "transaction".date, "budget".id
                       """
     }
@@ -87,7 +87,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
     }
   }
 
-  /*def findUsage(userEmail: String, dates: FromToDatesDTO): Future[Vector[SpendingGETDTO]] = {
+  def findUsage(userEmail: String, dates: FromToDatesDTO): Future[Vector[UsageGETDTO]] = {
     // if from and to dates are the two presents (JSON), we adapt the SQL request to integrate these dates
     // otherwise, we don't use them if no one is present (if one of them is present, we use the actual date for the other date)
     var dateFrom: Long = 0
@@ -104,51 +104,46 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
         dateTo = Date.valueOf(dates.to.get.year + "-" + dates.to.get.month + "-" + dates.to.get.day).getTime
       }
 
-      sqlRequest = sql"""SELECT "transaction".date, "budget".name, SUM("transaction".amount)
-                         FROM "budget"
-                         INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
-                         INNER JOIN "user" ON "transaction".userId = "user".id
-                         WHERE "user".email = '#$userEmail' AND "budget".type = 'outcome'
-                         AND 'transaction'.date BETWEEN '#$dateFrom' AND '#$dateTo'
-                         GROUP BY "transaction".date, "budget".id
+      sqlRequest = sql"""SELECT "income_outcome".date, "income_outcome".outcome, "income_outcome".income
+                         FROM "income_outcome"
+                         INNER JOIN "user" ON "income_outcome".userId = "user".id
+                         WHERE "user".email = '#$userEmail' AND "income_outcome".date BETWEEN '#$dateFrom' AND '#$dateTo'
+                         GROUP BY "income_outcome".date
                       """
     }
     else if (dates.to.isDefined) {
       dateTo = Date.valueOf(dates.to.get.year + "-" + dates.to.get.month + "-" + dates.to.get.day).getTime
       dateFrom = Calendar.getInstance().getTimeInMillis
 
-      sqlRequest = sql"""SELECT "transaction".date, "budget".name, SUM("transaction".amount)
-                         FROM "budget"
-                         INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
-                         INNER JOIN "user" ON "transaction".userId = "user".id
-                         WHERE "user".email = '#$userEmail' AND "budget".type = 'outcome'
-                         AND 'transaction'.date BETWEEN '#$dateFrom' AND '#$dateTo'
-                         GROUP BY "transaction".date, "budget".id
+      sqlRequest = sql"""SELECT "income_outcome".date, "income_outcome".outcome, "income_outcome".income
+                         FROM "income_outcome"
+                         INNER JOIN "user" ON "income_outcome".userId = "user".id
+                         WHERE "user".email = '#$userEmail' AND "income_outcome".date BETWEEN '#$dateFrom' AND '#$dateTo'
+                         GROUP BY "income_outcome".date
                       """
     }
     else {
       // we don't use between and the dates
-      sqlRequest = sql"""SELECT "transaction".date, "budget".name, SUM("transaction".amount)
-                         FROM "budget"
-                         INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
-                         INNER JOIN "user" ON "transaction".userId = "user".id
-                         WHERE "user".email = '#$userEmail' AND "budget".type = 'outcome'
-                         GROUP BY "transaction".date, "budget".id
+      sqlRequest = sql"""SELECT "income_outcome".date, "income_outcome".outcome, "income_outcome".income
+                         FROM "income_outcome"
+                         INNER JOIN "user" ON "income_outcome".userId = "user".id
+                         WHERE "user".email = '#$userEmail'
+                         GROUP BY "income_outcome".date
                       """
     }
 
     // too complicated request with slick directly
-    dbConfig.db.run(sqlRequest.as[SpendingGET]).map { spendings =>
-      val spendingsToSend = spendings.map { spending =>
-        val dateToSend = DateDTO(spending.date.toString.substring(8, 10).toInt, spending.date.toString.substring(5, 7).toInt,
-          spending.date.toString.substring(0, 4).toInt)
+    dbConfig.db.run(sqlRequest.as[UsageGET]).map { usages =>
+      val usagesToSend = usages.map { usage =>
+        val dateToSend = DateDTO(usage.date.toString.substring(8, 10).toInt, usage.date.toString.substring(5, 7).toInt,
+          usage.date.toString.substring(0, 4).toInt)
 
-        val spendingToReturn = SpendingGETDTO(dateToSend, spending.budget, spending.amount)
+        val usageToReturn = UsageGETDTO(dateToSend, usage.used, usage.left)
 
-        spendingToReturn
+        usageToReturn
       }
 
-      spendingsToSend
+      usagesToSend
     }
-  }*/
+  }
 }

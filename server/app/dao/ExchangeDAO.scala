@@ -93,7 +93,7 @@ class ExchangeDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Datab
     }
   }
 
-  def update(userEmail: String, id: Int, exchange: ExchangePUTDTO): Future[Any] = {
+  def update(userEmail: String, id: Int, exchange: ExchangePATCHDTO): Future[Any] = {
     // we first verify that the asked exchange (id) to update belongs to this user or exists
     dbConfig.db.run(exchanges.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .filter(_._1.id === id).result.head).map { _ =>

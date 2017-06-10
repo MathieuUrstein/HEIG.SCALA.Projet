@@ -20,7 +20,6 @@ DELETE  /api/user                    controllers.UserController.delete
 
 # Transaction
 POST    /api/transactions            controllers.TransactionController.create
-# TODO : change for GET when tests are finished (POSTMAN doesn't accept body for GET requests)
 OPTIONS /api/transactions            controllers.TransactionController.readAll
 GET     /api/transactions/:id        controllers.TransactionController.read(id: Int)
 PUT     /api/transactions/:id        controllers.TransactionController.update(id: Int)
@@ -28,7 +27,6 @@ DELETE  /api/transactions/:id        controllers.TransactionController.delete(id
 
 # Exchange
 POST    /api/exchanges               controllers.ExchangeController.create
-# TODO: change for GET when tests are finished (POSTMAN doesn't accept body for GET requests)
 OPTIONS /api/exchanges               controllers.ExchangeController.readAll
 GET     /api/exchanges/:id           controllers.ExchangeController.read(id: Int)
 PUT     /api/exchanges/:id           controllers.ExchangeController.update(id: Int)
@@ -42,7 +40,6 @@ PUT     /api/budgets/:id             controllers.BudgetController.update(id: Int
 DELETE  /api/budgets/:id             controllers.BudgetController.delete(id: Int)
 
 # Dashboard
-# TODO: change for GET when tests are finished (POSTMAN doesn't accept body for GET requests)
 OPTIONS /api/dashboard/spendings     controllers.DashboardController.spendings
 OPTIONS /api/dashboard/usage         controllers.DashboardController.usage
 

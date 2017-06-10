@@ -1,5 +1,7 @@
 package dao
 
+import java.sql.Date
+import java.util.Calendar
 import javax.inject.Inject
 
 import models._
@@ -37,7 +39,10 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
   def insertBudget(userEmail: String, budget: BudgetPOSTDTO): Future[Future[Int]] = {
     // we get the id of the connected user
     userDAO.getId(userEmail).map { userId =>
-      val budgetToInsert = Budget(budget.name, budget.`type`, budget.used, budget.left, budget.exceeding,
+      // add the date of the creation (the actual day)
+      val creationDate = Date.valueOf(Const.format.format(Calendar.getInstance().getTime))
+
+      val budgetToInsert = Budget(budget.name, creationDate, budget.`type`, budget.used, budget.left, budget.exceeding,
         budget.persistent, budget.reported, budget.color, userId)
 
       dbConfig.db.run(budgets returning budgets.map(_.id) += budgetToInsert)
@@ -122,6 +127,19 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     insertBudget(userEmail, budget).map { _ => () }
   }
 
+  // to know if we must update a budget (reinitialize it)
+  def getAllBudgets: Future[Seq[BudgetGET]] = dbConfig.db.run(budgets.map(_.budgetInfo).result)
+
+  def getTakesFrom(budgetId: Int): Future[Seq[TakesFromDTO]] = {
+    dbConfig.db.run(takesFromBudgets.filter(_.budgetGoesToId === budgetId).map(_.takesFromInfo).result)
+  }
+
+  // to reinitialize budget to given values
+  def reinitializeBudget(id: Int, usedValue: Double, leftValue: Double, exceedingValue: Double): Future[Unit] = {
+    dbConfig.db.run(budgets.filter(_.id === id).map(budget => (budget.used, budget.left, budget.exceeding))
+      .update(usedValue, leftValue, exceedingValue)).map { _ => () }
+  }
+
   def findAll(userEmail: String): Future[Seq[BudgetAndTakesFromAllGETDTO]] = {
     val budgetsToReturn: ArrayBuffer[BudgetAndTakesFromAllGETDTO] = ArrayBuffer()
 
@@ -158,7 +176,7 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     }
   }
 
-  def update(userEmail: String, id: Int, budget: BudgetPUTDTO): Future[Any] = {
+  def update(userEmail: String, id: Int, budget: BudgetPATCHDTO): Future[Any] = {
     // we first verify that the asked budget (id) to update belongs to this user or exists
     dbConfig.db.run(budgets.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
       .filter(_._1.id === id).result.head).map { _ =>
@@ -207,6 +225,7 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
   class BudgetTable(tag: Tag) extends Table[Budget](tag, "budget") {
     def id: Rep[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def userId: Rep[Int] = column[Int]("userId")
+    def creationDate: Rep[Date] = column[Date]("creationDate")
     def name: Rep[String] = column[String]("name")
     def `type`: Rep[String] = column[String]("type")
     def used: Rep[Double] = column[Double]("used")
@@ -225,14 +244,14 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     }
 
     def * : ProvenShape[Budget] = {
-      (name, `type`, used, left, exceeding, persistent, reported, color, userId) <>
+      (name, creationDate, `type`, used, left, exceeding, persistent, reported, color, userId) <>
         ((Budget.apply _).tupled, Budget.unapply)
     }
 
     def budgetTransactionInfo: (Rep[Double], Rep[Double], Rep[Double]) = (used, left, exceeding)
 
-    def budgetInfo: MappedProjection[BudgetGET, (Int, String, String, Double, Double, Double, Int, Boolean, String)] = {
-      (id, name, `type`, used, left, exceeding, persistent, reported, color) <> (BudgetGET.tupled, BudgetGET.unapply)
+    def budgetInfo: MappedProjection[BudgetGET, (Int, Date, String, String, Double, Double, Double, Int, Boolean, String)] = {
+      (id, creationDate, name, `type`, used, left, exceeding, persistent, reported, color) <> (BudgetGET.tupled, BudgetGET.unapply)
     }
   }
 

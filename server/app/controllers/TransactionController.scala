@@ -41,12 +41,12 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
       (JsPath \ "amount").write[Double]
     ) (unlift(TransactionAllGETDTO.unapply))
 
-  implicit val transactionPATCHDTOReads: Reads[TransactionPUTDTO] = (
+  implicit val transactionPATCHDTOReads: Reads[TransactionPATCHDTO] = (
     (JsPath \ "name").readNullable[String] and
       (JsPath \ "date").readNullable[DateDTO] and
       (JsPath \ "budgetId").readNullable[Int] and
       (JsPath \ "amount").readNullable[Double]
-    ) (TransactionPUTDTO.apply _)
+    ) (TransactionPATCHDTO.apply _)
 
   def create(): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[TransactionPOSTDTO]
@@ -99,7 +99,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
   }
 
   def update(id: Int): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
-    val result = request.body.validate[TransactionPUTDTO]
+    val result = request.body.validate[TransactionPATCHDTO]
 
     result.fold(
       errors => Future.successful {

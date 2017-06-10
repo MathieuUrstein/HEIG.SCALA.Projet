@@ -29,12 +29,12 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
       (JsPath \ "currency").write[String]
     ) (unlift(UserGETDTO.unapply))
 
-  implicit val userPATCHDTOReads: Reads[UserPUTDTO] = (
+  implicit val userPATCHDTOReads: Reads[UserPATCHDTO] = (
     (JsPath \ "fullname").readNullable[String] and
       (JsPath \ "email").readNullable[String] and
       (JsPath \ "password").readNullable[String] and
       (JsPath \ "currency").readNullable[String]
-    ) (UserPUTDTO.apply _)
+    ) (UserPATCHDTO.apply _)
 
   implicit val loginFormDTOReads: Reads[LoginFormDTO] = (
     (JsPath \ "email").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
@@ -109,7 +109,7 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
   }
 
   def update: Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
-    val result = request.body.validate[UserPUTDTO]
+    val result = request.body.validate[UserPATCHDTO]
 
     result.fold(
       errors => Future.successful {

@@ -38,12 +38,12 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
       (JsPath \ "amount").write[Double]
     ) (unlift(ExchangeAllGETDTO.unapply))
 
-  implicit val exchangePATCHDTOReads: Reads[ExchangePUTDTO] = (
+  implicit val exchangePATCHDTOReads: Reads[ExchangePATCHDTO] = (
     (JsPath \ "name").readNullable[String] and
       (JsPath \ "date").readNullable[DateDTO] and
       (JsPath \ "type").readNullable[String] and
       (JsPath \ "amount").readNullable[Double]
-    ) (ExchangePUTDTO.apply _)
+    ) (ExchangePATCHDTO.apply _)
 
   def create(): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[ExchangePOSTDTO]
@@ -89,7 +89,7 @@ class ExchangeController @Inject()(exchangeDAO: ExchangeDAO)(implicit executionC
   }
 
   def update(id: Int): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
-    val result = request.body.validate[ExchangePUTDTO]
+    val result = request.body.validate[ExchangePATCHDTO]
 
     result.fold(
       errors => Future.successful {

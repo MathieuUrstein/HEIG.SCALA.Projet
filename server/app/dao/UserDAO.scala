@@ -2,7 +2,7 @@ package dao
 
 import javax.inject.Inject
 
-import models.{User, UserGETDTO, UserPUTDTO}
+import models.{User, UserGETDTO, UserPATCHDTO}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.db.slick.DatabaseConfigProvider
 import play.db.NamedDatabase
@@ -45,6 +45,10 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
     dbConfig.db.run(users.filter(_.email === email).map(_.password).result.head)
   }
 
+  def getAllEmails: Future[Seq[String]] = {
+    dbConfig.db.run(users.map(_.email).result)
+  }
+
   def find(email: String): Future[UserGETDTO] = {
     dbConfig.db.run(users.filter(_.email === email).map(_.userInfo).result.head)
   }
@@ -53,7 +57,7 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
     dbConfig.db.run(users.filter(_.email === email).map(field).update(value)).map { _ => () }
   }
 
-  def update(email: String, user: UserPUTDTO): Future[Unit] = {
+  def update(email: String, user: UserPATCHDTO): Future[Unit] = {
     // we first verify that this user exists
     dbConfig.db.run(users.filter(_.email === email).result.head).map { _ =>
       // we update only the present fields (not None value)

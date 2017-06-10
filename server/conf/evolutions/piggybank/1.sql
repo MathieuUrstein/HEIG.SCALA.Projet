@@ -12,6 +12,7 @@ CREATE TABLE "user"(
 CREATE TABLE "budget"(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   userId INTEGER NOT NULL,
+  creationDate DATE NOT NULL,
   name VARCHAR(60) NOT NULL,
   type VARCHAR(60) NOT NULL,
   used DOUBLE NOT NULL,
@@ -54,6 +55,15 @@ CREATE TABLE "exchange"(
   FOREIGN KEY(userId) REFERENCES "user"(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE "income_outcome"(
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  userId INTEGER NOT NULL,
+  date DATE NOT NULL,
+  income DOUBLE NOT NULL,
+  outcome DOUBLE NOT NULL,
+  FOREIGN KEY(userId) REFERENCES "user"(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 # --- !Downs
 
 DROP TABLE "user";
@@ -61,3 +71,4 @@ DROP TABLE "budget";
 DROP TABLE "takes_from";
 DROP TABLE "transaction";
 DROP TABLE "exchange";
+DROP TABLE "income_outcome";

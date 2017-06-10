@@ -65,7 +65,7 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
 
   // TODO: patch (update) type and takesFrom values (improvement)
 
-  implicit val budgetPATCHDTOReads: Reads[BudgetPUTDTO] = (
+  implicit val budgetPATCHDTOReads: Reads[BudgetPATCHDTO] = (
     (JsPath \ "name").readNullable[String] and
       (JsPath \ "used").readNullable[Double] and
       (JsPath \ "left").readNullable[Double] and
@@ -74,7 +74,7 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
       (JsPath \ "reported").readNullable[Boolean] and
       (JsPath \ "color").readNullable[String] and
       (JsPath \ "takesFrom").readNullable[Seq[TakesFromDTO]]
-    ) (BudgetPUTDTO.apply _)
+    ) (BudgetPATCHDTO.apply _)
 
   // TODO: check for no negative values for left and used fields (improvement)
   // TODO: check that the order for the takesFrom values are correct (improvement)
@@ -116,7 +116,7 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
   }
 
   def update(id: Int): Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
-    val result = request.body.validate[BudgetPUTDTO]
+    val result = request.body.validate[BudgetPATCHDTO]
 
     result.fold(
       errors => Future.successful {

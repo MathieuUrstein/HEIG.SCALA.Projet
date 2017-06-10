@@ -20,17 +20,11 @@ class DashboardController @Inject()(dashboardDAO: DashboardDAO)(implicit executi
       (JsPath \ "amount").write[Double]
     ) (unlift(SpendingGETDTO.unapply))
 
-  /*implicit val userPATCHDTOReads: Reads[UserPATCHDTO] = (
-    (JsPath \ "fullname").readNullable[String] and
-      (JsPath \ "email").readNullable[String] and
-      (JsPath \ "password").readNullable[String] and
-      (JsPath \ "currency").readNullable[String]
-    ) (UserPATCHDTO.apply _)
-
-  implicit val loginFormDTOReads: Reads[LoginFormDTO] = (
-    (JsPath \ "email").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
-      (JsPath \ "password").read[String](notEqual(Const.errorMessageEmptyStringJSON, ""))
-    ) (LoginFormDTO.apply _)*/
+  implicit val usageGETDTOWrites: Writes[UsageGETDTO] = (
+    (JsPath \ "date").write[DateDTO] and
+      (JsPath \ "used").write[Double] and
+      (JsPath \ "left").write[Double]
+    ) (unlift(UsageGETDTO.unapply))
 
   def spendings: Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
     val result = request.body.validate[FromToDatesDTO]
@@ -48,5 +42,19 @@ class DashboardController @Inject()(dashboardDAO: DashboardDAO)(implicit executi
     )
   }
 
-  def usage = TODO
+  def usage: Action[JsValue] = Authenticated.async(BodyParsers.parse.json) { implicit request =>
+    val result = request.body.validate[FromToDatesDTO]
+
+    result.fold(
+      errors => Future.successful {
+        BadRequest(Json.obj("status" -> "ERROR", "message" -> JsError.toJson(errors)))
+      },
+      dates => {
+        // we look for the user email in the JWT
+        dashboardDAO.findUsage(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, dates).map { usages =>
+          Ok(Json.toJson(usages))
+        }
+      }
+    )
+  }
 }

@@ -1,6 +1,6 @@
 package controllers
 
-import play.api.mvc._
+ import play.api.mvc._
 
 class Application extends Controller {
   def dashboard = Action {
