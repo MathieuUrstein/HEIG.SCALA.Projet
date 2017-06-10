@@ -10,9 +10,7 @@ import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.util._
 
-class Login {
-
-}
+class Login {}
 
 object Login {
 
@@ -42,8 +40,8 @@ object Login {
       document.getElementById("register-currency").asInstanceOf[html.Input].value
     )
     API.register(user).onComplete {
-      case Success(req) =>
-        val token = req.getResponseHeader("Authorization")
+      case Success(resp) =>
+        val token = resp.getResponseHeader("Authorization")
         headers += ("Authorization" -> token)
         document.cookie = "Authorization=" + token
         document.location.pathname = "/"

@@ -503,7 +503,7 @@ definitions:
         type: number
       exceeding:
         type: number
-      persistant:
+      persistent:
         type: number
       reported:
         type: boolean
@@ -527,7 +527,7 @@ definitions:
       - used
       - left
       - exceeding
-      - persistant
+      - persistent
       - reported
       - color
   BudgetPatch:
@@ -543,7 +543,7 @@ definitions:
         type: number
       exceeding:
         type: number
-      persistant:
+      persistent:
         type: boolean
       reported:
         type: boolean

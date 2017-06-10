@@ -69,10 +69,10 @@ package object Models {
                 val used: Double,
                 val left: Double,
                 val exceeding: Double,
-                val persistant: Int,
+                val persistent: Int,
                 val reported: Boolean,
                 val color: String,
-                val takesFrom: List[BudgetRef]
+                val takesFrom: js.Array[BudgetRef]
               ) extends js.Object
 
   @ScalaJSDefined

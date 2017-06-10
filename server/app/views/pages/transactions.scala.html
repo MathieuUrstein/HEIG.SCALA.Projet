@@ -6,66 +6,66 @@
                     <div class="col-4">
                         <span>From :</span>
                         <div class="btn-group">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button id="from-month" class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Month
                             </button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#">January</a>
-                                <a class="dropdown-item" href="#">February</a>
-                                <a class="dropdown-item" href="#">March</a>
-                                <a class="dropdown-item" href="#">April</a>
-                                <a class="dropdown-item" href="#">Mai</a>
-                                <a class="dropdown-item" href="#">June</a>
-                                <a class="dropdown-item" href="#">July</a>
-                                <a class="dropdown-item" href="#">August</a>
-                                <a class="dropdown-item" href="#">September</a>
-                                <a class="dropdown-item" href="#">October</a>
-                                <a class="dropdown-item" href="#">November</a>
-                                <a class="dropdown-item" href="#">December</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">January</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">February</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">March</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">April</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">Mai</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">June</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">July</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">August</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">September</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">October</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">November</a>
+                                <a onclick="setFromMonth(this)" class="dropdown-item" href="#">December</a>
                             </div>
                         </div>
                         <div class="btn-group">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button id="from-year" class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Year
                             </button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#">2017</a>
-                                <a class="dropdown-item" href="#">2016</a>
+                                <a onclick="setFromYear(this)" class="dropdown-item" href="#">2017</a>
+                                <a onclick="setFromYear(this)" class="dropdown-item" href="#">2016</a>
                             </div>
                         </div>
                     </div>
                     <div id="add-transaction" class="col-4">
-                        <button>
+                        <button onclick="setEditedID(0)" data-toggle="modal" data-target="#transaction-modal">
                             <i class="fa fa-plus" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div class="col-4 text-right">
                         <div class="btn-group">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button id="to-month" class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Month
                             </button>
                             <div class="dropdown-menu dropdown-menu-right text-right">
-                                <a class="dropdown-item" href="#">January</a>
-                                <a class="dropdown-item" href="#">February</a>
-                                <a class="dropdown-item" href="#">March</a>
-                                <a class="dropdown-item" href="#">April</a>
-                                <a class="dropdown-item" href="#">Mai</a>
-                                <a class="dropdown-item" href="#">June</a>
-                                <a class="dropdown-item" href="#">July</a>
-                                <a class="dropdown-item" href="#">August</a>
-                                <a class="dropdown-item" href="#">September</a>
-                                <a class="dropdown-item" href="#">October</a>
-                                <a class="dropdown-item" href="#">November</a>
-                                <a class="dropdown-item" href="#">December</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">January</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">February</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">March</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">April</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">Mai</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">June</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">July</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">August</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">September</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">October</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">November</a>
+                                <a onclick="setToMonth(this)" class="dropdown-item" href="#">December</a>
                             </div>
                         </div>
                         <div class="btn-group">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button id="to-year" class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Year
                             </button>
                             <div class="dropdown-menu dropdown-menu-right text-right">
-                                <a class="dropdown-item" href="#">2017</a>
-                                <a class="dropdown-item" href="#">2016</a>
+                                <a onclick="setToYear(this)" class="dropdown-item" href="#">2017</a>
+                                <a onclick="setToYear(this)" class="dropdown-item" href="#">2016</a>
                             </div>
                         </div>
                         <span>: To</span>
@@ -103,31 +103,31 @@
                 <table class="table">
                     <tbody>
                         <tr>
-                            <td width="3%" class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td width="3%" class="edit"><button class="btn" data-toggle="modal" data-target="#transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
                             <td width="47%" class="name">Mc Donald <span class="date">23 sept 2017</span></td>
                             <td width="30%"><a href="#">Extra</a></td>
                             <td width="20%" class="amount">-12.30 CHF</td>
                         </tr>
                         <tr>
-                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
                             <td class="name">Car BMW x3 <span class="date">2 sept 2017</span></td>
                             <td><a href="#">Transportation</a></td>
                             <td class="amount">-34'123.30 CHF</td>
                         </tr>
                         <tr>
-                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
                             <td class="name">Grocery <span class="date">1 sept 2017</span></td>
                             <td><a href="#">Nutrition</a></td>
                             <td class="amount">-54.30 CHF</td>
                         </tr>
                         <tr style="background: #fffdf8">
-                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
                             <td class="name">Grandma gift <span class="date">29 oct 2016</span></td>
                             <td><a href="#">Magic money</a></td>
                             <td class="amount">+ 250 CHF</td>
                         </tr>
                         <tr>
-                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#edit-transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                            <td class="edit"><button class="btn" data-toggle="modal" data-target="#transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
                             <td class="name">Grocery <span class="date">1 sept 2017</span></td>
                             <td><a href="#">Nutrition</a></td>
                             <td class="amount">-54.30 CHF</td>
@@ -158,7 +158,7 @@
     </div>
 
         <!-- Modal -->
-    <div class="modal fade" id="edit-transaction-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="transaction-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">

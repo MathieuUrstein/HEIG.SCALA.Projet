@@ -5,63 +5,63 @@
                 <div class="col-4">
                     <span>From :</span>
                     <div class="btn-group">
-                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button id="from-month" class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Month
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">January</a>
-                            <a class="dropdown-item" href="#">February</a>
-                            <a class="dropdown-item" href="#">March</a>
-                            <a class="dropdown-item" href="#">April</a>
-                            <a class="dropdown-item" href="#">Mai</a>
-                            <a class="dropdown-item" href="#">June</a>
-                            <a class="dropdown-item" href="#">July</a>
-                            <a class="dropdown-item" href="#">August</a>
-                            <a class="dropdown-item" href="#">September</a>
-                            <a class="dropdown-item" href="#">October</a>
-                            <a class="dropdown-item" href="#">November</a>
-                            <a class="dropdown-item" href="#">December</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">January</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">February</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">March</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">April</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">Mai</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">June</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">July</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">August</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">September</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">October</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">November</a>
+                            <a onclick="setFromMonth(this)" class="dropdown-item" href="#">December</a>
                         </div>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button id="from-year" class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Year
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">2017</a>
-                            <a class="dropdown-item" href="#">2016</a>
+                            <a onclick="setFromYear(this)" class="dropdown-item" href="#">2017</a>
+                            <a onclick="setFromYear(this)" class="dropdown-item" href="#">2016</a>
                         </div>
                     </div>
                 </div>
-                <div id="add-transaction" class="col-4">
+                <div class="col-4">
                 </div>
                 <div class="col-4 text-right">
                     <div class="btn-group">
-                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button id="to-month" class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Month
                         </button>
                         <div class="dropdown-menu dropdown-menu-right text-right">
-                            <a class="dropdown-item" href="#">January</a>
-                            <a class="dropdown-item" href="#">February</a>
-                            <a class="dropdown-item" href="#">March</a>
-                            <a class="dropdown-item" href="#">April</a>
-                            <a class="dropdown-item" href="#">Mai</a>
-                            <a class="dropdown-item" href="#">June</a>
-                            <a class="dropdown-item" href="#">July</a>
-                            <a class="dropdown-item" href="#">August</a>
-                            <a class="dropdown-item" href="#">September</a>
-                            <a class="dropdown-item" href="#">October</a>
-                            <a class="dropdown-item" href="#">November</a>
-                            <a class="dropdown-item" href="#">December</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">January</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">February</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">March</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">April</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">Mai</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">June</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">July</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">August</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">September</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">October</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">November</a>
+                            <a onclick="setToMonth(this)" class="dropdown-item" href="#">December</a>
                         </div>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button id="to-year" class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Year
                         </button>
                         <div class="dropdown-menu dropdown-menu-right text-right">
-                            <a class="dropdown-item" href="#">2017</a>
-                            <a class="dropdown-item" href="#">2016</a>
+                            <a onclick="setToYear(this)" class="dropdown-item" href="#">2017</a>
+                            <a onclick="setToYear(this)" class="dropdown-item" href="#">2016</a>
                         </div>
                     </div>
                     <span>: To</span>
