@@ -36,7 +36,7 @@ case class Budget(name: String, creationDate: Date, `type`: String, used: Double
 case class TakesFrom(order: Int, budgetGoesToId: Int, budgetTakesFromId: Int)
 case class TakesFromDTO(order: Int, budgetId: Int)
 case class BudgetPOSTDTO(name: String, `type`: String, used: Double, left: Double, exceeding: Double, persistent: Int,
-                         reported: Boolean, color: String, takesFrom: Option[Seq[TakesFromDTO]])
+                         reported: Boolean, color: String, takesFrom: Seq[TakesFromDTO])
 case class BudgetGET(id: Int, creationDate: Date, name: String, `type`: String, used: Double, left: Double, exceeding: Double,
                      persistent: Int, reported: Boolean, color: String)
 case class BudgetAndTakesFromAllGETDTO(id: Int, name: String, `type`: String, used: Double, left: Double,

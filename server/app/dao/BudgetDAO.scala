@@ -74,8 +74,8 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
   // TODO: make better error messages (improvement)
 
   def insert(userEmail: String, budget: BudgetPOSTDTO): Future[Unit] = {
-    // test if takesFrom is defined or not (if we must or not add entries in table takes_from)
-    if (budget.takesFrom.isDefined) {
+    // test if takesFrom is empty or not (if we must or not add entries in table takes_from)
+    if (budget.takesFrom.nonEmpty) {
       // it is an error to define a takesFrom tab with the type income for the budget to create
       if (budget.`type`.equals("income")) {
         return Future.failed(new Exception("takesFrom hast to be define only for outcome budgets"))
@@ -93,7 +93,7 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
         }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
         // verify that the specified budgets (id) in takesFrom field exist among the budgets of this user
-        budget.takesFrom.get.foreach { b =>
+        budget.takesFrom.foreach { b =>
           // we must wait
           Await.ready(isBudgetExisting(userEmail, b.budgetId).map { r =>
             Await.ready(r.map { v =>

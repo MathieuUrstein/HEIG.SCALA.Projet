@@ -35,7 +35,7 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
       (JsPath \ "persistent").read[Int] and
       (JsPath \ "reported").read[Boolean] and
       (JsPath \ "color").read[String](notEqual(Const.errorMessageEmptyStringJSON, "")) and
-      (JsPath \ "takesFrom").readNullable[Seq[TakesFromDTO]](notEqual(Const.errorMessageEmptyArrayJSON, Seq.empty))
+      (JsPath \ "takesFrom").read[Seq[TakesFromDTO]]
     ) (BudgetPOSTDTO.apply _)
 
   implicit val budgetAndTakesFromAllGETDTOWrites: Writes[BudgetAndTakesFromAllGETDTO] = (
