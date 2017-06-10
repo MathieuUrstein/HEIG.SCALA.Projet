@@ -140,7 +140,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
     // we check if we are in exceeding
     if (leftActualValue == 0) {
       // it is a negative exceeding
-      // we do nothing (we will eventually look for the next income budget to take money from)
+      // we do nothing (we will eventually look for the next Income budget to take money from)
       amount
     }
     else {
@@ -173,7 +173,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
             Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.left, budget.used))
               .update(0, newUsedValue)).map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
-            // we will report the exceeding on the eventually next income budget to take money from
+            // we will report the exceeding on the eventually next Income budget to take money from
             newLeftValue
           }
           else {
@@ -201,7 +201,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
           Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.left, budget.used))
             .update(0, newUsedValue)).map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
-          // we will report the exceeding on the eventually next income budget to take money from
+          // we will report the exceeding on the eventually next Income budget to take money from
           newLeftValue
         }
         else {
@@ -230,13 +230,13 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
 
     // we check that the specified budgetId exists for this user
     budgetDAO.find(userEmail, transaction.budgetId).map { budget =>
-      // we check that a positive number for the amount is associated to an income and inversely
-      if (transaction.amount < 0 && budget.`type` == "income") {
-        throw new Exception("transaction amount negative associated to an income budget")
+      // we check that a positive number for the amount is associated to an Income and inversely
+      if (transaction.amount < 0 && budget.`type` == "Income") {
+        throw new Exception("transaction amount negative associated to an Income budget")
       }
 
-      if (transaction.amount > 0 && budget.`type` == "outcome") {
-        throw new Exception("transaction amount positive associated to an outcome budget")
+      if (transaction.amount > 0 && budget.`type` == "Outcome") {
+        throw new Exception("transaction amount positive associated to an Outcome budget")
       }
 
       var dateToInsert: Date = null
@@ -258,7 +258,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
 
 
       // we update the corresponding budget (left, used and exceeding values)
-      if (budget.`type` == "income") {
+      if (budget.`type` == "Income") {
         updateBudgetIncome(transaction.budgetId, transaction.amount)
       }
       else {
@@ -266,7 +266,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
 
         var budgetsMap: Map[Int, Int] = Map()
 
-        // we look for the order to treat the income budgets
+        // we look for the order to treat the Income budgets
         budget.takesFrom.get.foreach { b =>
           budgetsMap += b.order -> b.budgetId
         }
@@ -276,10 +276,10 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
 
         // TODO: add debt when all incomes are exhausted (improvement)
 
-        // we stop when we have a null exceeding or all income budgets have been processed
+        // we stop when we have a null exceeding or all Income budgets have been processed
         sortedMap.takeWhile(_ => returnedExceeding != 0).foreach { e =>
-          // updates takesFrom budgets (income) in order
-          // income budgets are considered as outcome
+          // updates takesFrom budgets (Income) in order
+          // Income budgets are considered as Outcome
           returnedExceeding = updateBudgetIncomeAsOutcome(e._2, returnedExceeding)
         }
       }
@@ -399,12 +399,12 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
         }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
         // check for the association
-        if (transaction.amount.get < 0 && budgetType == "income") {
-          throw new Exception("transaction amount negative associated to an income budget, budget not updated")
+        if (transaction.amount.get < 0 && budgetType == "Income") {
+          throw new Exception("transaction amount negative associated to an Income budget, budget not updated")
         }
 
-        if (transaction.amount.get > 0 && budgetType == "outcome") {
-          throw new Exception("transaction amount positive associated to an outcome budget, budget not updated")
+        if (transaction.amount.get > 0 && budgetType == "Outcome") {
+          throw new Exception("transaction amount positive associated to an Outcome budget, budget not updated")
         }
 
         dbConfig.db.run(transactions.filter(_.id === id).map(_.budgetId).update(transaction.budgetId.get)).map { _ => () }

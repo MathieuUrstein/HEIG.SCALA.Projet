@@ -7,7 +7,6 @@ import scala.concurrent._
 import scala.scalajs.js
 
 package object API {
-
   private val prefix = "/api/"
 
   private object urls {

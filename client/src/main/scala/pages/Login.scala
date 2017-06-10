@@ -13,7 +13,6 @@ import scala.util._
 class Login {}
 
 object Login {
-
   @JSExportTopLevel("login")
   def login(): Unit = {
     val credentials = new Credentials(

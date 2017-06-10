@@ -6,7 +6,6 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 package object Utils {
-
   def checkConnection(): Unit = {
     document.location.pathname match {
       case "/login" => ()

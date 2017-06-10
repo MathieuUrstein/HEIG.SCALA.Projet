@@ -54,10 +54,10 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     if (budgetGoesToId == takesFrom.budgetId) {
       Future.failed(new Exception("can't specify the same budget twice"))
     }
-    // we verify that the specified takesFrom budget is an income budget
+    // we verify that the specified takesFrom budget is an Income budget
     else {
       dbConfig.db.run(budgets.filter(_.id === takesFrom.budgetId).map(_.`type`).result.head).map { t =>
-        if (t.equals("income")) {
+        if (t.equals("Income")) {
           val takesFromToInsert = TakesFrom(takesFrom.order, budgetGoesToId, takesFrom.budgetId)
 
           // we must wait the result
@@ -65,7 +65,7 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
             Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
         }
         else {
-          throw new Exception("can't specify a takesFrom budget of type outcome")
+          throw new Exception("can't specify a takesFrom budget of type Outcome")
         }
       }
     }
@@ -76,9 +76,9 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
   def insert(userEmail: String, budget: BudgetPOSTDTO): Future[Unit] = {
     // test if takesFrom is empty or not (if we must or not add entries in table takes_from)
     if (budget.takesFrom.nonEmpty) {
-      // it is an error to define a takesFrom tab with the type income for the budget to create
-      if (budget.`type`.equals("income")) {
-        return Future.failed(new Exception("takesFrom hast to be define only for outcome budgets"))
+      // it is an error to define a takesFrom tab with the type Income for the budget to create
+      if (budget.`type`.equals("Income")) {
+        return Future.failed(new Exception("takesFrom hast to be define only for Outcome budgets"))
       }
       else {
         var errorWithTakesFrom: Boolean = false

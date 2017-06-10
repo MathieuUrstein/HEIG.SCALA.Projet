@@ -1,11 +1,9 @@
 package pages
 
-import org.scalajs.dom.{document, html}
 import API.Models
-import org.scalajs.dom._
+import org.scalajs.dom.{document, html, _}
 
-import scala.concurrent._
-import ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -16,7 +14,6 @@ class Exchanges {
 }
 
 object Exchanges {
-
   var `type`: String = "Borrow"
   var name: String = ""
   var amount: Double = 0.0

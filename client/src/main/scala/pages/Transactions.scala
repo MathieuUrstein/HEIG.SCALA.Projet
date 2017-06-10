@@ -5,7 +5,6 @@ class Transactions {
 }
 
 object Transactions {
-
   def list(): Unit = {
     // TODO
   }

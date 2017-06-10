@@ -4,7 +4,6 @@ import scala.scalajs._
 import scala.scalajs.js.annotation.ScalaJSDefined
 
 package object Models {
-
   @ScalaJSDefined
   class BudgetRef(
                    val order: Int,
