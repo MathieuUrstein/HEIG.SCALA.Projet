@@ -645,6 +645,7 @@ definitions:
       - persistent
       - reported
       - color
+      - takesFrom
   BudgetPatch:
     description: A budget
     properties:
