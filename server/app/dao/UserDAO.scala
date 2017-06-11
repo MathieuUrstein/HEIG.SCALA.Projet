@@ -62,7 +62,8 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
     dbConfig.db.run(users.filter(_.email === email).result.head).map { _ =>
       // we update only the present fields (not None value)
       if (user.fullname.isDefined) {
-        updateRequest(email, _.fullname, user.fullname.get)
+        Await.ready(updateRequest(email, _.fullname, user.fullname.get),
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (user.password.isDefined) {
@@ -70,11 +71,13 @@ class UserDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseC
         val passwordHash = BCrypt.hashpw(user.password.get, BCrypt.gensalt())
         user.password = Option(passwordHash)
 
-        updateRequest(email, _.password, user.password.get)
+        Await.ready(updateRequest(email, _.password, user.password.get),
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (user.currency.isDefined) {
-        updateRequest(email, _.currency, user.currency.get)
+        Await.ready(updateRequest(email, _.currency, user.currency.get),
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (user.email.isDefined) {

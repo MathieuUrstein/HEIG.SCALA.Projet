@@ -4,7 +4,6 @@ import pages._
 import Utils._
 
 object Main extends js.JSApp {
-
   val pathname: String = dom.document.location.pathname
 
   def main(): Unit = {

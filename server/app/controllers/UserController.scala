@@ -145,7 +145,7 @@ class UserController @Inject()(userDAO: UserDAO)(implicit executionContext: Exec
   def delete: Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     userDAO.delete(request.jwtSession.getAs[String](Const.ValueStoredJWT).get).map { _ =>
-      Ok(Json.obj("status" -> "OK", "user" -> "user deleted"))
+      Ok(Json.obj("status" -> "OK", "message" -> "user deleted"))
     }.recover {
       // case in not found the specified user with its email
       // case if the user gives the old token (after changed his email)

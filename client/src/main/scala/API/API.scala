@@ -7,7 +7,6 @@ import scala.concurrent._
 import scala.scalajs.js
 
 package object API {
-
   private val prefix = "/api/"
 
   private object urls {
@@ -124,22 +123,25 @@ package object API {
 
   def deleteUser(): Unit = {
     Ajax.delete(urls.user)
+  }*/
+
+  def postTransaction(transaction: Transaction): Future[dom.XMLHttpRequest] = {
+    SuperAjax.post(urls.transactions, transaction)
   }
 
-  def getTransactions(dateRange: DateRange): Unit = {
-    Ajax.get(urls.transactions)
+  def getTransactions: Future[dom.XMLHttpRequest] = {
+    SuperAjax.options(urls.transactions)
   }
 
-  def postTransaction(transaction: Transaction): Unit = {
-    Ajax.post(urls.transactions, JSON.stringify(transaction))
+  def getTransaction(id: Int): Future[dom.XMLHttpRequest] = {
+    SuperAjax.get(urls.transactions + "/" + id)
   }
 
-  def getTransaction(id: Int): Unit = {
-    Ajax.get(urls.transactions + "/" + id)
+  def patchTransaction(transaction: Transaction): Future[dom.XMLHttpRequest] = {
+    SuperAjax.patch(urls.transactions + "/" + transaction.id, transaction)
   }
 
-  def putTransaction(transaction: Transaction): Unit = {
-    Ajax.put(urls.transactions + "/" + transaction.id, JSON.stringify(transaction))
+  def deleteTransaction(id: Int): Future[dom.XMLHttpRequest] = {
+    SuperAjax.delete(urls.transactions + "/" + id)
   }
-  */
 }

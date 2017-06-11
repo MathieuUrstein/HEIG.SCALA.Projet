@@ -14,7 +14,6 @@ class Exchanges {
 }
 
 object Exchanges {
-
   var `type`: String = "Borrow"
   var name: String = ""
   var amount: Double = 0.0

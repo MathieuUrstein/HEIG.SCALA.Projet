@@ -32,7 +32,8 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
   def isBudgetExisting(userEmail: String, id: Int): Future[Future[Boolean]] = {
     // we get the id of the connected user
     userDAO.getId(userEmail).map { userId =>
-      dbConfig.db.run(budgets.filter(_.userId === userId).filter(_.id === id).exists.result)
+      Await.ready(dbConfig.db.run(budgets.filter(_.userId === userId).filter(_.id === id).exists.result),
+        Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
     }
   }
 
@@ -45,7 +46,8 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
       val budgetToInsert = Budget(budget.name, creationDate, budget.`type`, budget.used, budget.left, budget.exceeding,
         budget.persistent, budget.reported, budget.color, userId)
 
-      dbConfig.db.run(budgets returning budgets.map(_.id) += budgetToInsert)
+      Await.ready(dbConfig.db.run(budgets returning budgets.map(_.id) += budgetToInsert),
+        Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
     }
   }
 
@@ -54,10 +56,10 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     if (budgetGoesToId == takesFrom.budgetId) {
       Future.failed(new Exception("can't specify the same budget twice"))
     }
-    // we verify that the specified takesFrom budget is an income budget
+    // we verify that the specified takesFrom budget is an Income budget
     else {
       dbConfig.db.run(budgets.filter(_.id === takesFrom.budgetId).map(_.`type`).result.head).map { t =>
-        if (t.equals("income")) {
+        if (t.equals("Income")) {
           val takesFromToInsert = TakesFrom(takesFrom.order, budgetGoesToId, takesFrom.budgetId)
 
           // we must wait the result
@@ -65,7 +67,7 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
             Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
         }
         else {
-          throw new Exception("can't specify a takesFrom budget of type outcome")
+          throw new Exception("can't specify a takesFrom budget of type Outcome")
         }
       }
     }
@@ -76,9 +78,9 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
   def insert(userEmail: String, budget: BudgetPOSTDTO): Future[Unit] = {
     // test if takesFrom is empty or not (if we must or not add entries in table takes_from)
     if (budget.takesFrom.nonEmpty) {
-      // it is an error to define a takesFrom tab with the type income for the budget to create
-      if (budget.`type`.equals("income")) {
-        return Future.failed(new Exception("takesFrom hast to be define only for outcome budgets"))
+      // it is an error to define a takesFrom tab with the type Income for the budget to create
+      if (budget.`type`.equals("Income")) {
+        return Future.failed(new Exception("takesFrom hast to be define only for Outcome budgets"))
       }
       else {
         var errorWithTakesFrom: Boolean = false
@@ -124,7 +126,8 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
     }
 
     // simply add budget
-    insertBudget(userEmail, budget).map { _ => () }
+    Await.ready(insertBudget(userEmail, budget).map { _ => () },
+      Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
   }
 
   // to know if we must update a budget (reinitialize it)
@@ -183,31 +186,38 @@ class BudgetDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Databas
       // we update only the present fields
       // not the value None
       if (budget.name.isDefined) {
-        dbConfig.db.run(budgets.filter(_.id === id).map(_.name).update(budget.name.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgets.filter(_.id === id).map(_.name).update(budget.name.get)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (budget.used.isDefined) {
-        dbConfig.db.run(budgets.filter(_.id === id).map(_.used).update(budget.used.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgets.filter(_.id === id).map(_.used).update(budget.used.get)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (budget.left.isDefined) {
-        dbConfig.db.run(budgets.filter(_.id === id).map(_.left).update(budget.left.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgets.filter(_.id === id).map(_.left).update(budget.left.get)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (budget.exceeding.isDefined) {
-        dbConfig.db.run(budgets.filter(_.id === id).map(_.exceeding).update(budget.exceeding.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgets.filter(_.id === id).map(_.exceeding).update(budget.exceeding.get))
+          .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (budget.persistent.isDefined) {
-        dbConfig.db.run(budgets.filter(_.id === id).map(_.persistent).update(budget.persistent.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgets.filter(_.id === id).map(_.persistent).update(budget.persistent.get))
+          .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (budget.reported.isDefined) {
-        dbConfig.db.run(budgets.filter(_.id === id).map(_.reported).update(budget.reported.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgets.filter(_.id === id).map(_.reported).update(budget.reported.get))
+          .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (budget.color.isDefined) {
-        dbConfig.db.run(budgets.filter(_.id === id).map(_.color).update(budget.color.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgets.filter(_.id === id).map(_.color).update(budget.color.get)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
     }
   }

@@ -13,7 +13,8 @@ import slick.driver.SQLiteDriver.api._
 import slick.lifted.{ForeignKeyQuery, MappedProjection, ProvenShape}
 import utils.Const
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class ExchangeDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: DatabaseConfigProvider, userDAO: UserDAO)
                            (implicit executionContext: ExecutionContext) {
@@ -100,22 +101,26 @@ class ExchangeDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Datab
       // we update only the present fields
       // not the value None
       if (exchange.name.isDefined) {
-        dbConfig.db.run(exchanges.filter(_.id === id).map(_.name).update(exchange.name.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(exchanges.filter(_.id === id).map(_.name).update(exchange.name.get)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (exchange.date.isDefined) {
         val dateToInsert = Date.valueOf(exchange.date.get.year + "-" + exchange.date.get.month +
           "-" + exchange.date.get.day)
 
-        dbConfig.db.run(exchanges.filter(_.id === id).map(_.date).update(dateToInsert)).map { _ => () }
+        Await.ready(dbConfig.db.run(exchanges.filter(_.id === id).map(_.date).update(dateToInsert)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (exchange.`type`.isDefined) {
-        dbConfig.db.run(exchanges.filter(_.id === id).map(_.`type`).update(exchange.`type`.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(exchanges.filter(_.id === id).map(_.`type`).update(exchange.`type`.get))
+          .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (exchange.amount.isDefined) {
-        dbConfig.db.run(exchanges.filter(_.id === id).map(_.amount).update(exchange.amount.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(exchanges.filter(_.id === id).map(_.amount).update(exchange.amount.get))
+          .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
     }
   }

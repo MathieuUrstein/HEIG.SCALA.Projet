@@ -45,8 +45,8 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
       val newExceedingValue = amount + exceedingActualValue
 
       // we update the exceeding
-      dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(newExceedingValue))
-        .map { _ => () }
+      Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(newExceedingValue))
+        .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
     }
     else {
       val newUsedActualValue = usedActualValue - amount
@@ -60,8 +60,9 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
         // we update the exceeding
         // we put the used value to 0
         // we put the left value to max
-        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.exceeding, budget.used, budget.left))
-          .update(newExceedingValue, 0, newLeftValue)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.exceeding, budget.used, budget.left))
+          .update(newExceedingValue, 0, newLeftValue)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
       else {
         // we change the left value
@@ -69,8 +70,9 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
 
         // we update the new used value
         // we change the left value
-        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.used, budget.left))
-          .update(newUsedActualValue, newLeftValue)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.used, budget.left))
+          .update(newUsedActualValue, newLeftValue)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
     }
   }
@@ -94,8 +96,8 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
       val newExceedingValue = exceedingActualValue + (-amount)
 
       // only update exceeding value
-      dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(newExceedingValue))
-        .map { _ => () }
+      Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(_.exceeding).update(newExceedingValue))
+        .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
     }
     else {
       val newLeftActualValue = leftActualValue + amount
@@ -109,8 +111,9 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
         // we update the exceeding
         // we put the left value to 0
         // we update the used value to max
-        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.exceeding, budget.left, budget.used))
-          .update(newExceedingValue, 0, newUsedValue)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.exceeding, budget.left, budget.used))
+          .update(newExceedingValue, 0, newUsedValue)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
       else {
         // we change the used value
@@ -118,8 +121,9 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
 
         // we update the new left value
         // we change the used value
-        dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.left, budget.used))
-          .update(newLeftActualValue, newUsedValue)).map { _ => () }
+        Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.left, budget.used))
+          .update(newLeftActualValue, newUsedValue)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
     }
   }
@@ -140,7 +144,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
     // we check if we are in exceeding
     if (leftActualValue == 0) {
       // it is a negative exceeding
-      // we do nothing (we will eventually look for the next income budget to take money from)
+      // we do nothing (we will eventually look for the next Income budget to take money from)
       amount
     }
     else {
@@ -173,7 +177,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
             Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.left, budget.used))
               .update(0, newUsedValue)).map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
-            // we will report the exceeding on the eventually next income budget to take money from
+            // we will report the exceeding on the eventually next Income budget to take money from
             newLeftValue
           }
           else {
@@ -201,7 +205,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
           Await.ready(dbConfig.db.run(budgetDAO.budgets.filter(_.id === budgetId).map(budget => (budget.left, budget.used))
             .update(0, newUsedValue)).map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
-          // we will report the exceeding on the eventually next income budget to take money from
+          // we will report the exceeding on the eventually next Income budget to take money from
           newLeftValue
         }
         else {
@@ -230,13 +234,13 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
 
     // we check that the specified budgetId exists for this user
     budgetDAO.find(userEmail, transaction.budgetId).map { budget =>
-      // we check that a positive number for the amount is associated to an income and inversely
-      if (transaction.amount < 0 && budget.`type` == "income") {
-        throw new Exception("transaction amount negative associated to an income budget")
+      // we check that a positive number for the amount is associated to an Income and inversely
+      if (transaction.amount < 0 && budget.`type` == "Income") {
+        throw new Exception("transaction amount negative associated to an Income budget")
       }
 
-      if (transaction.amount > 0 && budget.`type` == "outcome") {
-        throw new Exception("transaction amount positive associated to an outcome budget")
+      if (transaction.amount > 0 && budget.`type` == "Outcome") {
+        throw new Exception("transaction amount positive associated to an Outcome budget")
       }
 
       var dateToInsert: Date = null
@@ -254,19 +258,22 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
       val transactionToInsert = Transaction(transaction.name, dateToInsert, transaction.amount, userId,
         transaction.budgetId)
 
-      dbConfig.db.run(transactions += transactionToInsert).map { _ => () }
+      Await.ready(dbConfig.db.run(transactions += transactionToInsert).map { _ => () },
+        Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
 
       // we update the corresponding budget (left, used and exceeding values)
-      if (budget.`type` == "income") {
-        updateBudgetIncome(transaction.budgetId, transaction.amount)
+      if (budget.`type` == "Income") {
+        Await.ready(updateBudgetIncome(transaction.budgetId, transaction.amount),
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
       else {
-        updateBudgetOutcome(transaction.budgetId, transaction.amount)
+        Await.ready(updateBudgetOutcome(transaction.budgetId, transaction.amount),
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
         var budgetsMap: Map[Int, Int] = Map()
 
-        // we look for the order to treat the income budgets
+        // we look for the order to treat the Income budgets
         budget.takesFrom.get.foreach { b =>
           budgetsMap += b.order -> b.budgetId
         }
@@ -276,10 +283,10 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
 
         // TODO: add debt when all incomes are exhausted (improvement)
 
-        // we stop when we have a null exceeding or all income budgets have been processed
+        // we stop when we have a null exceeding or all Income budgets have been processed
         sortedMap.takeWhile(_ => returnedExceeding != 0).foreach { e =>
-          // updates takesFrom budgets (income) in order
-          // income budgets are considered as outcome
+          // updates takesFrom budgets (Income) in order
+          // Income budgets are considered as Outcome
           returnedExceeding = updateBudgetIncomeAsOutcome(e._2, returnedExceeding)
         }
       }
@@ -362,52 +369,118 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
       // we update only the present fields
       // not the value None
       if (transaction.name.isDefined) {
-        dbConfig.db.run(transactions.filter(_.id === id).map(_.name).update(transaction.name.get)).map { _ => () }
+        Await.ready(dbConfig.db.run(transactions.filter(_.id === id).map(_.name).update(transaction.name.get))
+          .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
       if (transaction.date.isDefined) {
         val dateToInsert = Date.valueOf(transaction.date.get.year + "-" + transaction.date.get.month +
           "-" + transaction.date.get.day)
 
-        dbConfig.db.run(transactions.filter(_.id === id).map(_.date).update(dateToInsert)).map { _ => () }
+        Await.ready(dbConfig.db.run(transactions.filter(_.id === id).map(_.date).update(dateToInsert)).map { _ => () },
+          Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
 
-      if (transaction.amount.isDefined) {
-        dbConfig.db.run(transactions.filter(_.id === id).map(_.amount).update(transaction.amount.get)).map { _ => () }
+      if (transaction.budgetId.isEmpty && transaction.amount.isDefined) {
+        var transactionActualAmount: Double = 0
+
+        // we get the actual amount of the transaction to know if the new amount is correct
+        Await.ready(find(userEmail, id).map { transaction =>
+          transactionActualAmount = transaction.amount
+        }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+
+        if (transactionActualAmount < 0) {
+          // we must specify a new negative amount
+          if (transaction.amount.get > 0) {
+            throw new Exception("transaction amount positive associated to an Outcome budget, amount not updated")
+          }
+        }
+        else {
+          // we must specify a new positive amount
+          if (transaction.amount.get < 0) {
+            throw new Exception("transaction amount negative associated to an Income budget, amount not updated")
+          }
+        }
+
+        Await.ready(dbConfig.db.run(transactions.filter(_.id === id).map(_.amount).update(transaction.amount.get))
+          .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
       }
+      else {
+        if (transaction.budgetId.isDefined && transaction.amount.isDefined) {
+          // we wait if an error is coming for the new budget
+          var budgetExist: Boolean = true
 
-      if (transaction.budgetId.isDefined) {
-        // we wait if an error is coming for the new budget
-        var budgetExist: Boolean = true
-
-        // we check that the new budget exists
-        Await.ready(budgetDAO.isBudgetExisting(userEmail, transaction.budgetId.get).map { r =>
-          Await.ready(r.map { v =>
-            budgetExist = v
+          // we check that the new budget exists
+          Await.ready(budgetDAO.isBudgetExisting(userEmail, transaction.budgetId.get).map { r =>
+            Await.ready(r.map { v =>
+              budgetExist = v
+            }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
           }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
-        }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
-        if (!budgetExist) {
-          throw new Exception("new budget doesn't exist, budget not updated")
+          if (!budgetExist) {
+            throw new Exception("new budget doesn't exist, budget not updated")
+          }
+
+          var budgetType: String = ""
+
+          // we retrieve the type of the new budget to makes checks
+          Await.ready(budgetDAO.find(userEmail, transaction.budgetId.get).map { b =>
+            budgetType = b.`type`
+          }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+
+          // check for the association
+          if (transaction.amount.get < 0 && budgetType == "Income") {
+            throw new Exception("transaction amount negative associated to an Income budget, budget and amount not updated")
+          }
+
+          if (transaction.amount.get > 0 && budgetType == "Outcome") {
+            throw new Exception("transaction amount positive associated to an Outcome budget, budget and amount not updated")
+          }
+
+          Await.ready(dbConfig.db.run(transactions.filter(_.id === id)
+            .map(transaction => (transaction.budgetId, transaction.amount)).update(transaction.budgetId.get,
+            transaction.amount.get)).map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
         }
+        else {
+          // we wait if an error is coming for the new budget
+          var budgetExist: Boolean = true
 
-        var budgetType: String = ""
+          // we check that the new budget exists
+          Await.ready(budgetDAO.isBudgetExisting(userEmail, transaction.budgetId.get).map { r =>
+            Await.ready(r.map { v =>
+              budgetExist = v
+            }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+          }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
-        // we retrieve the type of the new budget to makes checks
-        Await.ready(budgetDAO.find(userEmail, transaction.budgetId.get).map { b =>
-          budgetType = b.`type`
-        }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+          if (!budgetExist) {
+            throw new Exception("new budget doesn't exist, budget not updated")
+          }
 
-        // check for the association
-        if (transaction.amount.get < 0 && budgetType == "income") {
-          throw new Exception("transaction amount negative associated to an income budget, budget not updated")
+          var newBudgetType: String = ""
+          var transactionActualAmount: Double = 0
+
+          // we get the actual amount of the transaction to know if the new budget associated is correct
+          Await.ready(find(userEmail, id).map { transaction =>
+            transactionActualAmount = transaction.amount
+          }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+
+          // we retrieve the type of the new budget to makes checks
+          Await.ready(budgetDAO.find(userEmail, transaction.budgetId.get).map { b =>
+            newBudgetType = b.`type`
+          }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+
+          // check for the association
+          if (transactionActualAmount < 0 && newBudgetType == "Income") {
+            throw new Exception("transaction amount negative associated to an Income budget, budget not updated")
+          }
+
+          if (transactionActualAmount > 0 && newBudgetType == "Outcome") {
+            throw new Exception("transaction amount positive associated to an Outcome budget, budget not updated")
+          }
+
+          Await.ready(dbConfig.db.run(transactions.filter(_.id === id).map(_.budgetId).update(transaction.budgetId.get))
+            .map { _ => () }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
         }
-
-        if (transaction.amount.get > 0 && budgetType == "outcome") {
-          throw new Exception("transaction amount positive associated to an outcome budget, budget not updated")
-        }
-
-        dbConfig.db.run(transactions.filter(_.id === id).map(_.budgetId).update(transaction.budgetId.get)).map { _ => () }
       }
     }
   }
@@ -415,7 +488,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
   def delete(userEmail: String, id: Int): Future[Future[Unit]] = {
     // we first verify that the asked transaction (id) to delete belongs to this user or exists
     dbConfig.db.run(transactions.join(userDAO.users).on(_.userId === _.id).filter(_._2.email === userEmail)
-      .filter(_._1.id === id).map(_._1.transactionInfo).result.head).map { transaction =>
+      .filter(_._1.id === id).map(_._1.transactionInfo).result.head).map { _ =>
       dbConfig.db.run(transactions.filter(_.id === id).delete).map { _ => () }
     }
   }

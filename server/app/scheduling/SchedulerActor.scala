@@ -23,12 +23,12 @@ class SchedulerActor @Inject()(userDAO: UserDAO, budgetDAO: BudgetDAO, transacti
       // we add new entries for income_outcome table for all users
       userDAO.getAllEmails.map { allUsersEmails =>
         allUsersEmails.foreach { email =>
-          budgetDAO.findAll(email).map { budgets =>
+          Await.ready(budgetDAO.findAll(email).map { budgets =>
             var totalIncomeLeft: Double = 0
             var totalOutcomeUsed: Double = 0
 
             budgets.foreach { budget =>
-              if (budget.`type` == "income") {
+              if (budget.`type` == "Income") {
                 totalIncomeLeft += budget.left + budget.exceeding
               }
               else {
@@ -36,11 +36,11 @@ class SchedulerActor @Inject()(userDAO: UserDAO, budgetDAO: BudgetDAO, transacti
               }
             }
 
-            userDAO.getId(email).map { userId =>
-              incomeOutcomeDAO.insert(IncomeOutcome(Date.valueOf(Const.format.format(Calendar.getInstance().getTime)),
-                totalIncomeLeft, totalOutcomeUsed, userId))
-            }
-          }
+            Await.ready(userDAO.getId(email).map { userId =>
+              Await.ready(incomeOutcomeDAO.insert(IncomeOutcome(Date.valueOf(Const.format.format(Calendar.getInstance().getTime)),
+                totalIncomeLeft, totalOutcomeUsed, userId)), Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+            }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+          }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
         }
       }
 
@@ -78,18 +78,19 @@ class SchedulerActor @Inject()(userDAO: UserDAO, budgetDAO: BudgetDAO, transacti
                   Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
               }
               else {
-                // we have to know if the exceeding is positive or negative (income or outcome)
+                // we have to know if the exceeding is positive or negative (Income or Outcome)
                 // if it is a positive exceeding, we do nothing
-                if (budget.`type` == "outcome") {
+                if (budget.`type` == "Outcome") {
                   // firstly, we reinitialize the budget
                   Await.ready(budgetDAO.reinitializeBudget(budget.id, 0, initialLeftValue, 0),
                     Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
                   // we update the new budget with the exceeding
-                  transactionDAO.updateBudgetOutcome(budget.id, -exceeding)
+                  Await.ready(transactionDAO.updateBudgetOutcome(budget.id, -exceeding),
+                    Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
                   var budgetsMap: Map[Int, Int] = Map()
 
-                  // we look for the order to treat the income budgets
+                  // we look for the order to treat the Income budgets
                   Await.ready(budgetDAO.getTakesFrom(budget.id).map { budgets =>
                     budgets.foreach { b =>
                       budgetsMap += b.order -> b.budgetId
@@ -99,10 +100,10 @@ class SchedulerActor @Inject()(userDAO: UserDAO, budgetDAO: BudgetDAO, transacti
                   val sortedMap = ListMap(budgetsMap.toSeq.sortWith(_._1 < _._1):_*)
                   var returnedExceeding: Double = -exceeding
 
-                  // we stop when we have a null exceeding or all income budgets have been processed
+                  // we stop when we have a null exceeding or all Income budgets have been processed
                   sortedMap.takeWhile(_ => returnedExceeding != 0).foreach { budgetTakesFrom =>
-                    // updates takesFrom budgets (income) in order
-                    // income budgets are considered as outcome
+                    // updates takesFrom budgets (Income) in order
+                    // Income budgets are considered as outcome
                     returnedExceeding = transactionDAO.updateBudgetIncomeAsOutcome(budgetTakesFrom._2, returnedExceeding)
                   }
                 }

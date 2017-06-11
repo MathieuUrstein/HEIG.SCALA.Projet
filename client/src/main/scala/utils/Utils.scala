@@ -6,7 +6,6 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 package object Utils {
-
   def checkConnection(): Unit = {
     document.location.pathname match {
       case "/login" => ()
@@ -102,18 +101,21 @@ package object Utils {
     setRange()
     refresh()
   }
+
   @JSExportTopLevel("setFromYear")
   def setFromYear(elem: html.Link): Unit = {
     fromYear = elem.innerHTML.toInt
     setRange()
     refresh()
   }
+
   @JSExportTopLevel("setToMonth")
   def setToMonth(elem: html.Link): Unit = {
     toMonth = monthStrToInt(elem.innerHTML)
     setRange()
     refresh()
   }
+
   @JSExportTopLevel("setToYear")
   def setToYear(elem: html.Link): Unit = {
     toYear = elem.innerHTML.toInt

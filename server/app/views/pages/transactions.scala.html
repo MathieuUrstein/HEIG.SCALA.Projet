@@ -35,7 +35,7 @@
                         </div>
                     </div>
                     <div id="add-transaction" class="col-4">
-                        <button onclick="setEditedID(0)" data-toggle="modal" data-target="#transaction-modal">
+                        <button onclick="transactionsCreate()" data-toggle="modal" data-target="#transaction-modal">
                             <i class="fa fa-plus" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -77,18 +77,18 @@
                         <input type="text" class="form-control" id="transaction-name" placeholder="Transaction name">
                     </div>
                     <div class="col2">
-                        <label for="transaction-name">Budget</label>
+                        <label for="transaction-budget">Budget</label>
                         <div class="dropdown">
-                            <a class="btn btn-secondary btn-block dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a id="transaction-budget-selector" class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Choose
                             </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                <a class="dropdown-item" href="#">Extra</a>
+                            <div id="transaction-budgets" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <!--<a class="dropdown-item" href="#">Extra</a>
                                 <a class="dropdown-item" href="#">Transportation</a>
                                 <a class="dropdown-item" href="#">Nutrition</a>
                                 <a class="dropdown-item" href="#">Magic money</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#"><i class="fa fa-plus" aria-hidden="true"></i> Add budget</a>
+                                <a class="dropdown-item" href="#"><i class="fa fa-plus" aria-hidden="true"></i> Add budget</a>-->
                             </div>
                         </div>
                     </div>
@@ -100,8 +100,8 @@
                         </div>
                     </div>
                 </div>
-                <table class="table">
-                    <tbody>
+                <table id="transaction-wrapper" class="table">
+                    <!--<tbody>
                         <tr>
                             <td width="3%" class="edit"><button class="btn" data-toggle="modal" data-target="#transaction-modal"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></td>
                             <td width="47%" class="name">Mc Donald <span class="date">23 sept 2017</span></td>
@@ -132,7 +132,7 @@
                             <td><a href="#">Nutrition</a></td>
                             <td class="amount">-54.30 CHF</td>
                         </tr>
-                    </tbody>
+                    </tbody>-->
                 </table>
             </div>
         </div>
@@ -140,25 +140,25 @@
     <div id="global-stats">
         <div class="container">
             <div class="progress">
-                <div class="progress-bar bg-warning" role="progressbar" style="width: 25%;">2300 CHF</div>
-                <div class="progress-bar" role="progressbar" style="width: 75%;">5100 CHF</div>
+                <div id="progress-outcome" class="progress-bar bg-danger" role="progressbar" style="width: 50%;">600 CHF</div>
+                <div id="progress-income" class="progress-bar bg-success" role="progressbar" style="width: 50%;">200 CHF</div>
             </div>
             <div class="details row">
                 <div class="col-3 text-left">
-                    | 0 CHF
+                    | Outcome
                 </div>
-                <div class="col-6 text-center">
-                    June budget usage - 30%
+                <div id="global-stats-resume" class="col-6 text-center">
+                    Borrow 45% - 55% Lend
                 </div>
                 <div class="col-3 text-right">
-                    7400 CHF |
+                    Income |
                 </div>
             </div>
         </div>
     </div>
 
         <!-- Modal -->
-    <div class="modal fade" id="transaction-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="transactions-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -171,36 +171,36 @@
                     <form>
                         <div class="form-group">
                             <label>Name</label>
-                            <input type="text" class="form-control" placeholder="Transaction name">
+                            <input id="modal-transaction-name" type="text" class="form-control" placeholder="Transaction name">
                         </div>
                         <div class="form-group">
                             <label>Budget</label>
                             <div class="dropdown">
-                                <a class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a id="modal-transaction-budget-selector" class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Choose
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <a class="dropdown-item" href="#">Extra</a>
+                                <div id="modal-transaction-budgets" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <!--<a class="dropdown-item" href="#">Extra</a>
                                     <a class="dropdown-item" href="#">Transportation</a>
                                     <a class="dropdown-item" href="#">Nutrition</a>
                                     <a class="dropdown-item" href="#">Magic money</a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="#"><i class="fa fa-plus" aria-hidden="true"></i> Add budget</a>
+                                    <a class="dropdown-item" href="#"><i class="fa fa-plus" aria-hidden="true"></i> Add budget</a>-->
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Amount</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="">
+                                <input id="modal-transaction-amount" type="text" class="form-control" placeholder="">
                                 <div class="input-group-addon">CHF</div>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger float-left">Delete</button>
-                    <button type="button" class="btn btn-success float-right">Save</button>
+                    <button onclick="transactionsDelete()" type="button" class="btn btn-danger float-left">Delete</button>
+                    <button onclick="transactionsSave()" type="button" class="btn btn-success float-right">Save</button>
                     <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
                 </div>
             </div>

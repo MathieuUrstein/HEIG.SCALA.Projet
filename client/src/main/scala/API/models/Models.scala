@@ -4,7 +4,6 @@ import scala.scalajs._
 import scala.scalajs.js.annotation.ScalaJSDefined
 
 package object Models {
-
   @ScalaJSDefined
   class BudgetRef(
                    val order: Int,
@@ -38,19 +37,24 @@ package object Models {
                    ) extends js.Object
 
   @ScalaJSDefined
+  class Transaction(val id: Int,
+                    val name: String,
+                    val date: Date,
+                    val budgetId: Int,
+                    val amount: Double
+                      ) extends js.Object
+
+  @ScalaJSDefined
   class TransactionBudget(val id: Int,
-                          val name: String,
-                          val date: Date,
-                          val budgetId: Int,
-                          val amount: Double
+                          val name: String
                          ) extends js.Object
 
   @ScalaJSDefined
-  class Transaction(val id: String,
-                    val name: String,
-                    val date: Date,
-                    val budget: TransactionBudget,
-                    val amount: Double
+  class TransactionGET(val id: Int,
+                       val name: String,
+                       val date: Date,
+                       val budget: TransactionBudget,
+                       val amount: Double
                    ) extends js.Object
 
   @ScalaJSDefined
