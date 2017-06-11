@@ -43,7 +43,7 @@ You just have to create an account with your preferred currency to start using i
 This web application was made for the Scala course at HEIG-VD.
 
 Don't hesitate to read the file **api.yaml** in the root of the project to understand how the REST API works if you want directly to use it.
-Feel also free to use the Postman requests that you will find in the [wiki](https://github.com/MathieuUrstein/HEIG.SCALA.Project/wiki)!
+Feel also free to use the Postman requests that you will find in the [wiki](https://github.com/MathieuUrstein/HEIG.SCALA.Projet/wiki)!
 
 Be aware to change the parameter **play.crypto.secret** in the file **application.conf** with a better secret key before to use this application.
 Because it is this value that is used to sign the JWT token used to protect the REST API.
