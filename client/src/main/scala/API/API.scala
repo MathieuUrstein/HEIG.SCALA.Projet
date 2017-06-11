@@ -105,6 +105,14 @@ package object API {
     SuperAjax.delete(urls.budgets + "/" + id)
   }
 
+  def getBudget(id: Int): Future[dom.XMLHttpRequest] = {
+    SuperAjax.get(urls.budgets + "/" + id)
+  }
+
+  def patchBudget(budget: Budget): Future[dom.XMLHttpRequest] = {
+    SuperAjax.patch(urls.budgets + "/" + budget.id, budget)
+  }
+
   /*
   def getUser(): Unit = {
     Ajax.get(urls.user)

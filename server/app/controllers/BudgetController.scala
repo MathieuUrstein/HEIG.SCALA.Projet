@@ -138,7 +138,7 @@ class BudgetController @Inject()(budgetDAO: BudgetDAO)(implicit executionContext
   def delete(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     budgetDAO.delete(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { _ =>
-      Ok(Json.obj("status" -> "OK", "user" -> "budget deleted"))
+      Ok(Json.obj("status" -> "OK", "message" -> "budget deleted"))
     }.recover {
       // case in not found the specified budget with its id
       case _: NoSuchElementException =>

@@ -1,9 +1,7 @@
 package pages
 
-import org.scalajs.dom.{document, html}
 import API.Models
 import org.scalajs.dom._
-
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.scalajs.js
@@ -100,7 +98,6 @@ object Exchanges {
 
     id match {
       case 0 =>
-        `type` = "Borrow"
         name = ""
         amount = 0.0
         date = Utils.now

@@ -5,10 +5,10 @@ import org.scalajs.dom._
 import scala.scalajs.js.annotation.JSExportTopLevel
 import API.Models
 import scala.scalajs.js
-import scala.scalajs.js.JSON
 import scala.util.{Failure, Success}
 import scala.concurrent._
 import ExecutionContext.Implicits.global
+import scala.scalajs.js.JSON
 
 class Budgets {
   Budgets.list()
@@ -21,10 +21,12 @@ object Budgets {
   var persistent: Int = 0
   var reported: Boolean = false
   var color: String = "chocolate"
-  var takesFrom: List[Int] = List.empty
+  var takesFrom: js.Array[Models.BudgetRef] = js.Array()
   var editedID: Int = 0
 
   private val budgetsWrapper = document.getElementById("budgets-wrapper").asInstanceOf[html.Div]
+  private val takesFromWrapper = document.getElementById("takes-from-wrapper").asInstanceOf[html.Div]
+  private val takesFromSelectorWrapper = document.getElementById("takes-from-selector-wrapper").asInstanceOf[html.Div]
 
   private def getValues(): Unit = {
     name = document.getElementById("budget-name").asInstanceOf[html.Input].value
@@ -40,13 +42,16 @@ object Budgets {
     var outcomeSum = 0.0
 
     budgetsWrapper.innerHTML = ""
+    takesFromSelectorWrapper.innerHTML = ""
 
     API.getBudgets.onComplete {
       case Success(resp) =>
         val budgets = js.JSON.parse(resp.responseText).asInstanceOf[js.Array[Models.Budget]]
-        budgets.sortBy(_.`type`).reverse.foreach(budget =>
+        budgets.sortBy(_.`type`).reverse.foreach(budget => {
           addBudget(budget)
-        )
+          if (budget.`type` == "Income")
+            addTakesFromSelector(budget)
+        })
       case Failure(e: ext.AjaxException) =>
         Utils.addAlert("danger", js.JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
     }
@@ -73,7 +78,7 @@ object Budgets {
     }
 
     val row =   "<h4>" +
-                  "<button class=\"btn edit\" data-toggle=\"modal\" data-target=\"#budgets-modal\"><i class=\"fa fa-ellipsis-v\" aria-hidden=\"true\"></i></button>" +
+                  "<button onclick=\"budgetsSetEditedID(" + budget.id + ")\" class=\"btn edit\" data-toggle=\"modal\" data-target=\"#budgets-modal\"><i class=\"fa fa-ellipsis-v\" aria-hidden=\"true\"></i></button>" +
                   budget.name +
                   "<span class=\"float-right\">" +
                     (if (budget.reported)
@@ -114,13 +119,117 @@ object Budgets {
     budgetsWrapper.appendChild(div)
   }
 
+  def addTakesFromSelector(income: Models.Budget): Unit = {
+    val a = "<a onclick=\"budgetsAddTakesFrom(" + income.id + ", '" + income.name + "')\" class=\"dropdown-item\" href=\"#\">" + income.name + "</a>"
+    val div = document.createElement("div").asInstanceOf[html.Div]
+    div.innerHTML = a
+    takesFromSelectorWrapper.appendChild(div)
+  }
+
+  @JSExportTopLevel("budgetsAddTakesFrom")
+  def addTakesFrom(id: Int, name: String): Unit = {
+    if (takesFrom.indexWhere(_.budgetId == id) == -1) {
+      takesFrom.append(new Models.BudgetRef(
+        if (takesFrom.length == 0)
+          0
+        else
+          takesFrom.last.order + 1,
+        id
+      ))
+      val row = "<span class=\"order\">" + takesFrom.last.order + "</span> " + name + " <a onclick=\"budgetsRemoveTakesFrom(this.parentNode, " + id + ")\" href=\"#\" class=\"remove\"><i class=\"fa fa-times\" aria-hidden=\"true\"></i></a>"
+      val div = document.createElement("div").asInstanceOf[html.Div]
+      div.className = "related-income"
+      div.innerHTML = row
+      takesFromWrapper.appendChild(div)
+    }
+  }
+
+  @JSExportTopLevel("budgetsRemoveTakesFrom")
+  def removeTakesFrom(elem: html.Div, id: Int): Unit = {
+    takesFromWrapper.removeChild(elem)
+    takesFrom.remove(takesFrom.indexWhere(_.order == id))
+  }
+
   @JSExportTopLevel("budgetsSetEditedID")
   def setEditedID(id: Int): Unit = {
     editedID = id
+
+    id match {
+      case 0 =>
+        name = ""
+        amount = 0.0
+
+        document.getElementById("budget-name").asInstanceOf[html.Input].value = ""
+        document.getElementById("budget-amount").asInstanceOf[html.Input].value = ""
+      case _ =>
+        API.getBudget(id).onComplete {
+          case Success(resp) =>
+            val budget = JSON.parse(resp.responseText).asInstanceOf[Models.Budget]
+            `type` = budget.`type`
+            name = budget.name
+            amount = budget.used + budget.left + budget.exceeding
+            persistent = budget.persistent
+            reported = budget.reported
+            color = budget.color
+            takesFrom = budget.takesFrom
+
+            document.getElementById("budget-name").asInstanceOf[html.Input].value = name
+            document.getElementById("budget-amount").asInstanceOf[html.Input].value = amount.toString
+            document.getElementById("persistent-selector").asInstanceOf[html.Link].innerHTML = persistent match {
+              case 1 => "Every day"
+              case 7  => "Every week"
+              case 30 => "Every month"
+              case 365 => "Every year"
+              case _ => "None"
+            }
+            document.getElementById("reported-selector").asInstanceOf[html.Link].innerHTML = reported match {
+              case true => "Yes"
+              case _ => "No"
+            }
+            println(color)
+            document.getElementById("color-selector").asInstanceOf[html.Link].innerHTML =
+              "<span class=\"preview-color\" style=\"background: " + color + "\"></span> " + color match {
+                case "aquamarine" => "Aquamarine"
+                case "blueviolet" => "Blue violet"
+                case "brown" => "Brown"
+                case "cadetblue" => "CadetBlue"
+                case "chartreuse" => "Chartreuse"
+                case "chocolate" => "Chocolate"
+                case "coral" => "Coral"
+                case "cornflowerblue" => "Cornflower blue"
+                case "darkblue" => "Dark blue"
+                case "darkcyan" => "Dark cyan"
+                case "darkgoldenrod" => "Dark golden rod"
+                case "darkgreen" => "Dark green"
+                case "darkkhaki" => "Dark khaki"
+                case "darkmagenta" => "Dark magenta"
+                case "darkorange" => "Dark orange"
+                case "darksalmon" => "Dark salmon"
+                case "darkturquoise" => "Dark turquoise"
+                case "deeppink" => "Deep pink"
+                case "deepskyblue" => "Deep sky blue"
+                case "goldenrod" => "Golden rod"
+                case "green" => "Green"
+                case "indianred" => "Indian red"
+                case "indigo" => "Indigo"
+                case "lightslategray" => "Light slate gray"
+                case "limegreen" => "Lime green"
+                case "mediumblue" => "Medium blue"
+                case "olive" => "Olive"
+                case "orange" => "Orange"
+                case other => other
+              }
+            takesFromWrapper.innerHTML = ""
+            takesFrom.foreach(el => addTakesFrom(el.budgetId, "coco"))
+            // TODO mettre a jour interface modale
+          case Failure(e: ext.AjaxException) =>
+            Utils.addAlert("danger", js.JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
+        }
+    }
   }
 
-  @JSExportTopLevel("setPersistant")
-  def setPersistant(elem: html.Link): Unit = {
+  @JSExportTopLevel("setPersistent")
+  def setPersistent(elem: html.Link): Unit = {
     persistent = elem.innerHTML match {
       case "Every day" => 1
       case "Every week" => 7
@@ -163,22 +272,21 @@ object Budgets {
   def save(): Unit = {
     getValues()
 
+    val budget = new Models.Budget(
+      editedID,
+      name,
+      `type`,
+      0,
+      amount,
+      0,
+      persistent,
+      reported,
+      color,
+      takesFrom
+    )
+
     editedID match {
       case 0 =>
-        val budget = new Models.Budget(
-          0,
-          name,
-          `type`,
-          0,
-          amount,
-          0,
-          persistent,
-          reported,
-          color,
-          js.Array()
-        )
-        println(JSON.stringify(budget))
-
         API.postBudget(budget).onComplete {
           case Success(resp) =>
             Utils.addAlert("success", js.JSON.parse(resp.responseText).selectDynamic("message").asInstanceOf[String])
@@ -187,6 +295,13 @@ object Budgets {
             Utils.addAlert("danger", js.JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
         }
       case _ =>
+        API.patchBudget(budget).onComplete {
+          case Success(resp) =>
+            Utils.addAlert("success", js.JSON.parse(resp.responseText).selectDynamic("message").asInstanceOf[String])
+            list()
+          case Failure(e: ext.AjaxException) =>
+            Utils.addAlert("danger", js.JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
+        }
     }
   }
 }

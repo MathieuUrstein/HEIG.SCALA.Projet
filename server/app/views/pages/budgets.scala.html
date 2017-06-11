@@ -311,17 +311,17 @@
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Persistant</label>
+                                    <label><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Persistent</label>
                                     <div class="dropdown">
                                         <a id="persistent-selector" class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             None
                                         </a>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">None</a>
-                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">Every day</a>
-                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">Every week</a>
-                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">Every month</a>
-                                            <a onclick="setPersistant(this)" class="dropdown-item" href="#">Every year</a>
+                                            <a onclick="setPersistent(this)" class="dropdown-item" href="#">None</a>
+                                            <a onclick="setPersistent(this)" class="dropdown-item" href="#">Every day</a>
+                                            <a onclick="setPersistent(this)" class="dropdown-item" href="#">Every week</a>
+                                            <a onclick="setPersistent(this)" class="dropdown-item" href="#">Every month</a>
+                                            <a onclick="setPersistent(this)" class="dropdown-item" href="#">Every year</a>
                                         </div>
                                     </div>
                                 </div>
@@ -386,15 +386,14 @@
                                     <label>Takes from incomes (in order)</label>
                                     <div class="dropdown" style="margin-bottom: 10px">
                                         <a class="btn btn-secondary btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            None
+                                            <i class="fa fa-plus" aria-hidden="true"></i> Add
                                         </a>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                            <a class="dropdown-item" href="#">Income 1</a>
-                                            <a class="dropdown-item" href="#">Income 2</a>
+                                        <div id="takes-from-selector-wrapper" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                         </div>
                                     </div>
-                                    <div class="related-income"><span class="order">1</span> Income 1 <a href="#" class="remove"><i class="fa fa-times" aria-hidden="true"></i></a></div>
-                                    <div class="related-income"><span class="order">2</span> Income 2 <a href="#" class="remove"><i class="fa fa-times" aria-hidden="true"></i></a></div>
+                                    <div id="takes-from-wrapper">
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
