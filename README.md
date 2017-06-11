@@ -67,6 +67,14 @@ To launch the application with SBT, go to the root of the project and execute th
 
 Normally your default browser will be opened in the following address **http://localhost:9000/**. If it is not the case, go to it manually.
 
+## Problems encountered
+
+We have encountered several problems during the development of this application. Here you can find some of them.
+
+The major problem that we can consider is the lack of documentation. Because all technologies related to Scala (Scala.js, Scala Play and Slick) are really recent, you can't find really good documentation. You have to test several possibilities before to find a solution to a problem or to search on websites like **https://stackoverflow.com/** if someone has the same problem and a solution that works by chance.
+
+That introduces an other problem. It is the lack of time. We don't have enough time to test all the posibilities for a project like this. We have to find additionnal time althought the end of the semester is already overloaded.
+
 ## Authors
 
 Made by [Mathieu Urstein](https://github.com/MathieuUrstein), 
