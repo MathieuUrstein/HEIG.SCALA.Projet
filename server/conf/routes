@@ -15,28 +15,28 @@ GET     /budgets                    controllers.Application.budgets
 POST    /api/register                controllers.UserController.create
 POST    /api/auth                    controllers.UserController.login
 GET     /api/user                    controllers.UserController.read
-PATCH     /api/user                    controllers.UserController.update
+PATCH   /api/user                    controllers.UserController.update
 DELETE  /api/user                    controllers.UserController.delete
 
 # Transaction
 POST    /api/transactions            controllers.TransactionController.create
 OPTIONS /api/transactions            controllers.TransactionController.readAll
 GET     /api/transactions/:id        controllers.TransactionController.read(id: Int)
-PATCH     /api/transactions/:id        controllers.TransactionController.update(id: Int)
+PATCH   /api/transactions/:id        controllers.TransactionController.update(id: Int)
 DELETE  /api/transactions/:id        controllers.TransactionController.delete(id: Int)
 
 # Exchange
 POST    /api/exchanges               controllers.ExchangeController.create
 OPTIONS /api/exchanges               controllers.ExchangeController.readAll
 GET     /api/exchanges/:id           controllers.ExchangeController.read(id: Int)
-PATCH     /api/exchanges/:id           controllers.ExchangeController.update(id: Int)
+PATCH   /api/exchanges/:id           controllers.ExchangeController.update(id: Int)
 DELETE  /api/exchanges/:id           controllers.ExchangeController.delete(id: Int)
 
 # Budget
 POST    /api/budgets                 controllers.BudgetController.create
 GET     /api/budgets                 controllers.BudgetController.readAll
 GET     /api/budgets/:id             controllers.BudgetController.read(id: Int)
-PATCH     /api/budgets/:id             controllers.BudgetController.update(id: Int)
+PATCH   /api/budgets/:id             controllers.BudgetController.update(id: Int)
 DELETE  /api/budgets/:id             controllers.BudgetController.delete(id: Int)
 
 # Dashboard

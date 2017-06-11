@@ -122,7 +122,7 @@ class TransactionController @Inject()(transactionDAO: TransactionDAO)(implicit e
   def delete(id: Int): Action[AnyContent] = Authenticated.async { implicit request =>
     // we look for the user email in the JWT
     transactionDAO.delete(request.jwtSession.getAs[String](Const.ValueStoredJWT).get, id).map { _ =>
-      Ok(Json.obj("status" -> "OK", "user" -> "transaction deleted"))
+      Ok(Json.obj("status" -> "OK", "message" -> "transaction deleted"))
     }.recover {
       // case in not found the specified transaction with its id (or the transaction doesn't belong to this user)
       case _: NoSuchElementException =>

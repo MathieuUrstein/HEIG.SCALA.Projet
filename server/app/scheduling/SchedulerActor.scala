@@ -23,7 +23,7 @@ class SchedulerActor @Inject()(userDAO: UserDAO, budgetDAO: BudgetDAO, transacti
       // we add new entries for income_outcome table for all users
       userDAO.getAllEmails.map { allUsersEmails =>
         allUsersEmails.foreach { email =>
-          budgetDAO.findAll(email).map { budgets =>
+          Await.ready(budgetDAO.findAll(email).map { budgets =>
             var totalIncomeLeft: Double = 0
             var totalOutcomeUsed: Double = 0
 
@@ -36,11 +36,11 @@ class SchedulerActor @Inject()(userDAO: UserDAO, budgetDAO: BudgetDAO, transacti
               }
             }
 
-            userDAO.getId(email).map { userId =>
-              incomeOutcomeDAO.insert(IncomeOutcome(Date.valueOf(Const.format.format(Calendar.getInstance().getTime)),
-                totalIncomeLeft, totalOutcomeUsed, userId))
-            }
-          }
+            Await.ready(userDAO.getId(email).map { userId =>
+              Await.ready(incomeOutcomeDAO.insert(IncomeOutcome(Date.valueOf(Const.format.format(Calendar.getInstance().getTime)),
+                totalIncomeLeft, totalOutcomeUsed, userId)), Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+            }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
+          }, Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
         }
       }
 
@@ -85,7 +85,8 @@ class SchedulerActor @Inject()(userDAO: UserDAO, budgetDAO: BudgetDAO, transacti
                   Await.ready(budgetDAO.reinitializeBudget(budget.id, 0, initialLeftValue, 0),
                     Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
                   // we update the new budget with the exceeding
-                  transactionDAO.updateBudgetOutcome(budget.id, -exceeding)
+                  Await.ready(transactionDAO.updateBudgetOutcome(budget.id, -exceeding),
+                    Duration(Const.maxTimeToWaitInSeconds, Const.timeToWaitUnit))
 
                   var budgetsMap: Map[Int, Int] = Map()
 
