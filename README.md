@@ -67,7 +67,7 @@ To launch the application with SBT, go to the root of the project and execute th
 
 Normally your default browser will be opened in the following address **http://localhost:9000/**. If it is not the case, go to it manually.
 
-## Users already created with some data
+## Users already created with examples data
 
 Here you can find a table with the actual users in the database.
 
