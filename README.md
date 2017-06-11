@@ -59,13 +59,25 @@ in your browser. After that, a clean database will be created inside the **db** 
 
 To launch the application with SBT, go to the root of the project and execute the following commands:
 
-`sbt`
+```sbt```
 
-`clean`
+```clean```
 
-`run`
+```run```
 
 Normally your default browser will be opened in the following address **http://localhost:9000/**. If it is not the case, go to it manually.
+
+## Users already created with examples data
+
+Here you can find a table with the actual users in the database.
+
+```
+id        fullname                    email                                password            currency
+1         Sébastien Boson             sebastien.boson@test.ch              boson               CHF
+2         Mathieu Urstein             mathieu.urstein@test.ch              urstein             CHF
+3         Jean Durand                 jean.durand@test.ch                  durand              CHF
+4         Paul Bonvin                 paul.bonvin@test.ch                  bonvin              CHF
+```
 
 ## Problems encountered
 
