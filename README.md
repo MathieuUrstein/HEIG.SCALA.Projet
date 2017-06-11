@@ -3,6 +3,7 @@
 ## Context
 
 **PiggyBank** is a web application that was made for the Scala course at HEIG-VD.
+
 It is a project made in the end of a semester that has permitted to us to consolidate our knowledge in the programming language **Scala**.
 
 ## Description
