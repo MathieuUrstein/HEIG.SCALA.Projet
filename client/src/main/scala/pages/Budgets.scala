@@ -186,7 +186,6 @@ object Budgets {
               case true => "Yes"
               case _ => "No"
             }
-            println(color)
             document.getElementById("color-selector").asInstanceOf[html.Link].innerHTML =
               "<span class=\"preview-color\" style=\"background: " + color + "\"></span> " + color match {
                 case "aquamarine" => "Aquamarine"
@@ -220,8 +219,23 @@ object Budgets {
                 case other => other
               }
             takesFromWrapper.innerHTML = ""
-            takesFrom.foreach(el => addTakesFrom(el.budgetId, "coco"))
-            // TODO mettre a jour interface modale
+            takesFrom.foreach(el => {
+              takesFrom.remove(takesFrom.indexOf(el))
+
+              API.getBudget(el.budgetId).onComplete {
+                case Success(respIn) =>
+                  val budgetIn = JSON.parse(respIn.responseText).asInstanceOf[Models.Budget]
+                  addTakesFrom(el.budgetId, budgetIn.name)
+                case Failure(e: ext.AjaxException) =>
+                  Utils.addAlert("danger", js.JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
+              }
+            })
+            `type` match {
+              case "Outcome" =>
+                document.getElementById("outcome-tab-link").asInstanceOf[html.Link].click()
+              case _ =>
+                document.getElementById("income-tab-link").asInstanceOf[html.Link].click()
+            }
           case Failure(e: ext.AjaxException) =>
             Utils.addAlert("danger", js.JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
         }
