@@ -23,7 +23,7 @@
                             Settings
                             <i class="fa fa-cog" aria-hidden="true"></i>
                         </a>
-                        <a id="disconnect" class="dropdown-item" onclick="disconnect()">
+                        <a id="disconnect" class="dropdown-item" href="#" onclick="disconnect()">
                             Disconnect
                             <i class="fa fa-sign-out" aria-hidden="true"></i>
                         </a>
@@ -95,10 +95,10 @@
 
         @content
 
-        @scalajs.html.scripts("client", routes.Assets.versioned(_).toString, name => getClass.getResource(s"/public/$name") != null)
         <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
         <script src="@routes.Assets.versioned("js/bootstrap.min.js")"></script>
         <script src="@routes.Assets.versioned("js/Chart.bundle.min.js")"></script>
+        @scalajs.html.scripts("client", routes.Assets.versioned(_).toString, name => getClass.getResource(s"/public/$name") != null)
     </body>
 </html>

@@ -49,13 +49,13 @@ case class BudgetPATCHDTO(name: Option[String], used: Option[Double], left: Opti
                           persistent: Option[Int], reported: Option[Boolean], color: Option[String],
                           takesFrom: Option[Seq[TakesFromDTO]])
 
-case class SpendingGETDTO(date: DateDTO, budget: String, amount: Double)
-case class SpendingGET(date: Date, budget: String, amount: Double)
+case class SpendingGETDTO(date: DateDTO, budget: String, amount: Double, color: String)
+case class SpendingGET(date: Date, budget: String, amount: Double, color: String)
 case class UsageGETDTO(date: DateDTO, used: Double, left: Double)
 case class UsageGET(date: Date, used: Double, left: Double)
 
 object SpendingGET {
-  implicit val spendingGETResult = GetResult(r => SpendingGET(r.nextDate, r.nextString, r.nextDouble))
+  implicit val spendingGETResult = GetResult(r => SpendingGET(r.nextDate, r.nextString, r.nextDouble, r.nextString))
 }
 object UsageGET {
   implicit val usageGETResult = GetResult(r => UsageGET(r.nextDate, r.nextDouble, r.nextDouble))

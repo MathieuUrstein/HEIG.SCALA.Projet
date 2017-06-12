@@ -16,6 +16,8 @@ package object API {
     val transactions: String = prefix + "transactions"
     val exchanges: String = prefix + "exchanges"
     val budgets: String = prefix + "budgets"
+    val usage: String = prefix + "dashboard/usage"
+    val spendings: String = prefix + "dashboard/spendings"
   }
 
   object SuperAjax {
@@ -72,6 +74,14 @@ package object API {
     SuperAjax.post(urls.auth, credentials)
   }
 
+  def getUsage: Future[dom.XMLHttpRequest] = {
+    SuperAjax.options(urls.usage)
+  }
+
+  def getSpenings: Future[dom.XMLHttpRequest] = {
+    SuperAjax.options(urls.spendings)
+  }
+
   def postExchange(exchange: Exchange): Future[dom.XMLHttpRequest] = {
     SuperAjax.post(urls.exchanges, exchange)
   }
@@ -102,6 +112,14 @@ package object API {
 
   def deleteBudget(id: Int): Future[dom.XMLHttpRequest] = {
     SuperAjax.delete(urls.budgets + "/" + id)
+  }
+
+  def getBudget(id: Int): Future[dom.XMLHttpRequest] = {
+    SuperAjax.get(urls.budgets + "/" + id)
+  }
+
+  def patchBudget(budget: Budget): Future[dom.XMLHttpRequest] = {
+    SuperAjax.patch(urls.budgets + "/" + budget.id, budget)
   }
 
   /*

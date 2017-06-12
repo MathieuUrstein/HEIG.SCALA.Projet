@@ -70,7 +70,7 @@
             <div id="spending-details" class="cat">
                 <h4>Spending details</h4>
                 <canvas id="spending-details-canvas" height="80"></canvas>
-                <script>
+                <!--<script>
                         var dayLabels =  [];
                         var dataSet1 = [];
                         var dataSet2 = [];
@@ -111,7 +111,7 @@
                         };
                         var g1 = function() {
                             var ctx = document.getElementById("spending-details-canvas").getContext("2d");
-                            window.myBar = new Chart(ctx, {
+                            new Chart(ctx, {
                                 type: 'bar',
                                 data: barChartData,
                                 options: {
@@ -131,59 +131,25 @@
                                 }
                             });
                         };
-                </script>
+                </script>-->
             </div>
             <div id="income-outcome-details" class="cat">
                 <h4>Outcome usage - Income left</h4>
                 <canvas id="income-outcome-details-canvas" height="80"></canvas>
-                <script>
-                        var incomeOutcomeData = {
-                            labels: dayLabels,
-                            datasets: [{
-                                type: 'line',
-                                label: 'Outcome usage',
-                                borderColor: '#f0ad4e',
-                                borderWidth: 2,
-                                fill: false,
-                                data: outcomeData
-                            }, {
-                                type: 'line',
-                                label: 'Income left',
-                                borderColor: '#c6527b',
-                                borderWidth: 2,
-                                fill: false,
-                                data: incomeData
-                            }]
-                        };
-                        var g2 = function() {
-                            var ctx = document.getElementById("income-outcome-details-canvas").getContext("2d");
-                            window.myBar = new Chart(ctx, {
-                                type: 'bar',
-                                data: incomeOutcomeData,
-                                options: {
-                                    tooltips: {
-                                        mode: 'index',
-                                        intersect: false
-                                    },
-                                    responsive: true
-                                }
-                            });
-                        };
-                </script>
                 <div class="recap">
                     <div class="progress">
-                        <div class="progress-bar bg-warning" role="progressbar" style="width: 25%;">2300 CHF</div>
-                        <div class="progress-bar" role="progressbar" style="width: 75%;">5100 CHF</div>
+                        <div id="progress-outcome" class="progress-bar bg-warning" role="progressbar" style="width: 25%;">2300 CHF</div>
+                        <div id="progress-income" class="progress-bar" role="progressbar" style="width: 75%;">5100 CHF</div>
                     </div>
                     <div class="details row">
                         <div class="col-3 text-left">
-                            | 0 CHF
+                            | Outcome
                         </div>
-                        <div class="col-6 text-center">
+                        <div id="global-stats-resume" class="col-6 text-center">
                             June budget usage - 30%
                         </div>
                         <div class="col-3 text-right">
-                            7400 CHF |
+                            Income |
                         </div>
                     </div>
                 </div>
@@ -192,309 +158,21 @@
                 <div class="col-6">
                     <h4>Outcome usage budgets</h4>
                     <canvas id="outcome-usage-budgets" height="120"></canvas>
-                    <script>
-                            var outcomeUsageBudgets = {
-                                datasets: [{
-                                    label: 'Outcome usage budgets',
-                                    data: [
-                                        2300,
-                                        6500,
-                                        940
-                                    ],
-                                    backgroundColor: [
-                                        "blueviolet",
-                                        "cadetblue",
-                                        "chocolate"
-                                    ]
-                                }],
-                                labels: [
-                                    'Extra',
-                                    'Nutrition',
-                                    'Exceeding example'
-                                ]
-                            };
+                    <div id="outcomes-wrapper">
 
-                            var g3 = function() {
-                                var ctx = document.getElementById("outcome-usage-budgets").getContext("2d");
-                                window.myDoughnut = new Chart(ctx, {
-                                    type: 'doughnut',
-                                    data: outcomeUsageBudgets,
-                                    options: {
-                                        responsive: true,
-                                        legend: {
-                                            display: false
-                                        }
-                                    }
-                                });
-                            };
-                    </script>
-                    <div class="budget">
-                        <h6>
-                            Extra
-                            <span class="float-right">
-                                <i class="fa fa-retweet" aria-hidden="true"></i>
-                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
-                            </span>
-                        </h6>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 10%; background: blueviolet">2300 CHF</div>
-                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 90%;">3000 CHF</div>
-                        </div>
-                        <div class="details row">
-                            <div class="col-3 text-left">
-                                | 0 CHF
-                            </div>
-                            <div class="col-6 text-center">
-                                Used 10% - 90% Left
-                            </div>
-                            <div class="col-3 text-right">
-                                7400 CHF |
-                            </div>
-                        </div>
-                    </div>
-                    <div class="budget">
-                        <h6>
-                            Nutrition
-                            <span class="float-right">
-                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
-                            </span>
-                        </h6>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 40%; background: cadetblue">2300 CHF</div>
-                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 60%;">3000 CHF</div>
-                        </div>
-                        <div class="details row">
-                            <div class="col-3 text-left">
-                                | 0 CHF
-                            </div>
-                            <div class="col-6 text-center">
-                                Used 40% - 60% Left
-                            </div>
-                            <div class="col-3 text-right">
-                                7400 CHF |
-                            </div>
-                        </div>
-                    </div>
-                    <div class="budget">
-                        <h6>
-                            Exceeding exemple
-                            <span class="float-right">
-                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
-                            </span>
-                        </h6>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 90%; background: chocolate">2300 CHF</div>
-                            <div class="progress-bar" role="progressbar" style="width: 10%; background: red">3000 CHF</div>
-                        </div>
-                        <div class="details row">
-                            <div class="col-3 text-left">
-                                | 0 CHF
-                            </div>
-                            <div class="col-6 text-center">
-                                Used 100% - 10% Exceeding
-                            </div>
-                            <div class="col-3 text-right">
-                                7400 CHF |
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="col-6">
                     <h4>Income left budgets</h4>
                     <canvas id="income-left-budgets" height="120"></canvas>
-                    <script>
-                            var incomeLeftBudgets = {
-                                datasets: [{
-                                    label: 'Income left budget',
-                                    data: [
-                                        5200,
-                                        1500,
-                                        9340
-                                    ],
-                                    backgroundColor: [
-                                        "darkblue",
-                                        "darksalmon",
-                                        "olive"
-                                    ]
-                                }],
-                                labels: [
-                                    'Salary',
-                                    'Gifts',
-                                    'Full example'
-                                ]
-                            };
+                    <div id="incomes-wrapper">
 
-                            var g4 = function() {
-                                var ctx = document.getElementById("income-left-budgets").getContext("2d");
-                                window.myDoughnut = new Chart(ctx, {
-                                    type: 'doughnut',
-                                    data: incomeLeftBudgets,
-                                    options: {
-                                        responsive: true,
-                                        legend: {
-                                            display: false
-                                        }
-                                    }
-                                });
-                            };
-                    </script>
-                    <div class="budget">
-                        <h6>
-                            Salary
-                            <span class="float-right">
-                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-                            </span>
-                        </h6>
-                        <div class="progress">
-                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 30%;">3000 CHF</div>
-                            <div class="progress-bar" role="progressbar" style="width: 70%; background: darkblue;">2300 CHF</div>
-                        </div>
-                        <div class="details row">
-                            <div class="col-3 text-left">
-                                | 0 CHF
-                            </div>
-                            <div class="col-6 text-center">
-                                Used 30% - 70% Left
-                            </div>
-                            <div class="col-3 text-right">
-                                7400 CHF |
-                            </div>
-                        </div>
-                    </div>
-                    <div class="budget">
-                        <h6>
-                            Gifts
-                            <span class="float-right">
-                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-                            </span>
-                        </h6>
-                        <div class="progress">
-                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 80%;">3000 CHF</div>
-                            <div class="progress-bar" role="progressbar" style="width: 20%; background: darksalmon">2300 CHF</div>
-                        </div>
-                        <div class="details row">
-                            <div class="col-3 text-left">
-                                | 0 CHF
-                            </div>
-                            <div class="col-6 text-center">
-                                Used 80% - 20% Left
-                            </div>
-                            <div class="col-3 text-right">
-                                7400 CHF |
-                            </div>
-                        </div>
-                    </div>
-                    <div class="budget">
-                        <h6>
-                            Full example
-                            <span class="float-right">
-                                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-                            </span>
-                        </h6>
-                        <div class="progress">
-                            <div class="progress-bar bg-faded left" role="progressbar" style="width: 100%;">3000 CHF</div>
-                        </div>
-                        <div class="details row">
-                            <div class="col-3 text-left">
-                                | 0 CHF
-                            </div>
-                            <div class="col-6 text-center">
-                                Used 100% - 0% Left
-                            </div>
-                            <div class="col-3 text-right">
-                                7400 CHF |
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
-            <div class="cat full-budget">
-                <div class="budget default">
-                    <h4>
-                        Exchanges
-                        <span class="float-right">
-                            <i class="fa fa-refresh" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: 45%;">3000 CHF</div>
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 55%;">2300 CHF</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
-                        </div>
-                        <div class="col-6 text-center">
-                            Borrow 45% - 55% Lend
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="cat full-budget">
-                <div class="budget default">
-                    <h4>
-                        Balance
-                        <span class="float-right">
-                            <i class="fa fa-balance-scale" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: 60%;">3000 CHF - 60%</div>
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 40%;">2300 CHF - 40%</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
-                        </div>
-                        <div class="col-6 text-center">
-                            Outcome 60% - 40% Income
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="cat full-budget">
-                <div class="budget default">
-                    <h4>
-                        Debt
-                        <span class="float-right">
-                            <i class="fa fa-asterisk" aria-hidden="true"></i>
-                        </span>
-                    </h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-debt" role="progressbar" style="width: 100%;">3000 CHF</div>
-                    </div>
-                    <div class="details row">
-                        <div class="col-3 text-left">
-                            | 0 CHF
-                        </div>
-                        <div class="col-6 text-center">
-                            When all incomes are used, the outcomes uses debt
-                        </div>
-                        <div class="col-3 text-right">
-                            7400 CHF |
-                        </div>
-                    </div>
-                </div>
+            <div id="budgets-defaults-wrapper">
+
             </div>
         </div>
-        <script>
-                window.onload = function() {
-                    g1();
-                    g2();
-                    g3();
-                    g4();
-                }
-        </script>
     </div>
 }

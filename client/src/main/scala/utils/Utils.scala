@@ -153,7 +153,6 @@ package object Utils {
 
   def addAlert(`type`: String, content: String): Unit = {
     val wrapper: html.Div = document.getElementById("flash").asInstanceOf[html.Div]
-
     val alertDiv = document.createElement("div").asInstanceOf[html.Div]
     alertDiv.className = "alert alert-dismissible fade show alert-" + `type`
     alertDiv.innerHTML =  "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
@@ -161,5 +160,10 @@ package object Utils {
       "</button>" +
       content
     wrapper.appendChild(alertDiv)
+
+    val jsFun: js.Function0[Any] = () => {
+      wrapper.removeChild(alertDiv)
+    }
+    window.setTimeout(jsFun, 8000)
   }
 }
