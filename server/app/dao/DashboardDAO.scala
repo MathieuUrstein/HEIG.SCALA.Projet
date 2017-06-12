@@ -43,7 +43,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
                          FROM "budget"
                          INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
                          INNER JOIN "user" ON "transaction".userId = "user".id
-                         WHERE "user".email = '#$userEmail' AND "budget".type = 'outcome'
+                         WHERE "user".email = '#$userEmail' AND "budget".type = 'Outcome'
                          AND "transaction".date BETWEEN '#$dateFrom' AND '#$dateTo'
                          GROUP BY "transaction".date, "budget".id
                       """
@@ -56,7 +56,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
                          FROM "budget"
                          INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
                          INNER JOIN "user" ON "transaction".userId = "user".id
-                         WHERE "user".email = '#$userEmail' AND "budget".type = 'outcome'
+                         WHERE "user".email = '#$userEmail' AND "budget".type = 'Outcome'
                          AND "transaction".date BETWEEN '#$dateFrom' AND '#$dateTo'
                          GROUP BY "transaction".date, "budget".id
                       """
@@ -67,7 +67,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
                          FROM "budget"
                          INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
                          INNER JOIN "user" ON "transaction".userId = "user".id
-                         WHERE "user".email = '#$userEmail' AND "budget".type = 'outcome'
+                         WHERE "user".email = '#$userEmail' AND "budget".type = 'Outcome'
                          GROUP BY "transaction".date, "budget".id
                       """
     }

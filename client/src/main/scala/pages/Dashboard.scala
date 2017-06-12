@@ -24,6 +24,18 @@ object Dashboard {
   private val spendingDetailsCanvas = document.getElementById("spending-details-canvas").asInstanceOf[html.Canvas]
   private val inOutDetailsCanvas = document.getElementById("income-outcome-details-canvas").asInstanceOf[html.Canvas]
 
+  private def sortStringDate = (date1: String, date2: String) => {
+    val day1 = date1.split("/")(0).toInt
+    val month1 = date1.split("/")(1).toInt
+    val day2 = date2.split("/")(0).toInt
+    val month2 = date2.split("/")(1).toInt
+
+    if (month1 < month2) true
+    else if (month1 > month2) false
+    else if (day1 < day2) true
+    else false
+  }
+
   def addBugetDoughnut(budgets: js.Array[Models.Budget], `type`: String): Unit = {
     var wrapper: html.Canvas = null
     val colors: js.Array[String] = js.Array()
@@ -73,13 +85,18 @@ object Dashboard {
           budgets += spending.budget -> spending.color
         })
 
-        budgets.foreach(budget => datasets.push(
-          Dataset(
-            label = budget._1,
-            backgroundColor = js.Array(budget._2),
-            data = new js.Array[Double](labels.length).map(_ => 10.0)
+        budgets.foreach(budget => {
+          val x: js.Array[Double] = js.Array()
+          labels.foreach(y => x.push(3))
+          println(budget._2)
+          datasets.push(
+            Dataset(
+              label = budget._1,
+              backgroundColor = js.Array(budget._2),
+              data = x
+            )
           )
-        ))
+        })
 
         new Chart(
           spendingDetailsCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D],
@@ -110,7 +127,40 @@ object Dashboard {
     API.getUsage.onComplete {
       case Success(resp) =>
         val usages = js.JSON.parse(resp.responseText).asInstanceOf[js.Array[Models.Usage]]
-        
+        var dateInOut: Map[String, (Double, Double)] = Map.empty
+
+        usages.foreach(usage => {
+          dateInOut += (usage.date.day + "/" + usage.date.month) -> (usage.used, usage.left)
+        })
+
+        val jsLabels: js.Array[String] = js.Array()
+        val orderedKeys = dateInOut.keys.toList.sortWith(sortStringDate)
+        orderedKeys.foreach(jsLabels.push(_))
+
+        val inData: js.Array[Double] = js.Array()
+        val outData: js.Array[Double] = js.Array()
+        orderedKeys.foreach(key => {
+          outData.push(dateInOut(key)._1)
+          inData.push(dateInOut(key)._2)
+        })
+
+        val incomesDataSet: Dataset = Dataset(
+          `type` = "line",
+          label = "Income left",
+          borderColor = "#c6527b",
+          borderWidth = 2,
+          fill = false,
+          data = inData
+        )
+        val outcomesDataSet: Dataset = Dataset(
+          `type` = "line",
+          label = "Outcome usage",
+          borderColor = "#f0ad4e",
+          borderWidth = 2,
+          fill = false,
+          data = outData
+        )
+
         new Chart(
           inOutDetailsCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D],
           Config(
@@ -119,16 +169,10 @@ object Dashboard {
               tooltips = Tooltips(mode = "index", intersect = false)
             ),
             data = Data(
-              labels = js.Array("1", "2"),
+              labels = jsLabels,
               datasets = js.Array(
-                Dataset(
-                  label = "l1",
-                  data = js.Array(6, 7),
-                  borderColor = "#f0ad4e",
-                  borderWidth = 2,
-                  fill = false,
-                  `type` = "line"
-                )
+                incomesDataSet,
+                outcomesDataSet
               )
             )
           )
