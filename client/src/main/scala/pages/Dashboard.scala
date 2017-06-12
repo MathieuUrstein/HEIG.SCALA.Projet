@@ -122,7 +122,7 @@ object Dashboard {
         // map every budget to his color
         var budgetColor: Map[String, String] = Map.empty
         // map every date to a budget and this budget to the amount spent at this date
-        var dateBudgetValue: Map[String, Map[String, Double]] = Map.empty
+        var dateBudgetValue: Map[String, scala.collection.mutable.Map[String, Double]] = Map.empty
         // map every budget to an array of amount spent where every position of the array have to match the labels order
         var budgetData: Map[String, js.Array[Double]] = Map.empty
 
@@ -136,12 +136,11 @@ object Dashboard {
           val date = spending.date.day + "/" + spending.date.month
           // if the dateBudgetValue map contains the date add the corresponding budget and amount
           if (dateBudgetValue.keySet.contains(date)) {
-            var budgetValue: Map[String, Double] = dateBudgetValue(date)
-            budgetValue += (spending.budget -> -spending.amount)
+            dateBudgetValue(date) += (spending.budget -> -spending.amount)
           } else {
             // dateBudgetValue don't contains the actual date
             // then add a new map with the corresponding budget and amount
-            dateBudgetValue += date -> Map(spending.budget -> -spending.amount)
+            dateBudgetValue += date -> scala.collection.mutable.Map(spending.budget -> -spending.amount)
           }
         })
 
