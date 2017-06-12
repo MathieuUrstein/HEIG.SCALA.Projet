@@ -47,6 +47,13 @@ object Transactions {
       case Success(resp) =>
         val budgets = js.JSON.parse(resp.responseText).asInstanceOf[js.Array[Models.Budget]]
         budgets.foreach { budget =>
+          if (budget.`type` == "Income") {
+            incomeTotal += budget.left + budget.exceeding
+          }
+          else {
+            outcomeTotal += budget.used + budget.exceeding
+          }
+
           addExistingBudget(budget)
         }
 
@@ -54,13 +61,6 @@ object Transactions {
           case Success(response) =>
             val transactions = js.JSON.parse(response.responseText).asInstanceOf[js.Array[Models.TransactionGET]]
             transactions.foreach { transaction =>
-              if (transaction.amount > 0) {
-                incomeTotal += transaction.amount
-              }
-              else {
-                outcomeTotal += transaction.amount
-              }
-
               addTransaction(transaction)
             }
 
