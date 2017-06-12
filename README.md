@@ -61,9 +61,14 @@ To launch the application with SBT, go to the root of the project and execute th
 
 ```sbt```
 
-```clean```
+```clean``` (in SBT)
 
-```run```
+```run``` (in SBT)
+
+or 
+
+```sbt clean``` (out of SBT)
+```sbt run``` (out of SBT)
 
 Normally your default browser will be opened in the following address **http://localhost:9000/**. If it is not the case, go to it manually.
 
