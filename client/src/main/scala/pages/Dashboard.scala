@@ -138,21 +138,21 @@ object Dashboard {
         val orderedKeys = dateBudgetValue.keys.toList.sortWith(sortStringDate)
         orderedKeys.foreach(key => {
           labels.push(key)
-          dateBudgetValue(key).foreach(tup => {
-            budgetData(tup._1).push(tup._2)
-          })
+          dateBudgetValue(key).foreach { case (budget, amount) =>
+            budgetData(budget).push(amount)
+          }
         })
         println("labels : " + labels.length)
-        budgetColor.foreach(tup => {
-          println(tup._1 + " : " + budgetData(tup._1).length)
+        budgetColor.foreach { case(budget, color) =>
+          println(budget + " : " + budgetData(budget).length)
           val colors: js.Array[String] = js.Array()
-          labels.foreach(_ => colors.push(tup._2))
+          labels.foreach(_ => colors.push(color))
           datasets.push(Dataset(
-            label = tup._1,
+            label = budget,
             backgroundColor = colors,
-            data = budgetData(tup._1)
+            data = budgetData(budget)
           ))
-        })
+        }
 
         spendingsChart = new Chart(
           spendingDetailsCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D],
