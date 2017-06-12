@@ -85,7 +85,25 @@ We have encountered several problems during the development of this application.
 
 The major problem that we can consider is the lack of documentation. Because all technologies related to Scala (Scala.js, Scala Play and Slick) are really recent, you can't find really good documentation. You have to test several possibilities before to find a solution to a problem or to search on websites like **https://stackoverflow.com/** if someone has the same problem and a solution that works by chance.
 
-That introduces an other problem. It is the lack of time. We don't have enough time to test all the posibilities for a project like this. We have to find additionnal time althought the end of the semester is already overloaded.
+That introduces an other problem. It is the lack of time. We don't have enough time to test all the posibilities for a project like this. We have to find additionnal time althought the end of the semester is already overloaded. This is linked with a problem of how starting the project. You have to test several possibilities and different configurations to have 
+
+## Improvements
+
+At present, the application is functionnal. You can use the features presented in the **description** section with just some restrictions.
+
+It is not possible to PATCH the type and the takesFrom budgets for a particular budget. When a budget is deleted, the eventual budgets that depend on it are not updated (takesFrom values). It would be possible to do that with some checks and modifications on the server side. When a transaction is updated with a change in the amount or the budgetId fields, the linked budgets are not updated. The same when we delete a transaction. These two last things would be also possible with some changes on the server side.
+
+Now we can give a list of possible improvements on the server side:
+
+  * Restrict the type of a budget to values "income" and "outcome".
+  * Check that the left and used values for a budget are not negative.
+  * Check that the order of the takesFrom values (budgets) is correct (no negative value).
+  * Restrict the type of an exchange to values "borrow" and "lend".
+  * Add treatment when the user is already connected and try to connect himslef again (error message).
+  * Invaliding JWT (both for logout and the change of the user's email).
+  * Make better error messages when a budget is created.
+  * Add a debt management when all incomes are exhausted.
+  * Remove the error that appears when the server receives a number that begins with the value "0".
 
 ## Authors
 
