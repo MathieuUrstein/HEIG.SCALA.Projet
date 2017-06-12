@@ -115,7 +115,7 @@ At the moment, the application is functionnal. You can use the features presente
 
 It is not possible to PATCH the type and the takesFrom budgets for a particular budget. When a budget is deleted, the eventual budgets that depend on it are not updated (takesFrom values). It would be possible to do that with some checks and modifications on the server side. When a transaction is updated with a change in the amount or the budgetId fields, the linked budgets are not updated. The same when we delete a transaction. These two last things would be also possible with some changes on the server side.
 
-Also, edge cases have not been tested and will probably fail.
+Also, edge cases have not been tested and will probably fail. Code was written in the hurry and is not commented. We may imporove that in the future.
 
 Now we can give a list of possible improvements on the server side:
 
