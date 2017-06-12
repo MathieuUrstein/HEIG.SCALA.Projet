@@ -70,7 +70,7 @@ or
 ```sbt clean``` (out of SBT)
 ```sbt run``` (out of SBT)
 
-Normally your default browser will be opened in the following address **http://localhost:9000/**. If it is not the case, go to it manually.
+Normally your default browser will be opened at the following address **http://localhost:9000/**. If it is not the case, open it manually.
 
 ## Users already created with examples data
 
@@ -88,15 +88,21 @@ id        fullname                    email                                passw
 
 We have encountered several problems during the development of this application. Here you can find some of them.
 
-The major problem that we can consider is the lack of documentation. Because all technologies related to Scala (Scala.js, Scala Play and Slick) are really recent, you can't find really good documentation. You have to test several possibilities before to find a solution to a problem or to search on websites like **https://stackoverflow.com/** if someone has the same problem and a solution that works by chance.
+The major problem that we can consider is the lack of documentation (12 june 2017). Because all technologies related to Scala (Scala.js, Scala Play and Slick) are really new, you can't find really good documentation. You have to test several possibilities before to find a solution to a problem or to search on websites like **https://stackoverflow.com/** if someone had the same problem and a solution that opefully works.
 
-That introduces an other problem. It is the lack of time. We don't have enough time to test all the posibilities for a project like this. We have to find additionnal time althought the end of the semester is already overloaded. This is linked with a problem of how starting the project. You have to test several possibilities and different configurations to have 
+That introduces an other problem. It is the lack of time. We don't have enough time to test all the edge cases for a project like this. We have to find additionnal time although the end of the semester is already overloaded. 
+
+Starting a project with such en environement is quite hard. You have to manage lots of modules and build configurations.
+
+No up to date Charjs Facades for Scalajs. We had to do our own.
 
 ## Improvements
 
-At present, the application is functionnal. You can use the features presented in the **description** section with just some restrictions.
+At the moment, the application is functionnal. You can use the features presented in the **description** section with just some restrictions.
 
 It is not possible to PATCH the type and the takesFrom budgets for a particular budget. When a budget is deleted, the eventual budgets that depend on it are not updated (takesFrom values). It would be possible to do that with some checks and modifications on the server side. When a transaction is updated with a change in the amount or the budgetId fields, the linked budgets are not updated. The same when we delete a transaction. These two last things would be also possible with some changes on the server side.
+
+Also, edge cases have not been tested and will probably fail.
 
 Now we can give a list of possible improvements on the server side:
 
@@ -112,5 +118,6 @@ Now we can give a list of possible improvements on the server side:
 
 ## Authors
 
-Made by [Mathieu Urstein](https://github.com/MathieuUrstein), 
+Made by, 
 [Sébastien Boson](https://github.com/sebastie-boson)
+[Mathieu Urstein](https://github.com/MathieuUrstein)
