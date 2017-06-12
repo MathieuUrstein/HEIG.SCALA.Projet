@@ -103,7 +103,7 @@ Now we can give a list of possible improvements on the server side:
   * Invaliding JWT (both for logout and the change of the user's email).
   * Make better error messages when a budget is created.
   * Add a debt management when all incomes are exhausted.
-  * Remove the error that appears when the server receives a number that begins with the value "0".
+  * Remove the error that appears when the server receives a number that begins with the value "0" in JSON.
 
 ## Authors
 
