@@ -30,13 +30,18 @@ You just have to create an account with your preferred currency to start using i
 **PiggyBank** has also a nice dashboard that will present you statistics about your spendings and incomes with colored graphics.
 
 ---
+---
 ![Transactions](images/transactions.png)
+---
 ---
 ![Exchanges](images/exchanges.png)
 ---
+---
 ![Budgets](images/budgets.png)
 ---
+---
 ![Doughnuts](images/doughnuts.png)
+---
 ---
 
 ## Technologies used
