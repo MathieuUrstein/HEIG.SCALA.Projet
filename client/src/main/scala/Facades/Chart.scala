@@ -130,6 +130,7 @@ object Config {
 @js.native
 class Chart protected() extends js.Object {
   def this(context: CanvasRenderingContext2D, conf: Config) = this()
+  def destroy() = js.native
 }
 
 @js.native

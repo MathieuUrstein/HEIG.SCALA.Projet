@@ -24,6 +24,8 @@ object Dashboard {
   private val spendingDetailsCanvas = document.getElementById("spending-details-canvas").asInstanceOf[html.Canvas]
   private val inOutDetailsCanvas = document.getElementById("income-outcome-details-canvas").asInstanceOf[html.Canvas]
 
+  private var spendingsChart: Chart = new Chart(spendingDetailsCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D], Config())
+
   private def sortStringDate = (date1: String, date2: String) => {
     val day1 = date1.split("/")(0).toInt
     val month1 = date1.split("/")(1).toInt
@@ -73,32 +75,51 @@ object Dashboard {
   }
 
   def showSpendingDetails(): Unit = {
+
     API.getSpenings.onComplete {
       case Success(resp) =>
         val spendings = js.JSON.parse(resp.responseText).asInstanceOf[js.Array[Models.Spending]]
         val labels: js.Array[String] = js.Array()
         val datasets: js.Array[Dataset] = js.Array()
-        var budgets: Map[String, String] = Map.empty
+        var budgetColor: Map[String, String] = Map.empty
+        var dateBudgetValue: Map[String, Map[String, Double]] = Map.empty
+        var budgetData: Map[String, js.Array[Double]] = Map.empty
 
         spendings.foreach(spending => {
-          labels.push(spending.date.day + "/" + spending.date.month)
-          budgets += spending.budget -> spending.color
+          budgetColor += spending.budget -> spending.color
+          val date = spending.date.day + "/" + spending.date.month
+          if (dateBudgetValue.keySet.contains(date)) {
+            var budgetValue: Map[String, Double] = dateBudgetValue(date)
+            budgetValue += (spending.budget -> -spending.amount)
+          } else {
+            dateBudgetValue += date -> Map(spending.budget -> -spending.amount)
+          }
         })
 
-        budgets.foreach(budget => {
-          val x: js.Array[Double] = js.Array()
-          labels.foreach(y => x.push(3))
-          println(budget._2)
-          datasets.push(
-            Dataset(
-              label = budget._1,
-              backgroundColor = js.Array(budget._2),
-              data = x
-            )
-          )
+        budgetColor.keySet.foreach(budget => {
+          budgetData += budget -> js.Array()
         })
 
-        new Chart(
+        val orderedKeys = dateBudgetValue.keys.toList.sortWith(sortStringDate)
+        orderedKeys.foreach(key => {
+          labels.push(key)
+          dateBudgetValue(key).foreach(tup => {
+            budgetData(tup._1).push(tup._2)
+          })
+        })
+        println("labels : " + labels.length)
+        budgetColor.foreach(tup => {
+          println(tup._1 + " : " + budgetData(tup._1).length)
+          val colors: js.Array[String] = js.Array()
+          labels.foreach(_ => colors.push(tup._2))
+          datasets.push(Dataset(
+            label = tup._1,
+            backgroundColor = colors,
+            data = budgetData(tup._1)
+          ))
+        })
+
+        spendingsChart = new Chart(
           spendingDetailsCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D],
           Config(
             `type` = "bar",
@@ -133,13 +154,12 @@ object Dashboard {
           dateInOut += (usage.date.day + "/" + usage.date.month) -> (usage.used, usage.left)
         })
 
-        val jsLabels: js.Array[String] = js.Array()
+        val labels: js.Array[String] = js.Array()
         val orderedKeys = dateInOut.keys.toList.sortWith(sortStringDate)
-        orderedKeys.foreach(jsLabels.push(_))
-
         val inData: js.Array[Double] = js.Array()
         val outData: js.Array[Double] = js.Array()
         orderedKeys.foreach(key => {
+          labels.push(key)
           outData.push(dateInOut(key)._1)
           inData.push(dateInOut(key)._2)
         })
@@ -169,7 +189,7 @@ object Dashboard {
               tooltips = Tooltips(mode = "index", intersect = false)
             ),
             data = Data(
-              labels = jsLabels,
+              labels = labels,
               datasets = js.Array(
                 incomesDataSet,
                 outcomesDataSet
@@ -186,6 +206,10 @@ object Dashboard {
 
     var incomesSum = 0.0
     var outcomesSum = 0.0
+
+    incomesWrapper.innerHTML = ""
+    outcomesWrapper.innerHTML = ""
+    spendingsChart.destroy()
 
     showSpendingDetails()
     showInOutUsage()
