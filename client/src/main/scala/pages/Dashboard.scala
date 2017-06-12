@@ -3,9 +3,7 @@ package pages
 import API.Models
 import Facades._
 import org.scalajs.dom._
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent._
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 

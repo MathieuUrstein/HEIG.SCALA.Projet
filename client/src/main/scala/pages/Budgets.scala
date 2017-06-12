@@ -241,15 +241,15 @@ object Budgets {
   }
 
   def addTakesFromSelector(income: Models.Budget): Unit = {
-    val a = "<a onclick=\"budgetsAddTakesFrom(" + income.id + ", '" + income.name + "')\" class=\"dropdown-item\" href=\"#\">" + income.name + "</a>"
+    val a = "<a onclick=\"budgetsAddTakesFrom(" + income.id + ", '" + income.name + "', true)\" class=\"dropdown-item\" href=\"#\">" + income.name + "</a>"
     val div = document.createElement("div").asInstanceOf[html.Div]
     div.innerHTML = a
     takesFromSelectorWrapper.appendChild(div)
   }
 
   @JSExportTopLevel("budgetsAddTakesFrom")
-  def addTakesFrom(id: Int, name: String): Unit = {
-    if (takesFrom.indexWhere(_.budgetId == id) == -1) {
+  def addTakesFrom(id: Int, name: String, checkDuplicates: Boolean = true): Unit = {
+    if (!checkDuplicates || takesFrom.indexWhere(_.budgetId == id) == -1) {
       takesFrom.append(new Models.BudgetRef(
         if (takesFrom.length == 0)
           0
@@ -342,12 +342,10 @@ object Budgets {
               }
             takesFromWrapper.innerHTML = ""
             takesFrom.foreach(el => {
-              takesFrom.remove(takesFrom.indexOf(el))
-
               API.getBudget(el.budgetId).onComplete {
                 case Success(respIn) =>
                   val budgetIn = JSON.parse(respIn.responseText).asInstanceOf[Models.Budget]
-                  addTakesFrom(el.budgetId, budgetIn.name)
+                  addTakesFrom(el.budgetId, budgetIn.name, checkDuplicates = false)
                 case Failure(e: ext.AjaxException) =>
                   Utils.addAlert("danger", js.JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
               }
