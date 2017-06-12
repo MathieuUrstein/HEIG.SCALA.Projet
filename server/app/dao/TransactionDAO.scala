@@ -360,7 +360,7 @@ class TransactionDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Da
     }
   }
 
-  // TODO: when updating the amount field or delete a transaction, update the corresponding budgets (improvement)
+  // TODO: when updating the amount or the budgetId fields, or delete a transaction, update the corresponding budgets (improvement)
 
   def update(userEmail: String, id: Int, transaction: TransactionPATCHDTO): Future[Any] = {
     // we first verify that the asked transaction (id) to update belongs to this user or exists
