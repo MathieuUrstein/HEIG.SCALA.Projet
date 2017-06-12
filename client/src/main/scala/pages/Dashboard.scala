@@ -151,17 +151,19 @@ object Dashboard {
         orderedDates.foreach(date => {
           // create the labels order with the dates in order
           labels.push(date)
-          // for each (budget, amount) combination of the actual date
-          dateBudgetValue(date).foreach { case (budget, amount) =>
-            // add the amount of the  budget (Chart.js works with ordered arrays)
+
+          // for each budgets
+          budgetColor.keySet.foreach(budget => {
+            // get the amount of the budget for the specific date
+            // if there where no value, push an amount of 0 to let Chart.js know there is no value to this date
+            val amount: Double = dateBudgetValue(date).getOrElse(budget, 0)
+            // push the amount to the dataset of this budget
             budgetData(budget).push(amount)
-          }
+          })
         })
 
-        println("labels : " + labels.length)
         // for each (budget, color) combination
         budgetColor.foreach { case(budget, color) =>
-          println(budget + " : " + budgetData(budget).length)
           // each data need it's color on the plot. We choosed to give the same color for each budget
           val colors: js.Array[String] = js.Array()
           labels.foreach(_ => colors.push(color))
