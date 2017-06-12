@@ -113,40 +113,59 @@ object Dashboard {
 
     API.getSpenings.onComplete {
       case Success(resp) =>
+        // all spendgins in the actual range
         val spendings = js.JSON.parse(resp.responseText).asInstanceOf[js.Array[Models.Spending]]
+        // labels of the plot, in this case, the dates
         val labels: js.Array[String] = js.Array()
+        // each dataset will represent a budget and the relative spendings
         val datasets: js.Array[Dataset] = js.Array()
+        // map every budget to his color
         var budgetColor: Map[String, String] = Map.empty
+        // map every date to a budget and this budget to the amount spent at this date
         var dateBudgetValue: Map[String, Map[String, Double]] = Map.empty
+        // map every budget to an array of amount spent where every position of the array have to match the labels order
         var budgetData: Map[String, js.Array[Double]] = Map.empty
 
-        spendings.foreach(spending => {
+        // foreach spendings as spending
+        spendings.foreach(f = spending => {
+          // add the budget and his color
           budgetColor += spending.budget -> spending.color
+          // initialize the data array of the current budget
+          budgetData += spending.budget -> js.Array()
+          // keep the date such as : day / month
           val date = spending.date.day + "/" + spending.date.month
+          // if the dateBudgetValue map contains the date add the corresponding budget and amount
           if (dateBudgetValue.keySet.contains(date)) {
             var budgetValue: Map[String, Double] = dateBudgetValue(date)
             budgetValue += (spending.budget -> -spending.amount)
           } else {
+            // dateBudgetValue don't contains the actual date
+            // then add a new map with the corresponding budget and amount
             dateBudgetValue += date -> Map(spending.budget -> -spending.amount)
           }
         })
 
-        budgetColor.keySet.foreach(budget => {
-          budgetData += budget -> js.Array()
-        })
-
-        val orderedKeys = dateBudgetValue.keys.toList.sortWith(sortStringDate)
-        orderedKeys.foreach(key => {
-          labels.push(key)
-          dateBudgetValue(key).foreach { case (budget, amount) =>
+        // getting date in time order
+        val orderedDates = dateBudgetValue.keys.toList.sortWith(sortStringDate)
+        // iterating over the map in time order
+        orderedDates.foreach(date => {
+          // create the labels order with the dates in order
+          labels.push(date)
+          // for each (budget, amount) combination of the actual date
+          dateBudgetValue(date).foreach { case (budget, amount) =>
+            // add the amount of the  budget (Chart.js works with ordered arrays)
             budgetData(budget).push(amount)
           }
         })
+
         println("labels : " + labels.length)
+        // for each (budget, color) combination
         budgetColor.foreach { case(budget, color) =>
           println(budget + " : " + budgetData(budget).length)
+          // each data need it's color on the plot. We choosed to give the same color for each budget
           val colors: js.Array[String] = js.Array()
           labels.foreach(_ => colors.push(color))
+          // create a dataset for the actual budget
           datasets.push(Dataset(
             label = budget,
             backgroundColor = colors,
@@ -154,6 +173,7 @@ object Dashboard {
           ))
         }
 
+        // chart creation
         spendingsChart = new Chart(
           spendingDetailsCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D],
           Config(
@@ -190,13 +210,13 @@ object Dashboard {
         })
 
         val labels: js.Array[String] = js.Array()
-        val orderedKeys = dateInOut.keys.toList.sortWith(sortStringDate)
+        val orderedDates = dateInOut.keys.toList.sortWith(sortStringDate)
         val inData: js.Array[Double] = js.Array()
         val outData: js.Array[Double] = js.Array()
-        orderedKeys.foreach(key => {
-          labels.push(key)
-          outData.push(dateInOut(key)._1)
-          inData.push(dateInOut(key)._2)
+        orderedDates.foreach(date => {
+          labels.push(date)
+          outData.push(dateInOut(date)._1)
+          inData.push(dateInOut(date)._2)
         })
 
         val incomesDataSet: Dataset = Dataset(
