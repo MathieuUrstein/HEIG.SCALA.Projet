@@ -17,7 +17,8 @@ class DashboardController @Inject()(dashboardDAO: DashboardDAO)(implicit executi
   implicit val spendingGETDTOWrites: Writes[SpendingGETDTO] = (
     (JsPath \ "date").write[DateDTO] and
       (JsPath \ "budget").write[String] and
-      (JsPath \ "amount").write[Double]
+      (JsPath \ "amount").write[Double] and
+      (JsPath \ "color").write[String]
     ) (unlift(SpendingGETDTO.unapply))
 
   implicit val usageGETDTOWrites: Writes[UsageGETDTO] = (

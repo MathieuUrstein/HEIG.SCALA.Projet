@@ -23,6 +23,8 @@ object Main extends js.JSApp {
         new Budgets
       case _ =>
         new Dashboard
+        Utils.setRange()
+        Utils.refresh = Dashboard.list
     }
   }
 }

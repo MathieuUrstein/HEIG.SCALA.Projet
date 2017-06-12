@@ -39,7 +39,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
         dateTo = Date.valueOf(dates.to.get.year + "-" + dates.to.get.month + "-" + dates.to.get.day).getTime
       }
 
-      sqlRequest = sql"""SELECT "transaction".date, "budget".name, SUM("transaction".amount)
+      sqlRequest = sql"""SELECT "transaction".date, "budget".name, SUM("transaction".amount), "budget".color
                          FROM "budget"
                          INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
                          INNER JOIN "user" ON "transaction".userId = "user".id
@@ -52,7 +52,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
       dateTo = Date.valueOf(dates.to.get.year + "-" + dates.to.get.month + "-" + dates.to.get.day).getTime
       dateFrom = Calendar.getInstance().getTimeInMillis
 
-      sqlRequest = sql"""SELECT "transaction".date, "budget".name, SUM("transaction".amount)
+      sqlRequest = sql"""SELECT "transaction".date, "budget".name, SUM("transaction".amount), "budget".color
                          FROM "budget"
                          INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
                          INNER JOIN "user" ON "transaction".userId = "user".id
@@ -63,7 +63,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
     }
     else {
       // we don't use between and the dates
-      sqlRequest = sql"""SELECT "transaction".date, "budget".name, SUM("transaction".amount)
+      sqlRequest = sql"""SELECT "transaction".date, "budget".name, SUM("transaction".amount), "budget".color
                          FROM "budget"
                          INNER JOIN "transaction" ON "budget".id = "transaction".budgetId
                          INNER JOIN "user" ON "transaction".userId = "user".id
@@ -78,7 +78,7 @@ class DashboardDAO @Inject()(@NamedDatabase(Const.DbName) dbConfigProvider: Data
         val dateToSend = DateDTO(spending.date.toString.substring(8, 10).toInt, spending.date.toString.substring(5, 7).toInt,
           spending.date.toString.substring(0, 4).toInt)
 
-        val spendingToReturn = SpendingGETDTO(dateToSend, spending.budget, spending.amount)
+        val spendingToReturn = SpendingGETDTO(dateToSend, spending.budget, spending.amount, spending.color)
 
         spendingToReturn
       }

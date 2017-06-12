@@ -672,10 +672,13 @@ definitions:
         type: string
       amount:
         type: number
+      color:
+        type: string
     required:
       - date
       - budget
       - amount
+      - color
   Usage:
     description: Total budget used and total budget left for a specific date
     properties:

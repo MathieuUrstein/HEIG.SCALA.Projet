@@ -83,7 +83,8 @@ package object Models {
   class Spending(
                   val date: Date,
                   val budget: String,
-                  val amount: Double
+                  val amount: Double,
+                  val color: String
                 ) extends js.Object
 
   @ScalaJSDefined

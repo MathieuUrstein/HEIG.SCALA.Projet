@@ -16,6 +16,8 @@ package object API {
     val transactions: String = prefix + "transactions"
     val exchanges: String = prefix + "exchanges"
     val budgets: String = prefix + "budgets"
+    val usage: String = prefix + "dashboard/usage"
+    val spendings: String = prefix + "dashboard/spendings"
   }
 
   object SuperAjax {
@@ -70,6 +72,14 @@ package object API {
 
   def login(credentials: Credentials): Future[dom.XMLHttpRequest] = {
     SuperAjax.post(urls.auth, credentials)
+  }
+
+  def getUsage: Future[dom.XMLHttpRequest] = {
+    SuperAjax.options(urls.usage)
+  }
+
+  def getSpenings: Future[dom.XMLHttpRequest] = {
+    SuperAjax.options(urls.spendings)
   }
 
   def postExchange(exchange: Exchange): Future[dom.XMLHttpRequest] = {
