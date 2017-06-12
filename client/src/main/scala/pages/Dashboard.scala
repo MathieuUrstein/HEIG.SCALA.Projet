@@ -4,8 +4,8 @@ import API.Models
 import Facades._
 import org.scalajs.dom._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
-import ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
@@ -36,6 +36,43 @@ object Dashboard {
     else if (month1 > month2) false
     else if (day1 < day2) true
     else false
+  }
+
+  def showIncomeOutcomeDetails(): Unit = {
+    var incomeTotal = 0.0
+    var outcomeTotal = 0.0
+
+    API.getBudgets.onComplete {
+      case Success(resp) =>
+        val budgets = js.JSON.parse(resp.responseText).asInstanceOf[js.Array[Models.Budget]]
+        budgets.foreach { budget =>
+          if (budget.`type` == "Income") {
+            incomeTotal += budget.left + budget.exceeding
+          }
+          else {
+            outcomeTotal += budget.used + budget.exceeding
+          }
+        }
+        var outcomePercent = 0
+
+        if (incomeTotal + outcomeTotal == 0) {
+          outcomePercent = 50
+        } else if (outcomeTotal == 0) {
+          outcomePercent = 0
+        } else if(incomeTotal == 0) {
+          outcomePercent = 100
+        } else {
+          outcomePercent = (outcomeTotal / (incomeTotal+outcomeTotal) * 100).toInt
+        }
+        document.getElementById("global-stats-resume").asInstanceOf[html.Div].innerHTML =
+          "Outcome " + outcomePercent + "% - " + (100 - outcomePercent) + "% Income"
+        document.getElementById("progress-outcome").asInstanceOf[html.Div].style.width = outcomePercent + "%"
+        document.getElementById("progress-income").asInstanceOf[html.Div].style.width = (100 - outcomePercent) + "%"
+        document.getElementById("progress-outcome").asInstanceOf[html.Div].innerHTML = outcomeTotal + " CHF"
+        document.getElementById("progress-income").asInstanceOf[html.Div].innerHTML = incomeTotal + " CHF"
+      case Failure(e: ext.AjaxException) =>
+        Utils.addAlert("danger", js.JSON.parse(e.xhr.responseText).selectDynamic("message").asInstanceOf[String])
+    }
   }
 
   def addBugetDoughnut(budgets: js.Array[Models.Budget], `type`: String): Unit = {
@@ -213,6 +250,7 @@ object Dashboard {
 
     showSpendingDetails()
     showInOutUsage()
+    showIncomeOutcomeDetails()
 
     API.getBudgets.onComplete {
       case Success(resp) =>
